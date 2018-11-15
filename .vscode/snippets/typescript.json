@@ -1,0 +1,80 @@
+{
+	"New Promise": {
+		"prefix": "newpromise",
+		"body": [
+			"return new Promise((resolve, reject) => {",
+			"\t$0",
+			"});"
+		],
+		"description": "return new Promise"
+	},
+	"New Arrow Function": {
+		"prefix": "newarrow",
+		"body": [
+			"($1) => {",
+			"\t$0",
+			"}"
+		],
+		"description": "place a new arrow function definition"
+	},
+	"New Auth Request": {
+		"prefix": "newauthrequest",
+		"body": [
+			"this.authHttp.get(this.baseUrl + '/$1').",
+			"\tmap(response => response.json()).",
+			"\tsubscribe((result) => {",
+			"\t\t$0",
+			"\t}, (error) => {",
+			"\t\tthis.toastr.error('', this.serviceName);",
+			"\t\tconsole.error(error);",
+			"\t});"
+		],
+		"description": "place a new auth request definition"
+	},
+	"New DB Query": {
+		"prefix": "newquery",
+		"body": [
+			"this.db.query('$1', {$2}, (err, result, fields) => {",
+			"\tif (err) {",
+			"\t\treject(err);",
+			"\t} else {",
+			"\t\t$0",
+			"\t}",
+			"});"
+		],
+		"description": "place a new this.db.query definition"
+	},
+	"New Log Between Equals": {
+		"prefix": "newlogequals",
+		"body": [
+			"console.log('===========================================');",
+			"console.log('===========================================');",
+			"console.log($0);",
+			"console.log('===========================================');",
+			"console.log('===========================================');"
+		],
+		"description": "place a logging blog to identify"
+	},
+	"New Log Between Greater Than": {
+		"prefix": "newloggreater",
+		"body": [
+			"console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');",
+			"console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');",
+			"console.log($0);",
+			"console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');",
+			"console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');"
+		],
+		"description": "place a logging blog to identify"
+	},
+	"New Log Between Less Than": {
+		"prefix": "newlogless",
+		"body": [
+			"console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');",
+			"console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');",
+			"console.log($0);",
+			"console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');",
+			"console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');"
+		],
+		"description": "place a logging blog to identify"
+	}
+}
