@@ -1,0 +1,25 @@
+// /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Ubuntu:100,200,300,400,500,600,700,800,900');
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+// // @import '~@angular/material/theming';
+// // @include mat-core();
+// // $primary: mat-palette($mat-indigo);
+// // $accent: mat-palette($mat-pink, A200, A100, A400);
+// // $warn: mat-palette($mat-red, A700);
+// // $theme: mat-light-theme($primary, $accent);
+// // @include angular-material-theme($theme);
+// @import 'variables';
+// @import '~bootstrap/scss/functions';
+// @import '~bootstrap/scss/variables';
+// @import '~bootstrap/scss/mixins';
+// @import '~bootstrap/scss/reboot';
+// @import '~bootstrap/scss/grid';
+// @import '~bootstrap/scss/utilities';
+// @import 'reset';
+body {
+   margin: 0;
+   font-size: 14px;
+   font-family: 'Ubuntu', sans-serif;
+   background-color: white;
+   height: 100%;
+}
