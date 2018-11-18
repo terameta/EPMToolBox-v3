@@ -8,18 +8,22 @@
 // // $warn: mat-palette($mat-red, A700);
 // // $theme: mat-light-theme($primary, $accent);
 // // @include angular-material-theme($theme);
-// @import 'variables';
-// @import '~bootstrap/scss/functions';
-// @import '~bootstrap/scss/variables';
-// @import '~bootstrap/scss/mixins';
-// @import '~bootstrap/scss/reboot';
-// @import '~bootstrap/scss/grid';
-// @import '~bootstrap/scss/utilities';
-// @import 'reset';
+@import 'variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins';
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/grid';
+@import '~bootstrap/scss/utilities';
+@import 'reset';
+html,
 body {
+   height: 100%;
+   background-color: white;
    margin: 0;
+}
+
+body {
    font-size: 14px;
    font-family: 'Ubuntu', sans-serif;
-   background-color: white;
-   height: 100%;
 }

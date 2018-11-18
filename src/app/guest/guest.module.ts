@@ -5,9 +5,11 @@ import { Routes, RouterModule } from '@angular/router';
 import { FrontPageComponent } from './front-page/front-page.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
+import { MatButtonModule } from '@angular/material';
+import { FormsModule } from '@angular/forms';
 
 const routes: Routes = [
-	{ path: '', component: FrontPageComponent, pathMatch: 'full' },
+	{ path: '', component: FrontPageComponent },
 	{ path: 'sign-in', component: SignInComponent },
 	{ path: 'sign-up', component: SignUpComponent }
 ];
@@ -21,6 +23,8 @@ const routes: Routes = [
 	],
 	imports: [
 		CommonModule,
+		FormsModule,
+		MatButtonModule,
 		RouterModule.forChild( routes )
 	]
 } )
