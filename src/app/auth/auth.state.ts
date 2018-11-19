@@ -1,9 +1,10 @@
-import { User, UserAuthStatus } from './auth.models';
+import { AuthStatus, User, UserType } from './auth.models';
 
 export const FEATURE = 'auth';
 
 export interface AuthState {
-	user: User
+	user: User,
+	status: AuthStatus
 }
 
 export const authInitialState: AuthState = {
@@ -11,6 +12,7 @@ export const authInitialState: AuthState = {
 		name: '',
 		surname: '',
 		email: '',
-		authStatus: UserAuthStatus.SignedOut
-	}
+		type: UserType.Guest
+	},
+	status: AuthStatus.SignedOut
 };
