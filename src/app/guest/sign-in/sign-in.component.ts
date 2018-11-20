@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/app.state';
+import { SignIn } from 'src/app/auth/auth.actions';
 
 @Component( {
 	selector: 'app-sign-in',
@@ -12,13 +15,14 @@ export class SignInComponent implements OnInit {
 		password: ''
 	};
 
-	constructor() { }
+	constructor( private store: Store<AppState> ) { }
 
 	ngOnInit() {
 	}
 
 	public signin = ( f: NgForm ) => {
 		console.log( this.creds );
+		this.store.dispatch( new SignIn( this.creds ) );
 	}
 
 }

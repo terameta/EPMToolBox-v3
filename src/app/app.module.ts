@@ -9,6 +9,8 @@ import { GuestComponent } from './guest/guest/guest.component';
 import { StoreModule } from '@ngrx/store';
 import { AppReducer } from './app.reducer';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './auth/auth.effects';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' }
@@ -23,6 +25,7 @@ const routes: Routes = [
 		FormsModule,
 		BrowserAnimationsModule,
 		StoreModule.forRoot( AppReducer ),
+		EffectsModule.forRoot( [AuthEffects] ),
 		RouterModule.forRoot( routes ),
 		StoreRouterConnectingModule.forRoot()
 	],

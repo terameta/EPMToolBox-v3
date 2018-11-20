@@ -29,7 +29,7 @@
 	"tslint.autoFixOnSave": false,
 	"workbench.editor.enablePreview": false,
 	"explorer.openEditors.visible": 0,
-	"editor.tabCompletion": true,
+	"editor.tabCompletion": "on",
 	"editor.formatOnType": true,
 	"editor.formatOnPaste": true,
 	"editor.formatOnSave": true,

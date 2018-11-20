@@ -1,6 +1,6 @@
 import { AuthStatus, User, UserType } from './auth.models';
 
-export const FEATURE = 'auth';
+export const FEATURE = 'AUTH';
 
 export interface AuthState {
 	user: User,

@@ -9,7 +9,7 @@ import { Action } from '@ngrx/store';
 export class AuthEffects {
 	@Effect( { dispatch: false } )
 	login$: Observable<any> = this.actions$.pipe(
-		ofType( '[AUTH] LOGIN' ),
+		ofType( '[AUTH] SignIn' ),
 		map( action => {
 			console.log( action );
 		} )
