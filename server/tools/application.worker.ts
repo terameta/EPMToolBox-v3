@@ -4,11 +4,13 @@ import * as express from 'express';
 import { Server } from 'http';
 import * as socketio from 'socket.io';
 import * as multer from 'multer';
-import { MainTools } from './maintools';
+import { MainTools } from './tools.main';
 import { json, text, urlencoded } from 'body-parser';
 import { join } from 'path';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
+import * as jwt from 'express-jwt';
+import { RestAPI } from '../api/api';
 
 // import * as express from 'express';
 // import { Server } from 'http';
@@ -28,9 +30,9 @@ export class ApplicationWorker {
 	private app: express.Application;
 	private server: Server;
 	private io: socketio.Server;
+	private restAPI: RestAPI;
 
 	private mainTools: MainTools;
-	// private api: ATApi;
 	private multerStorage: multer.StorageEngine;
 
 	constructor( private db: DB, config: SystemConfig ) {
@@ -55,6 +57,10 @@ export class ApplicationWorker {
 		this.app.use( helmet.noCache() );
 
 		this.app.use( morgan( 'short' ) );
+
+		this.app.use( '/api', jwt( { secret: config.hash } ).unless( { path: ['/api/auth/signin', /\/api\/dime\/secret\/givemysecret/i] } ) );
+
+		this.restAPI = new RestAPI( this.app, this.db, this.mainTools );
 
 		this.app.get( '*', ( req, res ) => {
 			res.sendFile( join( __dirname, '../../dist/index.html' ) );

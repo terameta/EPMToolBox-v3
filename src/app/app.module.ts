@@ -11,6 +11,7 @@ import { AppReducer } from './app.reducer';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { EffectsModule } from '@ngrx/effects';
 import { AuthEffects } from './auth/auth.effects';
+import { HttpClientModule } from '@angular/common/http';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' }
@@ -23,6 +24,7 @@ const routes: Routes = [
 	imports: [
 		BrowserModule,
 		FormsModule,
+		HttpClientModule,
 		BrowserAnimationsModule,
 		StoreModule.forRoot( AppReducer ),
 		EffectsModule.forRoot( [AuthEffects] ),
