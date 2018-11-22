@@ -12,10 +12,15 @@ import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { EffectsModule } from '@ngrx/effects';
 import { AuthEffects } from './auth/auth.effects';
 import { HttpClientModule } from '@angular/common/http';
+import { JwtModule } from '@auth0/angular-jwt';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' }
 ];
+
+export function tokenGetter() {
+	return localStorage.getItem( 'token' );
+}
 
 @NgModule( {
 	declarations: [
@@ -29,7 +34,8 @@ const routes: Routes = [
 		StoreModule.forRoot( AppReducer ),
 		EffectsModule.forRoot( [AuthEffects] ),
 		RouterModule.forRoot( routes ),
-		StoreRouterConnectingModule.forRoot()
+		StoreRouterConnectingModule.forRoot(),
+		JwtModule.forRoot( { config: { tokenGetter } } )
 	],
 	providers: [],
 	bootstrap: [AppComponent]

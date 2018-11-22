@@ -10,3 +10,14 @@ export interface User {
 	surname: string,
 	clearance: any
 }
+
+export enum UserType {
+	Local = 'local',
+	Directory = 'directory'
+}
+
+export enum UserRole {
+	Admin = 'admin',
+	User = 'user',
+	Guest = 'guest'
+}

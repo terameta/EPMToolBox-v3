@@ -108,26 +108,26 @@ export class AcmUserTool {
 		} );
 	}
 	private populateAccessRights = async ( rights: { processes: any[] } ) => {
+		throw new Error( 'You should implement populate Access Rights' );
+		// for ( const item of rights.processes ) {
 
-		for ( const item of rights.processes ) {
-
-		}
-		return new Promise( ( resolve, reject ) => {
-			async.eachOfSeries(
-				rights.processes,
-				( item, key, callback ) => {
-					this.db.query( 'INSERT INTO userdimeprocesses SET ?', item, ( err, result, fields ) => {
-						if ( err ) {
-							reject( err );
-						} else {
-							callback();
-						}
-					} );
-				}, () => {
-					resolve();
-				}
-			);
-		} );
+		// }
+		// return new Promise( ( resolve, reject ) => {
+		// 	async.eachOfSeries(
+		// 		rights.processes,
+		// 		( item, key, callback ) => {
+		// 			this.db.query( 'INSERT INTO userdimeprocesses SET ?', item, ( err, result, fields ) => {
+		// 				if ( err ) {
+		// 					reject( err );
+		// 				} else {
+		// 					callback();
+		// 				}
+		// 			} );
+		// 		}, () => {
+		// 			resolve();
+		// 		}
+		// 	);
+		// } );
 	}
 	public update = ( item: User ) => {
 		return new Promise( ( resolve, reject ) => {

@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http';
 export class AuthService {
 	constructor( private http: HttpClient ) { }
 
-	public signin = ( payload ) => this.http.post<{ token: string }>( '/api/auth/signin', payload );
+	public signin = ( payload ) => this.http.post<{ token: string }>( '/api/auth/signin', payload, { reportProgress: true } );
 
 	// public isAuthenticated$ = new BehaviorSubject<boolean>( false );
 	// // public user$ = new BehaviorSubject<ATUser>( JSONDeepCopy( ATUserDefault ) );

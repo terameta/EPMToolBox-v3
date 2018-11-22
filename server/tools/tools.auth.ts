@@ -1,13 +1,12 @@
-import { escape } from 'mysql';
 import * as bcrypt from 'bcrypt';
 import * as ActiveDirectory from 'activedirectory';
 
 import { AccessManagementServer } from 'shared/models/accessmanagement.server';
-import { User } from 'shared/models/user';
+import { User, UserType } from '../../shared/models/user';
 import { AccessManagementServerTool } from './tools.accessmanagement.server';
 import { MainTools } from './tools.main';
 import { DB } from './db';
-
+import { waiter } from '../../shared/utilities/utility.functions';
 
 interface AuthObjectDirectory {
 	username: string,
@@ -29,15 +28,15 @@ export class AuthTools {
 
 	public signin = async ( payload: { username: string, password: string } ) => {
 		if ( !payload || !payload.username || !payload.password ) throw new Error( 'No credentials presented' );
-		console.log( 'We shouldnt reach here if there is an error' );
+		await waiter( 5000 );
 		return await this.authenticate( payload );
 	}
 
 	private authenticate = async ( payload: { username: string, password: string } ) => {
 		const fixedUserName = payload.username.toString().toLowerCase();
 		const { tuple: dbUser } = await this.db.queryOne<User>( 'SELECT * FROM users WHERE username = ?', fixedUserName );
-		if ( dbUser.type === 'local' ) return await this.authenticateWithLocal( payload.username, payload.password, dbUser );
-		if ( dbUser.type === 'directory' ) return await this.authenticateWithDirectory( payload.username, payload.password, dbUser );
+		if ( dbUser.type === UserType.Local ) return await this.authenticateWithLocal( payload.username, payload.password, dbUser );
+		if ( dbUser.type === UserType.Directory ) return await this.authenticateWithDirectory( payload.username, payload.password, dbUser );
 		throw new Error( 'Wrong user type. Please consult with system admin' );
 	}
 
@@ -45,9 +44,9 @@ export class AuthTools {
 		return new Promise( ( resolve, reject ) => {
 			bcrypt.compare( password, dbUser.password, ( err, hashResult ) => {
 				if ( err ) {
-					reject( 'There is an issue with the encryption. Please consult with the system admin.' );
+					reject( new Error( 'There is an issue with the encryption. Please consult with the system admin.' ) );
 				} else if ( !hashResult ) {
-					reject( 'Authentication failed' );
+					reject( new Error( 'Authentication failed' ) );
 				} else {
 					resolve( this.authenticateAction( dbUser ) );
 				}
@@ -75,11 +74,11 @@ export class AuthTools {
 			authObj.ldapClient = new ActiveDirectory( config );
 			authObj.ldapClient.authenticate( authObj.ldapServer.prefix + '\\' + authObj.ldapServer.userdn, authObj.ldapServer.password, ( err: any, auth: any ) => {
 				if ( err ) {
-					reject( 'There is an error with the directory server configuration. Please consult with the system admin.' );
+					reject( err );
 				} else if ( auth ) {
 					resolve( authObj );
 				} else {
-					reject( 'There is an issue with the directory server binding. Please consult with the system admin.' );
+					reject( new Error( 'There is an issue with the directory server binding. Please consult with the system admin.' ) );
 				}
 			} );
 		} );
@@ -90,9 +89,9 @@ export class AuthTools {
 				if ( err ) {
 					reject( err );
 				} else if ( !users ) {
-					reject( 'User not found in the directory' );
+					reject( new Error( 'User not found in the directory' ) );
 				} else if ( users.length !== 1 ) {
-					reject( 'User not found in the directory.' );
+					reject( new Error( 'User not found in the directory.' ) );
 				} else {
 					authObj.username = users[0].userPrincipalName;
 					resolve( authObj );
@@ -108,7 +107,7 @@ export class AuthTools {
 				} else if ( auth ) {
 					resolve( authObj.dbUser );
 				} else {
-					reject( 'User authentication has failed!' );
+					reject( new Error( 'User authentication has failed!' ) );
 				}
 			} );
 		} );

@@ -6,15 +6,9 @@ export class Rester {
 	constructor( public tools: MainTools ) { }
 
 	public respond = ( theFunction: Function, payload: any, req: Request, res: Response ) => {
-		theFunction( payload ).then( function ( result: any ) {
-			// console.log( result );
-			res.send( result );
-		} ).catch( function ( issue: Error ) {
-			console.log( issue.name );
-			console.log( issue.message );
-			console.log( issue );
-			res.status( 500 ).json( { status: 'fail', message: issue } );
-		} );
+		theFunction( payload ).
+			then( ( result: any ) => res.send( result ) ).
+			catch( ( issue: Error ) => res.status( 500 ).json( { status: 'fail', title: issue.name, message: issue.message } ) );
 	}
 
 	public restify( router: Router, tool: any ) {

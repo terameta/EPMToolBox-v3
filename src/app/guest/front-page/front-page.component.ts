@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { AuthState } from 'src/app/auth/auth.state';
 import { Store, select } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
-import { UserType } from 'src/app/auth/auth.models';
+import { UserType } from 'shared/models/user';
 
 @Component( {
 	selector: 'app-front-page',
