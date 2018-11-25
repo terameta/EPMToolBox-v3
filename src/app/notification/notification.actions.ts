@@ -56,7 +56,7 @@ export class NotificationNewWarning implements ReducingAction {
 
 export class NotificationNewError implements ReducingAction {
 	readonly feature = FEATURE;
-	readonly type = FEATURE + 'New Warning';
+	readonly type = FEATURE + 'New Error';
 
 	constructor( public payload: Error ) { }
 
@@ -69,13 +69,11 @@ export class NotificationNewError implements ReducingAction {
 
 export class NotificationNewFatalError implements ReducingAction {
 	readonly feature = FEATURE;
-	readonly type = FEATURE + 'New Warning';
+	readonly type = FEATURE + 'New Fatal Error';
 
 	constructor( public payload: Error ) { }
 
 	public reducer = ( state: NotificationState ): NotificationState => {
-		console.log( 'We received a new fatal error' );
-		console.log( this.payload );
 		const newState: NotificationState = { ...state };
 		newState.notifications.push( { ...getBaseNotification(), ...this.payload, ...{ type: NotificationType.FatalError } } );
 		return newState;
@@ -86,13 +84,24 @@ export class NotificationDismissWithTitle implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'Dismiss with Title';
 
-	constructor( public payload: string ) { console.log( 'NotificationDismissWithTitle constructed' ); }
+	constructor( public payload: string ) { }
 
 	public reducer = ( state: NotificationState ): NotificationState => {
-		console.log( 'NotificationDismissWithTitle reducing' );
 		const newState: NotificationState = { ...state };
 		newState.notifications = newState.notifications.filter( n => n.title !== this.payload );
-		console.log( 'NotificationDismissWithTitle reduced' );
+		return newState;
+	}
+}
+
+export class NotificationDismissWithUUID implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Dismiss with UUID';
+
+	constructor( public payload: string ) { }
+
+	public reducer = ( state: NotificationState ): NotificationState => {
+		const newState: NotificationState = { ...state };
+		newState.notifications = newState.notifications.filter( n => n.uuid !== this.payload );
 		return newState;
 	}
 }

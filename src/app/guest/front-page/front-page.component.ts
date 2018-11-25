@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { AuthState } from 'src/app/auth/auth.state';
 import { Store, select } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
-import { UserType } from 'shared/models/user';
+import { UserRole } from 'shared/models/user';
 
 @Component( {
 	selector: 'app-front-page',
@@ -12,7 +12,7 @@ import { UserType } from 'shared/models/user';
 } )
 export class FrontPageComponent implements OnInit {
 	public auth$: Observable<AuthState>;
-	public userType = UserType;
+	public userRole = UserRole;
 
 	constructor( private store: Store<AppState> ) {
 		this.auth$ = this.store.pipe( select( 'auth' ) );

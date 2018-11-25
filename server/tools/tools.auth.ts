@@ -28,7 +28,6 @@ export class AuthTools {
 
 	public signin = async ( payload: { username: string, password: string } ) => {
 		if ( !payload || !payload.username || !payload.password ) throw new Error( 'No credentials presented' );
-		await waiter( 5000 );
 		return await this.authenticate( payload );
 	}
 

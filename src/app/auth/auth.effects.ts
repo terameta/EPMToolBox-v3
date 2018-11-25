@@ -28,14 +28,14 @@ export class AuthEffects {
 
 	@Effect() signinSuccess$: Observable<any> = this.actions$.pipe(
 		ofType( FEATURE + 'SignIn Success' ),
-		map( () => ( new NotificationDismissWithTitle( 'signing In' ) ) )
+		map( () => ( new NotificationDismissWithTitle( 'Signing In' ) ) )
 	);
 
 	@Effect() signinfailure$: Observable<any> = this.actions$.pipe(
 		ofType( FEATURE + 'SignIn Failure' ),
 		mergeMap( ( action: ReducingAction ) => [
 			( new NotificationDismissWithTitle( 'Signing In' ) ),
-			( new NotificationNewFatalError( action.payload ) )
+			( new NotificationNewFatalError( { ...action.payload, ...{ title: 'Sign In Error' } } ) )
 		] )
 	);
 

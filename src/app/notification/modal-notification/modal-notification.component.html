@@ -1,0 +1,14 @@
+<div class="card w-100">
+	<div class="card-header" [ngClass]="assignedClass">
+		{{notification.title}}
+	</div>
+	<div class="card-body">
+		<ng-container *ngIf="notification.type == notificationType.BlockingProgress">
+			<i class="fa fa-spin fa-circle-notch"></i>
+		</ng-container>
+		{{notification.message}}
+	</div>
+	<div class="card-footer text-right">
+		<button type="button" class="btn btn-sm btn-outline-dark" (click)="dismiss()">Dismiss</button>
+	</div>
+</div>

@@ -13,6 +13,11 @@ import { EffectsModule } from '@ngrx/effects';
 import { AuthEffects } from './auth/auth.effects';
 import { HttpClientModule } from '@angular/common/http';
 import { JwtModule } from '@auth0/angular-jwt';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
+import { NotificationModule } from './notification/notification.module';
+import { SharedEffects } from './shared/shared.effects';
+import { RouterEffects } from './shared/router.effects';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' }
@@ -32,10 +37,13 @@ export function tokenGetter() {
 		HttpClientModule,
 		BrowserAnimationsModule,
 		StoreModule.forRoot( AppReducer ),
-		EffectsModule.forRoot( [AuthEffects] ),
+		EffectsModule.forRoot( [AuthEffects, RouterEffects, SharedEffects] ),
 		RouterModule.forRoot( routes ),
 		StoreRouterConnectingModule.forRoot(),
-		JwtModule.forRoot( { config: { tokenGetter } } )
+		JwtModule.forRoot( { config: { tokenGetter } } ),
+		ModalModule.forRoot(),
+		ProgressbarModule.forRoot(),
+		NotificationModule
 	],
 	providers: [],
 	bootstrap: [AppComponent]

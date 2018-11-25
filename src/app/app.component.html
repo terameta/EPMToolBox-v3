@@ -1,1 +1,19 @@
 <router-outlet></router-outlet>
+<ng-container *ngIf="nState">
+	<div *ngIf="notificationCount > 0" bsModal [config]="{show:true, animated: false}" #notificationModal="bs-modal" (onHidden)="onNotificationHide()" class="modal" tabindex="-1">
+		<div class="modal-dialog p-0" [ngClass]="modalSizeClass">
+			<div class="modal-content p-0">
+				<div class="modal-body p-0">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col p-0 m-1" *ngFor="let notification of nState.notifications">
+								<pre>{{nState | json}}</pre>
+								<app-modal-notification [notification]="notification"></app-modal-notification>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</ng-container>

@@ -3,7 +3,7 @@ import { User, UserRole, UserType } from 'shared/models/user';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { JSONDeepCopy } from 'shared/utilities/utility.functions';
 
-export const FEATURE = '[AUTH] ';
+export const FEATURE = '[AUTH]';
 
 export interface AuthState {
 	user: User,
