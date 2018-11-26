@@ -7,6 +7,6 @@ export interface NotificationState {
 	notifications: Notification[]
 }
 
-export const notificationInitialState = (): NotificationState => {
+export const initialNotificationState = (): NotificationState => {
 	return JSONDeepCopy( { notifications: [] } );
 };

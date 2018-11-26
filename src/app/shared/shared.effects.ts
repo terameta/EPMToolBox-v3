@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { Observable } from 'rxjs';
-import { tap, withLatestFrom } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import { Observable, interval } from 'rxjs';
+import { tap, withLatestFrom, map, filter, distinctUntilChanged, take } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
 import { AppState } from '../app.state';
 import { AuthStatus } from '../auth/auth.models';
 import { UserRole } from 'shared/models/user';
 import { RouterGo } from './router.actions';
+import { InterestShowAll } from './interest.actions';
 
 @Injectable()
 export class SharedEffects {
@@ -21,6 +22,18 @@ export class SharedEffects {
 			}
 		} )
 	);
+
+	@Effect( { dispatch: false } ) SHOWINITIALINTEREST$: Observable<any> = this.actions$.pipe(
+		ofType( 'ROUTER_NAVIGATION' ),
+		withLatestFrom( this.store.pipe( select( 'auth' ) ) ),
+		filter( ( [routerAction, authState] ) => authState.user.role === UserRole.Admin ),
+		distinctUntilChanged(),
+		take( 5 ),
+		// map( () => ( new InterestShowAll() ) )
+		tap( () => console.log( 'We want to show interest all' ) )
+	);
+
+	@Effect() REPEATEVERY10SECS$: Observable<any> = interval( 5000 ).pipe( map( () => ( new InterestShowAll() ) ) );
 
 	@Effect( { dispatch: false } ) ANYTHING$: Observable<any> = this.actions$.pipe( tap( a => console.log( a.type ) ) );
 

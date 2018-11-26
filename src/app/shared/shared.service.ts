@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { AppState } from '../app.state';
 
 @Injectable( {
@@ -10,6 +10,7 @@ export class SharedService {
 	constructor(
 		private store: Store<AppState>
 	) {
-		this.store.subscribe( console.log );
+		this.store.pipe( select( 'interest' ) ).subscribe( console.log );
+		console.log( 'Shared service constructed' );
 	}
 }

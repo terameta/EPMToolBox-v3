@@ -1,0 +1,31 @@
+<nav class="navbar navbar-dark fixed-top bg-dark justify-content-start p-0 top-nav-bar">
+	<a routerLink="/admin" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Start Here</a>
+	<a routerLink="environments" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Environments</a>
+	<a routerLink="streams" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Streams</a>
+	<a routerLink="maps" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Maps</a>
+	<a routerLink="matrices" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Matrices</a>
+	<a routerLink="schedules" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Schedules</a>
+	<a routerLink="processes" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Processes</a>
+	<a routerLink="asyncbr" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">AsyncBR</a>
+	<a routerLink="settings" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Settings</a>
+	<a routerLink="secrets" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Secrets</a>
+	<a routerLink="credentials" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Credentials</a>
+	<a routerLink="users" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Users</a>
+	<a routerLink="tags" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Tags</a>
+</nav>
+<nav class="navbar navbar-light fixed-top bg-accent justify-content-start top-system-bar text-evwhite py-3">
+	<ng-container *ngIf="url$ | async as url">
+		<ng-container [ngSwitch]="url">
+			<span class="navbar-text text-evwhite" *ngSwitchCase="'/admin'">
+				<!-- <i class="fas fa-home rounded-circle bg-dark"></i> -->
+				<!-- <span class="fa-stack"> -->
+				<!-- <i class="far fa-circle fa-stack-2x"></i> -->
+				<!-- <i class="fas fa-home fa-stack-1x"></i> -->
+
+				<!-- </span> -->
+				<span class="h3 shaded-text text-evwhite"><i class="fas fa-home fa-fw mr-3"></i>Home</span>
+			</span>
+			<span class="navbar-text" *ngSwitchDefault>Not Start Here</span>
+		</ng-container>
+	</ng-container>
+</nav>

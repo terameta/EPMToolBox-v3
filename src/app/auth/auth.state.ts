@@ -26,7 +26,7 @@ const authInitialStateBase: AuthState = {
 	status: AuthStatus.SignedOut
 };
 
-export const authInitialState = (): AuthState => {
+export const initialAuthState = (): AuthState => {
 	const state: AuthState = JSONDeepCopy( authInitialStateBase );
 	const helper = new JwtHelperService();
 	const storedToken = localStorage.getItem( 'token' );

@@ -18,9 +18,12 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { NotificationModule } from './notification/notification.module';
 import { SharedEffects } from './shared/shared.effects';
 import { RouterEffects } from './shared/router.effects';
+import { AdminComponent } from './admin/admin/admin.component';
+import { InterestEffects } from './shared/interest.effects';
 
 const routes: Routes = [
-	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' }
+	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' },
+	{ path: 'admin', component: AdminComponent, loadChildren: './admin/admin.module#AdminModule' }
 ];
 
 export function tokenGetter() {
@@ -37,7 +40,7 @@ export function tokenGetter() {
 		HttpClientModule,
 		BrowserAnimationsModule,
 		StoreModule.forRoot( AppReducer ),
-		EffectsModule.forRoot( [AuthEffects, RouterEffects, SharedEffects] ),
+		EffectsModule.forRoot( [AuthEffects, InterestEffects, RouterEffects, SharedEffects] ),
 		RouterModule.forRoot( routes ),
 		StoreRouterConnectingModule.forRoot(),
 		JwtModule.forRoot( { config: { tokenGetter } } ),
