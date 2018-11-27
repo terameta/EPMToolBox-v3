@@ -1,4 +1,27 @@
-We are at the front page
+<div class="container-fluid">
+	<div class="row">
+		<div class="col">
+			<pre>Auth:
+{{(state$ | async).auth | json}}</pre>
+		</div>
+		<div class="col">
+			<pre>Notification:
+{{(state$ | async).notification | json}}</pre>
+		</div>
+		<div class="col">
+			<pre>Router:
+{{(state$ | async).router | json}}</pre>
+		</div>
+		<div class="col">
+			<pre>Shared:
+{{(state$ | async).shared | json}}</pre>
+		</div>
+		<div class="col">
+			<pre>Tags:
+{{(state$ | async).tags | json}}</pre>
+		</div>
+	</div>
+</div>
 <!-- <div class="container-fluid">
 	<div class="row pb-3 pt-5">
 		<div class="col-3">

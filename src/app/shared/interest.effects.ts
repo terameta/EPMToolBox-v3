@@ -22,13 +22,9 @@ export class InterestEffects {
 			( new InterestShow( 'settings' ) ),
 			( new InterestShow( 'streams' ) ),
 			( new InterestShow( 'tags' ) ),
+			( new InterestShow( 'taggroups' ) ),
 			( new InterestShow( 'users' ) )
 		] )
-	);
-
-	@Effect( { dispatch: false } ) showalllog$: Observable<any> = this.actions$.pipe(
-		ofType( FEATURE + 'Interest Show All' ),
-		tap( ( a ) => console.log( a.type, 'is called', ( new Date() ).toString() ) )
 	);
 
 	@Effect() loseall$: Observable<any> = this.actions$.pipe(
@@ -45,6 +41,7 @@ export class InterestEffects {
 			( new InterestLose( 'settings' ) ),
 			( new InterestLose( 'streams' ) ),
 			( new InterestLose( 'tags' ) ),
+			( new InterestLose( 'taggroups' ) ),
 			( new InterestLose( 'users' ) )
 		] )
 	);

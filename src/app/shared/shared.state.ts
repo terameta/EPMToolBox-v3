@@ -11,4 +11,4 @@ export const initialSharedState = (): SharedState => {
 	return JSONDeepCopy( { interests: [], selectedTags: {} } );
 };
 
-export type Interest = 'environments' | 'streams' | 'maps' | 'matrices' | 'schedules' | 'processes' | 'asyncbr' | 'settings' | 'secrets' | 'credentials' | 'tags' | 'users';
+export type Interest = 'environments' | 'streams' | 'maps' | 'matrices' | 'schedules' | 'processes' | 'asyncbr' | 'settings' | 'secrets' | 'credentials' | 'tags' | 'taggroups' | 'users';

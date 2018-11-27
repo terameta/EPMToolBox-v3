@@ -20,8 +20,8 @@ export class AuthTools {
 	private acmServerTool: AccessManagementServerTool;
 
 	constructor(
-		public db: DB,
-		public tools: MainTools
+		private db: DB,
+		private tools: MainTools
 	) {
 		this.acmServerTool = new AccessManagementServerTool( this.db, this.tools );
 	}

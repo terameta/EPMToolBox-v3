@@ -20,6 +20,7 @@ import { SharedEffects } from './shared/shared.effects';
 import { RouterEffects } from './shared/router.effects';
 import { AdminComponent } from './admin/admin/admin.component';
 import { InterestEffects } from './shared/interest.effects';
+import { TagEffects } from './admin/tags/tag.effects';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' },
@@ -40,7 +41,7 @@ export function tokenGetter() {
 		HttpClientModule,
 		BrowserAnimationsModule,
 		StoreModule.forRoot( AppReducer ),
-		EffectsModule.forRoot( [AuthEffects, InterestEffects, RouterEffects, SharedEffects] ),
+		EffectsModule.forRoot( [AuthEffects, InterestEffects, RouterEffects, SharedEffects, TagEffects] ),
 		RouterModule.forRoot( routes ),
 		StoreRouterConnectingModule.forRoot(),
 		JwtModule.forRoot( { config: { tokenGetter } } ),

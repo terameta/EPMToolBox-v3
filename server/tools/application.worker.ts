@@ -11,6 +11,8 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import * as jwt from 'express-jwt';
 import { RestAPI } from '../api/api';
+import { Subscription } from 'rxjs';
+import { Interest } from 'src/app/shared/shared.state';
 
 // import * as express from 'express';
 // import { Server } from 'http';
@@ -70,98 +72,29 @@ export class ApplicationWorker {
 			console.log( 'Server is now running on port ' + config.serverPort );
 		} );
 
-		// 	this.io.on( 'connection', this.handleConnection );
+		this.io.on( 'connection', this.handleConnection );
 
-		// 	// setInterval( () => {
-		// 	// 	console.log( 'Inserting into the streams table' );
-		// 	// 	this.db.query( 'INSERT INTO streams (name, type, environment, dbName, tableName, customQuery, tags, exports) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', ['deleteMe', 0, 0, 'dbName', 'tableName', 'customQuery', '', ''] );
-		// 	// }, 30000 );
-
-		// 	// setTimeout( () => {
-		// 	// 	setInterval( () => {
-		// 	// 		console.log( 'Updating in the streams table' );
-		// 	// 		this.db.query( 'UPDATE streams SET dbName = ? WHERE name = ?', ['theDBName', 'deleteMe'] );
-		// 	// 	}, 30000 );
-		// 	// }, 10000 );
-
-		// 	// setTimeout( () => {
-		// 	// 	setInterval( () => {
-		// 	// 		console.log( 'Deleting from the streams table' );
-		// 	// 		this.db.query( 'DELETE FROM streams WHERE name = ?', 'deleteMe' );
-		// 	// 	}, 30000 );
-		// 	// }, 20000 );
 
 	}
 
-	// private handleConnection = ( socket: socketio.Socket ) => {
-	// 	// console.log( 'a user connected' );
-	// 	// console.log( socket.client.id );
-	// 	const interests: ATDataStoreInterest[] = [];
-	// 	const changeSubscription: Subscription = this.db.rtdb.changes$.subscribe( ( changedTable: string ) => { this.handleChanges( changedTable, interests, socket ); } );
-	// 	// console.log( 'We have now subscribed to changes$ on rtdb' );
-	// 	// console.log( socket );
-	// 	socket.on( 'disconnect', () => {
-	// 		// console.log( 'user disconnected' );
-	// 		changeSubscription.unsubscribe();
-	// 	} );
-	// 	socket.on( 'communication', ( payload: ATApiCommunication ) => {
-	// 		this.api.respond( payload, socket ).catch( console.log );
-	// 	} );
-	// 	socket.on( 'interest', ( payload ) => {
-	// 		this.handleInterests( interests, payload, socket );
-	// 	} );
-	// }
+	private handleConnection = ( socket: socketio.Socket ) => {
+		const interests: Interest[] = [];
+		const changeSubscription: Subscription = this.db.rtdb.changes$.subscribe( tablename => this.handleChanges( tablename, interests, socket ) );
+		socket.on( 'disconnect', () => {
+			changeSubscription.unsubscribe();
+		} );
+		socket.on( 'interest', async ( payload ) => {
+			this.handleInterests( interests, payload, socket );
+		} );
+	}
 
-	// private handleInterests = async ( interests: ATDataStoreInterest[], newInterests: ATDataStoreInterest[], socket: socketio.Socket ) => {
-	// 	// console.log( 'Existing Interests', interests );
-	// 	// console.log( 'New Interests', newInterests );
-	// 	newInterests.forEach( interest => {
-	// 		const toCompare = this.interestToString( interest );
-	// 		if ( !interests.map( e => JSON.stringify( e ) ).includes( toCompare ) ) {
-	// 			interests.push( interest );
-	// 			this.handleChanges( interest.concept, interests, socket );
-	// 		}
-	// 	} );
-	// 	interests = interests.filter( interest => {
-	// 		const toCompare = this.interestToString( interest );
-	// 		if ( !newInterests.map( this.interestToString ).includes( toCompare ) ) {
-	// 			return false;
-	// 		} else {
-	// 			return true;
-	// 		}
-	// 	} );
-	// }
+	private handleInterests = ( interests: Interest[], newInterests: Interest[], socket: socketio.Socket ) => {
+		newInterests.filter( interest => !interests.includes( interest ) ).forEach( interest => this.handleChanges( interest, newInterests, socket ) );
+		interests.splice( 0 );
+		newInterests.forEach( interest => interests.push( interest ) );
+	}
 
-	// private handleChanges = async ( changedTable: string, interests: ATDataStoreInterest[], socket: socketio.Socket ) => {
-	// 	// console.log( 'We are at handleChanges for table', changedTable );
-	// 	if ( interests.filter( i => i.concept === changedTable ).length > 0 ) {
-	// 		const payload: ATApiCommunication = {
-	// 			framework: changedTable,
-	// 			action: 'getAll',
-	// 			payload: {
-	// 				status: 'request',
-	// 				data: null
-	// 			}
-	// 		};
-	// 		this.api.respond( payload, socket );
-	// 		// console.log( 'We are at handleChanges for table', changedTable, 'is in the interests' );
-	// 		// this.api.respond()
-
-	// 		// throw new Error( 'This is not correct way, pull data from the tools.xxframeworkxxx.ts' );
-	// 		// const { tuples } = await this.db.query<any>( 'SELECT * FROM ' + changedTable );
-	// 		// const packet: ATApiCommunication = <ATApiCommunication>{};
-	// 		// packet.framework = changedTable;
-	// 		// packet.action = 'refresh';
-	// 		// packet.payload = {
-	// 		// 	status: 'success',
-	// 		// 	data: tuples
-	// 		// };
-	// 		// // console.log( 'We are at handleChanges', changedTable, '#Tuples:', tuples.length );
-	// 		// socket.emit( 'communication', packet );
-	// 	}
-	// }
-
-	// private interestToString = ( interest: ATDataStoreInterest ) => {
-	// 	return JSON.stringify( { concept: interest.concept, id: interest.id || interest.id === 0 ? interest.id : undefined } );
-	// }
+	private handleChanges = async ( changedTable: string, interests: Interest[], socket: socketio.Socket ) => {
+		interests.filter( interest => interest === changedTable ).forEach( interest => socket.emit( 'datachange', interest ) );
+	}
 }

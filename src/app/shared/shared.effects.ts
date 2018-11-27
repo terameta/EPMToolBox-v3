@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { Observable, interval } from 'rxjs';
+import { Observable, interval, of } from 'rxjs';
 import { tap, withLatestFrom, map, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { AppState } from '../app.state';
@@ -8,6 +8,10 @@ import { AuthStatus } from '../auth/auth.models';
 import { UserRole } from 'shared/models/user';
 import { RouterGo } from './router.actions';
 import { InterestShowAll } from './interest.actions';
+import { FEATURE } from './shared.state';
+import { ReducingAction } from './reducingaction.model';
+import { TagsLoad } from '../admin/tags/tag.actions';
+import { NotificationNewInfo } from '../notification/notification.actions';
 
 @Injectable()
 export class SharedEffects {
@@ -23,17 +27,21 @@ export class SharedEffects {
 		} )
 	);
 
-	@Effect( { dispatch: false } ) SHOWINITIALINTEREST$: Observable<any> = this.actions$.pipe(
+	@Effect() SHOWINITIALINTEREST$: Observable<any> = this.actions$.pipe(
 		ofType( 'ROUTER_NAVIGATION' ),
 		withLatestFrom( this.store.pipe( select( 'auth' ) ) ),
 		filter( ( [routerAction, authState] ) => authState.user.role === UserRole.Admin ),
 		distinctUntilChanged(),
-		take( 5 ),
-		// map( () => ( new InterestShowAll() ) )
-		tap( () => console.log( 'We want to show interest all' ) )
+		map( () => ( new InterestShowAll() ) )
 	);
 
-	@Effect() REPEATEVERY10SECS$: Observable<any> = interval( 5000 ).pipe( map( () => ( new InterestShowAll() ) ) );
+	@Effect() DataChange$: Observable<any> = this.actions$.pipe(
+		ofType( FEATURE + 'Data Change' ),
+		map( ( action: ReducingAction ) => {
+			if ( action.payload === 'tags' ) return ( new TagsLoad() );
+			return ( new NotificationNewInfo( { title: 'No feature', message: 'No feature is yet defined as ' + action.payload } ) );
+		} )
+	);
 
 	@Effect( { dispatch: false } ) ANYTHING$: Observable<any> = this.actions$.pipe( tap( a => console.log( a.type ) ) );
 

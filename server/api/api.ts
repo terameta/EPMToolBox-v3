@@ -2,6 +2,7 @@ import { Application } from 'express';
 import { MainTools } from 'server/tools/tools.main';
 import { DB } from 'server/tools/db';
 import { ApiAuth } from './api.auth';
+import { ApiTags } from './api.tags';
 
 // export const initializeRestApi = ( app: Application, db: DB, tools: MainTools ) => {
 // 	console.log( 'initializing Rest API' );
@@ -30,5 +31,6 @@ import { ApiAuth } from './api.auth';
 export class RestAPI {
 	constructor( private app: Application, private db: DB, private tools: MainTools ) {
 		const apiAuth = new ApiAuth( this.app, this.db, this.tools );
+		const apiTags = new ApiTags( this.app, this.db, this.tools );
 	}
 }
