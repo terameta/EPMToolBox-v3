@@ -11,19 +11,20 @@ import { InterestShowAll } from './interest.actions';
 import { FEATURE } from './shared.state';
 import { ReducingAction } from './reducingaction.model';
 import { TagsLoad } from '../admin/tags/tag.actions';
-import { NotificationNewInfo } from '../notification/notification.actions';
+import { NotificationNewFatalError } from '../notification/notification.actions';
+import { DoNothing } from './shared.actions';
 
 @Injectable()
 export class SharedEffects {
-	@Effect( { dispatch: false } ) ROUTER_NAVIGATION$: Observable<any> = this.actions$.pipe(
+	@Effect() ROUTER_NAVIGATION$: Observable<any> = this.actions$.pipe(
 		ofType( 'ROUTER_NAVIGATION' ),
 		withLatestFrom( this.store ),
-		tap( ( [routerAction, appState] ) => {
-			if ( routerAction.payload.routerState.url === '/sign-in' && appState.auth.status === AuthStatus.SignedIn ) {
-				console.log( 'We are actually logged in, let\'s go to correct location' );
-				if ( ( appState as AppState ).auth.user.role === UserRole.Admin ) { this.store.dispatch( new RouterGo( { path: ['/', 'admin'] } ) ); }
-				if ( ( appState as AppState ).auth.user.role === UserRole.User ) { this.store.dispatch( new RouterGo( { path: ['/', 'end-user'] } ) ); }
-			}
+		filter( ( [routerAction, appState] ) => ( routerAction as any ).payload.routerState.url === '/sign-in' && appState.auth.status === AuthStatus.SignedIn ),
+		map( ( [routerAction, appState] ) => {
+			console.log( 'We are actually logged in, let\'s go to correct location' );
+			if ( appState.auth.user.role === UserRole.Admin ) return new RouterGo( { path: ['/', 'admin'] } );
+			if ( appState.auth.user.role === UserRole.User ) return new RouterGo( { path: ['/', 'end-user'] } );
+			return new NotificationNewFatalError( new Error( 'User type is not determined' ) );
 		} )
 	);
 
@@ -39,11 +40,12 @@ export class SharedEffects {
 		ofType( FEATURE + 'Data Change' ),
 		map( ( action: ReducingAction ) => {
 			if ( action.payload === 'tags' ) return ( new TagsLoad() );
-			return ( new NotificationNewInfo( { title: 'No feature', message: 'No feature is yet defined as ' + action.payload } ) );
+			// return ( new NotificationNewInfo( { title: 'No feature', message: 'No feature is yet defined as ' + action.payload } ) );
+			return ( new DoNothing() );
 		} )
 	);
 
-	@Effect( { dispatch: false } ) ANYTHING$: Observable<any> = this.actions$.pipe( tap( a => console.log( a.type ) ) );
+	// @Effect( { dispatch: false } ) ANYTHING$: Observable<any> = this.actions$.pipe( tap( a => console.log( a.type ) ) );
 
 	constructor( private actions$: Actions, private store: Store<AppState> ) { }
 }

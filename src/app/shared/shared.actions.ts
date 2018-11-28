@@ -7,3 +7,10 @@ export class DataChange implements ReducingAction {
 
 	constructor( public payload: Interest ) { }
 }
+
+export class DoNothing implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Do Nothing';
+
+	constructor() { }
+}

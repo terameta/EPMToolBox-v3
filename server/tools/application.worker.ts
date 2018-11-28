@@ -95,6 +95,7 @@ export class ApplicationWorker {
 	}
 
 	private handleChanges = async ( changedTable: string, interests: Interest[], socket: socketio.Socket ) => {
+		console.log( changedTable, 'has changes' );
 		interests.filter( interest => interest === changedTable ).forEach( interest => socket.emit( 'datachange', interest ) );
 	}
 }

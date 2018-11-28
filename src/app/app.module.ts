@@ -15,6 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { JwtModule } from '@auth0/angular-jwt';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { NotificationModule } from './notification/notification.module';
 import { SharedEffects } from './shared/shared.effects';
 import { RouterEffects } from './shared/router.effects';
@@ -47,6 +48,7 @@ export function tokenGetter() {
 		JwtModule.forRoot( { config: { tokenGetter } } ),
 		ModalModule.forRoot(),
 		ProgressbarModule.forRoot(),
+		BsDropdownModule.forRoot(),
 		NotificationModule
 	],
 	providers: [],

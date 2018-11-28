@@ -129,3 +129,5 @@ export const positionMove = ( list: { position: number }[], index: number, direc
 		item.position = itemIndex + 1;
 	} );
 };
+
+export const actionType2Title = ( s: string ) => s.replace( /\[/g, '' ).replace( /]/g, ' ' );

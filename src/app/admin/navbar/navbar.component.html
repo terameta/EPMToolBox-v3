@@ -1,17 +1,50 @@
-<nav class="navbar navbar-dark fixed-top bg-dark justify-content-start p-0 top-nav-bar">
+<nav class="navbar navbar-dark fixed-top bg-dark justify-content-start p-0 top-nav-bar" style="z-index:1040;">
 	<a routerLink="/admin" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Start Here</a>
-	<a routerLink="environments" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Environments</a>
-	<a routerLink="streams" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Streams</a>
-	<a routerLink="maps" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Maps</a>
-	<a routerLink="matrices" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Matrices</a>
-	<a routerLink="schedules" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Schedules</a>
-	<a routerLink="processes" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Processes</a>
-	<a routerLink="asyncbr" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">AsyncBR</a>
-	<a routerLink="settings" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Settings</a>
-	<a routerLink="secrets" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Secrets</a>
-	<a routerLink="credentials" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Credentials</a>
-	<a routerLink="users" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Users</a>
-	<a routerLink="tags" routerLinkActive="bg-activedark text-warning" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Tags</a>
+	<a routerLink="environments" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Environments</a>
+	<a routerLink="streams" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Streams</a>
+	<a routerLink="maps" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Maps</a>
+	<a routerLink="matrices" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Matrices</a>
+	<a routerLink="schedules" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Schedules</a>
+	<a routerLink="processes" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Processes</a>
+	<a routerLink="asyncbr" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">AsyncBR</a>
+	<a routerLink="settings" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Settings</a>
+	<a routerLink="secrets" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Secrets</a>
+	<a routerLink="credentials" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Credentials</a>
+	<a routerLink="users" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Users</a>
+	<a routerLink="tags" routerLinkActive="active-navbar-item" class="navbar-text py-2 px-3 text-evwhite font-weight-bold top-nav-item">Tags</a>
+	<!-- <form class="form-inline ml-auto">
+		<input type="text" name="NavbarSearch" class="form-control form-control-sm h-50 text-evwhite border-top-0 border-right-0 border-left-0 rounded-0 border-accent" style="background-color: transparent;" placeholder="Search">
+	</form> -->
+	<div class="btn-group btn-group-sm p-0 ml-auto mr-5" dropdown title="Notifications">
+		<button id="button-basic" dropdownToggle type="button" class="btn btn-link navbar-text text-evwhite p-0" aria-controls="dropdown-basic">
+			<i class="fas fa-bell fa-fw"></i>
+		</button>
+		<ul id="dropdown-basic" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="button-basic">
+			<ng-container *ngIf="notifications$ | async as notifications; else noNotifications">
+				<ng-container *ngFor="let notification of notifications; let last = last;">
+					<li role="menuitem" class="notification-item">
+						<span class="d-inline-block pl-1 align-middle">
+							<i class="fas fa-info-circle fa-fw text-success" *ngIf="notification.type === notificationType.Info"></i>
+							<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.Progress"></i>
+							<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.BlockingProgress"></i>
+							<i class="fas fa-exclamation-circle fa-fw text-warning" *ngIf="notification.type === notificationType.Warning"></i>
+							<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.Error"></i>
+							<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.FatalError"></i>
+						</span>
+						<span class="d-inline-block px-1 text-truncate notification-title align-middle">{{notification.title}}</span>
+						<span class="d-inline-block px-1 text-truncate notification-message align-middle">{{notification.type}}-{{notification.message}}</span>
+					</li>
+					<li class="divider dropdown-divider" *ngIf="!last"></li>
+				</ng-container>
+			</ng-container>
+			<ng-template #noNotifications>
+				<li role="menuitem" class="w-100">There are no notifications at this moment.</li>
+			</ng-template>
+		</ul>
+	</div>
+	<div class="btn-group btn-group-sm p-0 mr-3">
+		<button class="btn btn-link navbar-text text-evwhite p-0" type="button" title="Sign Out"><i class="fas fa-sign-out-alt"></i></button>
+	</div>
 </nav>
 <nav class="navbar navbar-light fixed-top bg-accent justify-content-start top-system-bar text-evwhite py-3">
 	<ng-container *ngIf="url$ | async as url">
@@ -21,7 +54,6 @@
 				<!-- <span class="fa-stack"> -->
 				<!-- <i class="far fa-circle fa-stack-2x"></i> -->
 				<!-- <i class="fas fa-home fa-stack-1x"></i> -->
-
 				<!-- </span> -->
 				<span class="h3 shaded-text text-evwhite"><i class="fas fa-home fa-fw mr-3"></i>Home</span>
 			</span>

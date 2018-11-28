@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
+import { NotificationNewInfo } from 'src/app/notification/notification.actions';
 
 @Component( {
 	selector: 'app-front-page',

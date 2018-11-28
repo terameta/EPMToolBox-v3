@@ -22,3 +22,24 @@
 	background-color: $evactivedark;
 	color: $evwarning !important;
 }
+
+input::placeholder {
+	color: $evwhite;
+}
+
+.navbar-text:hover {
+	text-decoration: none;
+}
+
+.notification-item {
+	font-size: 12px;
+	min-width: 400px;
+}
+
+.notification-title {
+	width: 120px;
+}
+
+.notification-message {
+	max-width: 240px;
+}

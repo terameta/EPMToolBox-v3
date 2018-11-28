@@ -5,6 +5,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './admin/admin.component';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 const routes: Routes = [
 	{ path: '', component: FrontPageComponent }
@@ -15,6 +16,7 @@ const routes: Routes = [
 	imports: [
 		CommonModule,
 		FormsModule,
+		BsDropdownModule,
 		RouterModule.forChild( routes )
 	]
 } )
