@@ -44,7 +44,7 @@ export class AuthEffects {
 			console.log( 'We are now logged in, let\'s go to correct location' );
 			if ( appState.auth.user.role === UserRole.Admin ) return new RouterGo( { path: ['/', 'admin'] } );
 			if ( appState.auth.user.role === UserRole.User ) return new RouterGo( { path: ['/', 'end-user'] } );
-			return new NotificationNewFatalError( new Error( 'User type is not determined' ) );
+			return new NotificationNewFatalError( { title: 'User Issue', message: 'User type is not determined. Please contact system admin.' } );
 		} )
 	);
 

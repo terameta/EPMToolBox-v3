@@ -14,7 +14,7 @@ export class NotificationService {
 		private store: Store<AppState>,
 		private modalService: BsModalService
 	) {
-		// console.log( 'Notification service constructed' );
+		console.log( 'Notification service constructed' );
 		this.store.pipe( select( 'notification' ) ).subscribe( this.handleNotifications );
 	}
 

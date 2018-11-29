@@ -15,31 +15,55 @@
 	<!-- <form class="form-inline ml-auto">
 		<input type="text" name="NavbarSearch" class="form-control form-control-sm h-50 text-evwhite border-top-0 border-right-0 border-left-0 rounded-0 border-accent" style="background-color: transparent;" placeholder="Search">
 	</form> -->
-	<div class="btn-group btn-group-sm p-0 ml-auto mr-5" dropdown title="Notifications">
+	<div class="btn-group btn-group-sm p-0 ml-auto mr-5" dropdown title="Notifications" [(isOpen)]="shouldShowNotifications" [autoClose]="false">
 		<button id="button-basic" dropdownToggle type="button" class="btn btn-link navbar-text text-evwhite p-0" aria-controls="dropdown-basic">
 			<i class="fas fa-bell fa-fw"></i>
 		</button>
 		<ul id="dropdown-basic" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-			<ng-container *ngIf="notifications$ | async as notifications; else noNotifications">
+			<ng-container *ngIf="notifications$ | async as notifications">
 				<ng-container *ngFor="let notification of notifications; let last = last;">
-					<li role="menuitem" class="notification-item">
-						<span class="d-inline-block pl-1 align-middle">
-							<i class="fas fa-info-circle fa-fw text-success" *ngIf="notification.type === notificationType.Info"></i>
-							<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.Progress"></i>
-							<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.BlockingProgress"></i>
-							<i class="fas fa-exclamation-circle fa-fw text-warning" *ngIf="notification.type === notificationType.Warning"></i>
-							<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.Error"></i>
-							<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.FatalError"></i>
+					<li role="menuitem" class="notification-item px-2">
+						<div class="px-1 w-100 align-middle pb-1 d-flex">
+							<span class="d-inline-block mr-2 align-middle">
+								<i class="fas fa-info-circle fa-fw text-primary" *ngIf="notification.type === notificationType.Info"></i>
+								<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.Progress"></i>
+								<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.BlockingProgress"></i>
+								<i class="fas fa-exclamation-circle fa-fw text-warning" *ngIf="notification.type === notificationType.Warning"></i>
+								<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.Error"></i>
+								<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.FatalError"></i>
+								<i class="fas fa-check-circle fa-fw text-success" *ngIf="notification.type === notificationType.Success"></i>
+							</span>
+							<span class="d-inline-block">
+								{{notification.title}}
+							</span>
+							<span class="d-inline-block ml-auto">
+								<i class="fas fa-search fa-fw pointer mx-1" title="Show Details"></i>
+								<i class="fas fa-broom fa-flip-horizontal fa-fw pointer mx-1" title="Dismiss" (click)="notificationDismiss(notification.uuid)"></i>
+							</span>
+
+						</div>
+						<span class="d-inline-block px-1 w-100 align-middle">
+							<pre>{{notification.message}}</pre>
 						</span>
-						<span class="d-inline-block px-1 text-truncate notification-title align-middle">{{notification.title}}</span>
-						<span class="d-inline-block px-1 text-truncate notification-message align-middle">{{notification.type}}-{{notification.message}}</span>
 					</li>
 					<li class="divider dropdown-divider" *ngIf="!last"></li>
 				</ng-container>
+				<ng-container *ngIf="notifications.length == 0">
+					<li role="menuitem" class="w-100 notification-item px-2">There are no notifications at this moment.</li>
+				</ng-container>
 			</ng-container>
-			<ng-template #noNotifications>
-				<li role="menuitem" class="w-100">There are no notifications at this moment.</li>
-			</ng-template>
+
+			<li class="divider dropdown-divider"></li>
+			<div class="w-100 text-right notification-preferences px-1 py-0">
+				<div class="form-check align-middle" (click)="notificationAutoShowOnChange()">
+					<input type="checkbox" name="nsp" class="form-check-input" [ngModel]="notificationAutoShow">
+					<label for="nsp" class="form-check-label col-3 text-left p-0">Auto Show</label>
+				</div>
+				<div class="form-check align-middle" (click)="notificationAutoShowOnlyErrorOnChange()">
+					<input type="checkbox" name="nsp" class="form-check-input" [ngModel]="notificationAutoShowOnlyError">
+					<label for="nsp" class="form-check-label col-3 text-left p-0">Only On Error</label>
+				</div>
+			</div>
 		</ul>
 	</div>
 	<div class="btn-group btn-group-sm p-0 mr-3">

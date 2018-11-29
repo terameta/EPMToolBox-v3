@@ -12,7 +12,7 @@ import { FEATURE } from './shared.state';
 import { ReducingAction } from './reducingaction.model';
 import { TagsLoad } from '../admin/tags/tag.actions';
 import { NotificationNewFatalError } from '../notification/notification.actions';
-import { DoNothing } from './shared.actions';
+import { DoNothing, AutoShowNotificationsToggle } from './shared.actions';
 
 @Injectable()
 export class SharedEffects {
@@ -24,7 +24,7 @@ export class SharedEffects {
 			console.log( 'We are actually logged in, let\'s go to correct location' );
 			if ( appState.auth.user.role === UserRole.Admin ) return new RouterGo( { path: ['/', 'admin'] } );
 			if ( appState.auth.user.role === UserRole.User ) return new RouterGo( { path: ['/', 'end-user'] } );
-			return new NotificationNewFatalError( new Error( 'User type is not determined' ) );
+			return new NotificationNewFatalError( { title: 'User Error', message: 'User type is not determined <br> Please contact system admin.' } );
 		} )
 	);
 

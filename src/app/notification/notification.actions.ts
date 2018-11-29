@@ -58,11 +58,11 @@ export class NotificationNewError implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'New Error';
 
-	constructor( public payload: Error ) { }
+	constructor( public payload: { title: string, message: string } ) { }
 
 	public reducer = ( state: NotificationState ): NotificationState => {
 		const newState: NotificationState = { ...state };
-		newState.notifications.push( { ...getBaseNotification(), ...{ title: this.payload.name, message: this.payload.message }, ...{ type: NotificationType.Error } } );
+		newState.notifications.push( { ...getBaseNotification(), ...this.payload, ...{ type: NotificationType.Error } } );
 		return newState;
 	}
 }
@@ -71,11 +71,24 @@ export class NotificationNewFatalError implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'New Fatal Error';
 
-	constructor( public payload: Error ) { }
+	constructor( public payload: { title: string, message: string } ) { }
 
 	public reducer = ( state: NotificationState ): NotificationState => {
 		const newState: NotificationState = { ...state };
 		newState.notifications.push( { ...getBaseNotification(), ...this.payload, ...{ type: NotificationType.FatalError } } );
+		return newState;
+	}
+}
+
+export class NotificationNewSuccess implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'New Success';
+
+	constructor( public payload: { title: string, message: string } ) { }
+
+	public reducer = ( state: NotificationState ): NotificationState => {
+		const newState: NotificationState = { ...state };
+		newState.notifications.push( { ...getBaseNotification(), ...this.payload, ...{ type: NotificationType.Success } } );
 		return newState;
 	}
 }

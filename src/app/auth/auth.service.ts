@@ -1,10 +1,4 @@
 import { Injectable } from '@angular/core';
-// import { BehaviorSubject } from 'rxjs';
-// // import { ATUser, ATUserDefault } from 'shared/models/at.user';
-// // import { JSONDeepCopy } from 'shared/utilities/utilityFunctions';
-// import { JwtHelperService as JwtHelper } from '@auth0/angular-jwt';
-// // import { ATApiPayload } from 'shared/models/at.socketrequest';
-// import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable( {

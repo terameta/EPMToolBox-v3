@@ -18,5 +18,6 @@ export enum NotificationType {
 	BlockingProgress = 2,
 	Warning = 3,
 	Error = 4,
-	FatalError = 5
+	FatalError = 5,
+	Success = 6
 }

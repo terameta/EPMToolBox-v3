@@ -7,7 +7,6 @@
 					<div class="container-fluid">
 						<div class="row">
 							<div class="col p-0 m-1" *ngFor="let notification of nState.notifications">
-								<pre>{{nState | json}}</pre>
 								<app-modal-notification [notification]="notification"></app-modal-notification>
 							</div>
 						</div>
