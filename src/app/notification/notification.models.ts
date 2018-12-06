@@ -5,11 +5,13 @@ export interface Notification {
 	uuid: string,
 	title: string,
 	message: string,
-	type: NotificationType
+	type: NotificationType,
+	show: boolean,
+	countDown?: number
 }
 
 export const getBaseNotification = (): Notification => {
-	return { uuid: uuid(), title: '', message: '', type: NotificationType.Info };
+	return { uuid: uuid(), title: '', message: '', type: NotificationType.Info, show: false };
 };
 
 export enum NotificationType {

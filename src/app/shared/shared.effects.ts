@@ -11,8 +11,10 @@ import { InterestShowAll } from './interest.actions';
 import { FEATURE } from './shared.state';
 import { ReducingAction } from './reducingaction.model';
 import { TagsLoad } from '../admin/tags/tag.actions';
-import { NotificationNewFatalError } from '../notification/notification.actions';
-import { DoNothing, AutoShowNotificationsToggle } from './shared.actions';
+import { NotificationNew } from '../notification/notification.actions';
+import { DoNothing } from './shared.actions';
+import { NotificationType } from '../notification/notification.models';
+import { TagGroupsLoad } from '../admin/tags/taggroup.actions';
 
 @Injectable()
 export class SharedEffects {
@@ -24,7 +26,7 @@ export class SharedEffects {
 			console.log( 'We are actually logged in, let\'s go to correct location' );
 			if ( appState.auth.user.role === UserRole.Admin ) return new RouterGo( { path: ['/', 'admin'] } );
 			if ( appState.auth.user.role === UserRole.User ) return new RouterGo( { path: ['/', 'end-user'] } );
-			return new NotificationNewFatalError( { title: 'User Error', message: 'User type is not determined <br> Please contact system admin.' } );
+			return new NotificationNew( { title: 'User Error', message: 'User type is not determined <br> Please contact system admin.', type: NotificationType.FatalError } );
 		} )
 	);
 
@@ -40,7 +42,7 @@ export class SharedEffects {
 		ofType( FEATURE + 'Data Change' ),
 		map( ( action: ReducingAction ) => {
 			if ( action.payload === 'tags' ) return ( new TagsLoad() );
-			// return ( new NotificationNewInfo( { title: 'No feature', message: 'No feature is yet defined as ' + action.payload } ) );
+			if ( action.payload === 'taggroups' ) return ( new TagGroupsLoad() );
 			return ( new DoNothing() );
 		} )
 	);

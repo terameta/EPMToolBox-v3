@@ -6,9 +6,12 @@ import { AdminComponent } from './admin/admin.component';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
+import { TagsComponent } from './tags/tags/tags.component';
 
 const routes: Routes = [
-	{ path: '', component: FrontPageComponent }
+	{ path: '', component: FrontPageComponent },
+	{ path: 'tags', component: TagsComponent, loadChildren: './tags/tags.module#TagsModule' }
 ];
 
 @NgModule( {
@@ -17,6 +20,7 @@ const routes: Routes = [
 		CommonModule,
 		FormsModule,
 		BsDropdownModule,
+		ProgressbarModule,
 		RouterModule.forChild( routes )
 	]
 } )

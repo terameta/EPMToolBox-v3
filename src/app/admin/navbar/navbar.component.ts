@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
 import { Observable } from 'rxjs';
-import { getNotifications } from 'src/app/notification/notification.selectors';
 import { Notification, NotificationType } from 'src/app/notification/notification.models';
 import { getURL } from 'src/app/shared/router.selectors';
 import { getAutoShowNotificationsAndOnlyError } from 'src/app/shared/shared.selectors';
 import { AutoShowNotificationsToggle, AutoShowNotificationsOnlyErrorToggle } from 'src/app/shared/shared.actions';
-import { tap, combineLatest, map } from 'rxjs/operators';
+import { combineLatest, map, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationState } from 'src/app/notification/notification.state';
-import { NotificationDismissWithUUID } from 'src/app/notification/notification.actions';
+import { NotificationDismissWithUUID, NotificationShowDetail } from 'src/app/notification/notification.actions';
 
 
 @Component( {
@@ -43,7 +42,7 @@ export class NavbarComponent implements OnInit {
 					if ( notifications.length ) this.shouldShowNotifications = true;
 				}
 			}
-			// if ( notifications.length === 0 ) this.shouldShowNotifications = false;
+			if ( notifications.length === 0 ) this.shouldShowNotifications = false;
 		} );
 	}
 
@@ -57,10 +56,9 @@ export class NavbarComponent implements OnInit {
 		return false;
 	}
 
-	public notificationDismiss = ( uuid: string ) => {
-		this.store.dispatch( new NotificationDismissWithUUID( uuid ) );
-	}
-
-
+	public notificationDismiss = ( uuid: string ) => this.store.dispatch( new NotificationDismissWithUUID( uuid ) );
+	public notificationShowDetail = ( uuid: string ) => this.store.dispatch( new NotificationShowDetail( uuid ) );
+	public number2Array = ( length ) => ( new Array( length ) );
+	public url2Feature = ( url: string ) => url.split( '/' ).splice( 0, 3 ).join( '/' );
 
 }

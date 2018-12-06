@@ -6,9 +6,11 @@
 				<div class="modal-body p-0">
 					<div class="container-fluid">
 						<div class="row">
-							<div class="col p-0 m-1" *ngFor="let notification of nState.notifications">
-								<app-modal-notification [notification]="notification"></app-modal-notification>
-							</div>
+							<ng-container *ngFor="let notification of nState.notifications">
+								<div class="col p-0 m-1" *ngIf="notification.show">
+									<app-modal-notification [notification]="notification"></app-modal-notification>
+								</div>
+							</ng-container>
 						</div>
 					</div>
 				</div>

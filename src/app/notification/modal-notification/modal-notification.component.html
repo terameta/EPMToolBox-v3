@@ -1,11 +1,19 @@
 <div class="card w-100">
 	<div class="card-header" [ngClass]="assignedClass">
-		{{notification.title}}
+		<i class="fas fa-info-circle fa-fw text-primary" *ngIf="notification.type === notificationType.Info"></i>
+		<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.Progress"></i>
+		<i class="fas fa-circle-notch fa-spin fa-fw text-success" *ngIf="notification.type === notificationType.BlockingProgress"></i>
+		<i class="fas fa-exclamation-circle fa-fw text-warning" *ngIf="notification.type === notificationType.Warning"></i>
+		<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.Error"></i>
+		<i class="fas fa-skull-crossbones fa-fw text-danger" *ngIf="notification.type === notificationType.FatalError"></i>
+		<i class="fas fa-check-circle fa-fw text-success" *ngIf="notification.type === notificationType.Success"></i>
+		<span class="ml-2">{{notification.title}}</span>
 	</div>
 	<div class="card-body">
-		<ng-container *ngIf="notification.type == notificationType.BlockingProgress">
+		<!-- <ng-container *ngIf="notification.type == notificationType.BlockingProgress">
 			<i class="fa fa-spin fa-circle-notch"></i>
-		</ng-container>
+		</ng-container> -->
+
 		{{notification.message}}
 	</div>
 	<div class="card-footer text-right">

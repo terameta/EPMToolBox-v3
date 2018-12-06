@@ -4,7 +4,6 @@ import { Store, select } from '@ngrx/store';
 import { AppState } from './app.state';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { NotificationState } from './notification/notification.state';
-import { NotificationType } from './notification/notification.models';
 import { NotificationDismissWithUUID } from './notification/notification.actions';
 import { SharedService } from './shared/shared.service';
 import { waiter } from 'shared/utilities/utility.functions';
@@ -32,15 +31,14 @@ export class AppComponent implements OnInit {
 
 	private handleNotifications = ( ns: NotificationState ) => {
 		this.nState = ns;
-		this.notificationCount = this.nState.notifications.filter( n => ( n.type === NotificationType.BlockingProgress || n.type === NotificationType.FatalError ) ).length;
+		this.notificationCount = this.nState.notifications.filter( n => n.show ).length;
 		this.modalSizeClass = '';
 		if ( this.notificationCount < 2 ) this.modalSizeClass = 'modal-sm';
 		if ( this.notificationCount > 2 ) this.modalSizeClass = 'modal-lg';
 	}
 
 	public onNotificationHide = () => {
-		console.log( 'onNotificationHide is called' );
-		this.nState.notifications.filter( n => ( n.type === NotificationType.BlockingProgress || n.type === NotificationType.FatalError ) ).forEach( async ( n, ni ) => {
+		this.nState.notifications.filter( n => n.show ).forEach( async ( n, ni ) => {
 			await waiter( ni * 100 );
 			this.store.dispatch( new NotificationDismissWithUUID( n.uuid ) );
 		} );

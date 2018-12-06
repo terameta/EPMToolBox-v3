@@ -18,8 +18,10 @@ export class ModalNotificationComponent implements OnInit {
 
 	ngOnInit() {
 		this.assignedClass = '';
-		if ( this.notification.type === NotificationType.FatalError ) this.assignedClass = 'bg-danger';
-		if ( this.notification.type === NotificationType.BlockingProgress ) this.assignedClass = 'bg-accent';
+		// if ( this.notification.type === NotificationType.Info ) this.assignedClass = 'bg-primary';
+		// if ( this.notification.type === NotificationType.Error ) this.assignedClass = 'bg-danger';
+		// if ( this.notification.type === NotificationType.FatalError ) this.assignedClass = 'bg-danger';
+		// if ( this.notification.type === NotificationType.BlockingProgress ) this.assignedClass = 'bg-accent';
 	}
 
 	public dismiss = () => {

@@ -37,13 +37,14 @@
 								{{notification.title}}
 							</span>
 							<span class="d-inline-block ml-auto">
-								<i class="fas fa-search fa-fw pointer mx-1" title="Show Details"></i>
+								<i class="fas fa-search fa-fw pointer mx-1" title="Show Details" (click)="notificationShowDetail(notification.uuid)"></i>
 								<i class="fas fa-broom fa-flip-horizontal fa-fw pointer mx-1" title="Dismiss" (click)="notificationDismiss(notification.uuid)"></i>
 							</span>
 
 						</div>
 						<span class="d-inline-block px-1 w-100 align-middle">
-							<pre>{{notification.message}}</pre>
+							<pre class="m-0">{{notification.message}}</pre>
+							<progressbar *ngIf="notification.countDown > 0" max="10" [value]="notification.countDown" type="accent" [animate]="true" style="height:2px"></progressbar>
 						</span>
 					</li>
 					<li class="divider dropdown-divider" *ngIf="!last"></li>
@@ -72,16 +73,11 @@
 </nav>
 <nav class="navbar navbar-light fixed-top bg-accent justify-content-start top-system-bar text-evwhite py-3">
 	<ng-container *ngIf="url$ | async as url">
-		<ng-container [ngSwitch]="url">
-			<span class="navbar-text text-evwhite" *ngSwitchCase="'/admin'">
-				<!-- <i class="fas fa-home rounded-circle bg-dark"></i> -->
-				<!-- <span class="fa-stack"> -->
-				<!-- <i class="far fa-circle fa-stack-2x"></i> -->
-				<!-- <i class="fas fa-home fa-stack-1x"></i> -->
-				<!-- </span> -->
-				<span class="h3 shaded-text text-evwhite"><i class="fas fa-home fa-fw mr-3"></i>Home</span>
-			</span>
+		<ng-container [ngSwitch]="url2Feature(url)">
+			<span class="navbar-text text-evwhite" *ngSwitchCase="'/admin'"> <span class="h3 shaded-text text-evwhite"><i class="fas fa-home fa-fw mr-3"></i>Home</span></span>
+			<span class="navbar-text text-evwhite" *ngSwitchCase="'/admin/tags'"> <span class="h3 shaded-text text-evwhite"><i class="fas fa-tags fa-fw mr-3"></i>Tags</span></span>
 			<span class="navbar-text" *ngSwitchDefault>Not Start Here</span>
+			<!-- <i class="fas fa-tags"></i> -->
 		</ng-container>
 	</ng-container>
 </nav>

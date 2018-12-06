@@ -1,0 +1,23 @@
+<div class="container-fluid">
+	<ng-container *ngIf="tagState$ | async as tagState">
+		<table class="table" *ngIf="tagState.loaded; else loading">
+			<thead>
+				<tr>
+					<th></th>
+				</tr>
+			</thead>
+			<ng-container *ngIf="tagState.ids.length">
+
+			</ng-container>
+			<tbody>
+				<tr *ngFor="let id of tagState.ids">
+
+				</tr>
+			</tbody>
+		</table>
+		<ng-template #loading>
+			<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+		</ng-template>
+		<pre>{{tagState | json}}</pre>
+	</ng-container>
+</div>

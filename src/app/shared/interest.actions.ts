@@ -8,7 +8,7 @@ export class InterestShow implements ReducingAction {
 	constructor( public payload: Interest ) { }
 
 	public reducer = ( state: SharedState ): SharedState => {
-		const newState: SharedState = { ...state };
+		const newState: SharedState = { ...state, interests: [...state.interests] };
 		if ( !newState.interests.includes( this.payload ) ) {
 			newState.interests.push( this.payload );
 			return newState;

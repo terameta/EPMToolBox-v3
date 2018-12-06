@@ -7,21 +7,17 @@ import { FormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { GuestComponent } from './guest/guest/guest.component';
 import { StoreModule } from '@ngrx/store';
-import { AppReducer } from './app.reducer';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { EffectsModule } from '@ngrx/effects';
-import { AuthEffects } from './auth/auth.effects';
 import { HttpClientModule } from '@angular/common/http';
 import { JwtModule } from '@auth0/angular-jwt';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { NotificationModule } from './notification/notification.module';
-import { SharedEffects } from './shared/shared.effects';
-import { RouterEffects } from './shared/router.effects';
 import { AdminComponent } from './admin/admin/admin.component';
-import { InterestEffects } from './shared/interest.effects';
-import { TagEffects } from './admin/tags/tag.effects';
+import { AppReducer, AppMetaReducer } from './app.reducer';
+import { AppEffects } from './app.effects';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' },
@@ -41,8 +37,8 @@ export function tokenGetter() {
 		FormsModule,
 		HttpClientModule,
 		BrowserAnimationsModule,
-		StoreModule.forRoot( AppReducer ),
-		EffectsModule.forRoot( [AuthEffects, InterestEffects, RouterEffects, SharedEffects, TagEffects] ),
+		StoreModule.forRoot( AppReducer, { metaReducers: AppMetaReducer } ),
+		EffectsModule.forRoot( AppEffects ),
 		RouterModule.forRoot( routes ),
 		StoreRouterConnectingModule.forRoot(),
 		JwtModule.forRoot( { config: { tokenGetter } } ),

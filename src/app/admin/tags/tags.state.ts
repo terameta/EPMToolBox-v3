@@ -5,9 +5,10 @@ export const FEATURE = '[TAGS]';
 
 export interface TagState {
 	items: { [key: number]: Tag },
-	ids: number[]
+	ids: number[],
+	loaded: boolean
 }
 
-const baseTagState: TagState = { items: {}, ids: [] };
+const baseState: TagState = { items: {}, ids: [], loaded: false };
 
-export const initialTagState = (): TagState => JSONDeepCopy( baseTagState );
+export const initialTagState = (): TagState => JSONDeepCopy( baseState );

@@ -6,12 +6,13 @@ import { ReducingAction } from '../shared/reducingaction.model';
 import { AuthService } from './auth.service';
 import { SignInSuccess, SignInFailure } from './auth.actions';
 import { FEATURE } from './auth.state';
-import { NotificationNewFatalError, NotificationDismissWithTitle, NotificationNewBlockingProgress } from '../notification/notification.actions';
+import { NotificationNew, NotificationDismissWithTitle } from '../notification/notification.actions';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.state';
 import { AuthStatus } from './auth.models';
 import { UserRole } from 'shared/models/user';
 import { RouterGo } from '../shared/router.actions';
+import { NotificationType } from '../notification/notification.models';
 
 @Injectable()
 export class AuthEffects {
@@ -27,7 +28,7 @@ export class AuthEffects {
 		ofType( FEATURE + 'SignIn' ),
 		mergeMap( () => [
 			( new NotificationDismissWithTitle( 'Signing In' ) ),
-			( new NotificationNewBlockingProgress( { title: 'Signing In', message: 'Please wait...' } ) )
+			( new NotificationNew( { title: 'Signing In', message: 'Please wait...', type: NotificationType.BlockingProgress } ) )
 		] )
 	);
 
@@ -44,7 +45,7 @@ export class AuthEffects {
 			console.log( 'We are now logged in, let\'s go to correct location' );
 			if ( appState.auth.user.role === UserRole.Admin ) return new RouterGo( { path: ['/', 'admin'] } );
 			if ( appState.auth.user.role === UserRole.User ) return new RouterGo( { path: ['/', 'end-user'] } );
-			return new NotificationNewFatalError( { title: 'User Issue', message: 'User type is not determined. Please contact system admin.' } );
+			return new NotificationNew( { title: 'User Issue', message: 'User type is not determined. Please contact system admin.', type: NotificationType.FatalError } );
 		} )
 	);
 
@@ -52,7 +53,7 @@ export class AuthEffects {
 		ofType( FEATURE + 'SignIn Failure' ),
 		mergeMap( ( action: ReducingAction ) => [
 			( new NotificationDismissWithTitle( 'Signing In' ) ),
-			( new NotificationNewFatalError( { ...action.payload, ...{ title: 'Sign In Error' } } ) )
+			( new NotificationNew( { ...action.payload, title: 'Sign In Error', type: NotificationType.FatalError } ) )
 		] )
 	);
 

@@ -33,7 +33,7 @@ export const SortByVeryLongElementName = ( e1: any, e2: any ) => {
 	if ( e1[verylongelementname] > e2[verylongelementname] ) { return 1; } else if ( e1[verylongelementname] < e2[verylongelementname] ) { return -1; } else { return 0; }
 };
 
-export const waiter = ( duration: number ) => {
+export const waiter = ( duration = 5000 ) => {
 	return new Promise( ( resolve, reject ) => {
 		setTimeout( () => {
 			resolve();

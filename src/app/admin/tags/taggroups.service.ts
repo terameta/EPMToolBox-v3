@@ -5,8 +5,8 @@ import { TagGroup } from './taggroup.models';
 @Injectable( {
 	providedIn: 'root'
 } )
-export class TaggroupsService {
-	private baseUrl = '/api/tag';
+export class TagGroupsService {
+	private baseUrl = '/api/taggroups';
 
 	constructor( private http: HttpClient ) { }
 
