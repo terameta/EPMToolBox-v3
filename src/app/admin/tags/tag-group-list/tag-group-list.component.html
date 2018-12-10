@@ -1,1 +1,57 @@
-<pre>{{state$ | async | json}}</pre>
+<ng-container *ngIf="state$ | async as state; else loading">
+	<div class="container-fluid" *ngIf="state.loaded; else loading">
+		<div class="row">
+			<div class="col">
+				<div class="table-responsive">
+					<table class="table table-sm table-hover table-borderless m-0">
+						<thead>
+							<tr>
+								<th class="border-bottom border-warning m-0 p-0" width="100">Actions</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Name</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="px-0 text-nowrap text-right">
+									<i class="fas fa-plus-square fa-fw ml-auto text-success" (click)="us.create(feature)"></i>
+								</td>
+								<td>&nbsp;</td>
+								<td class="px-0">
+									<span class="p-0 pointer" (click)="us.create(feature)" title="New Tag Group">
+										<i class="fas fa-chevron-right text-warning"></i>
+										<i class="fas fa-chevron-right text-warning"></i>
+										New Tag Group
+									</span>
+								</td>
+							</tr>
+							<ng-container *ngFor="let id of state.ids; let i = index;">
+								<tr *ngIf="state.items[id] as item">
+									<td class="px-0 text-nowrap">
+										<a [routerLink]="id" title="Edit">
+											<i class="far fa-edit fa-fw"></i>
+										</a>
+										<i class="far fa-clone fa-fw pointer" title="Clone" (click)="us.clone(feature, item)"></i>
+										<i class="far fa-caret-square-up fa-fw pointer" title="Move Up" (click)="us.positionMove(feature, item, -1)"></i>
+										<i class="far fa-caret-square-down fa-fw pointer" title="Move Down" (click)="us.positionMove(feature, item, 1)"></i>
+										<i class="far fa-trash-alt fa-fw ml-3 pointer text-danger" title="Delete" (click)="us.delete(feature, item)"></i>
+									</td>
+									<td>&nbsp;</td>
+									<td class="px-0">
+										<a [routerLink]="id">
+											<i class="fas fa-chevron-right text-warning"></i>
+											{{item.name}}
+										</a>
+									</td>
+								</tr>
+							</ng-container>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</ng-container>
+<ng-template #loading>
+	Loading please wait
+</ng-template>

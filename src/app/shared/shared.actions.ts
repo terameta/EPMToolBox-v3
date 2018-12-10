@@ -36,6 +36,24 @@ export class AutoShowNotificationsOnlyErrorToggle implements ReducingAction {
 	}
 }
 
+export class SetCurrentFeature implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Set Current Feature';
+
+	constructor( public payload: string ) { }
+
+	public reducer = ( state: SharedState ): SharedState => ( { ...state, currentFeature: this.payload } );
+}
+
+export class SetCurrentID implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Set Current ID';
+
+	constructor( public payload: string ) { }
+
+	public reducer = ( state: SharedState ): SharedState => ( { ...state, currentID: this.payload ? parseInt( this.payload, 10 ) : null } );
+}
+
 export class DoNothing implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'Do Nothing';

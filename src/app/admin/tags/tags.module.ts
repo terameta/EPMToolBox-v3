@@ -7,7 +7,9 @@ import { FormsModule } from '@angular/forms';
 import { TagGroupListComponent } from './tag-group-list/tag-group-list.component';
 
 const routes: Routes = [
-	{ path: '', component: TagGroupListComponent }
+	{ path: '', component: TagGroupListComponent },
+	{ path: '0', redirectTo: '' },
+	{ path: ':taggroupid', component: TagListComponent }
 ];
 
 @NgModule( {

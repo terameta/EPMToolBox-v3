@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
+import { map, distinctUntilChanged, combineLatest } from 'rxjs/operators';
+import { FEATURE as GFEATURE } from '../taggroups.state';
+import { FEATURE as TFEATURE } from '../tags.state';
+import { UtilityService } from 'src/app/shared/utility.service';
 
 @Component( {
 	selector: 'app-tag-list',
@@ -8,11 +12,24 @@ import { AppState } from 'src/app/app.state';
 	styleUrls: ['./tag-list.component.scss']
 } )
 export class TagListComponent implements OnInit {
-	public tagState$ = this.store.select( 'tags' );
+	public groupFeature = GFEATURE;
+	public tagFeature = TFEATURE;
 
-	constructor( private store: Store<AppState> ) { }
+	public groupID$ = this.store.select( 'shared' ).pipe(
+		map( rs => rs.currentID ),
+		distinctUntilChanged()
+	);
+	public group$ = this.store.select( 'taggroups' ).pipe(
+		combineLatest( this.groupID$ ),
+		map( ( [tg, id] ) => ( { ...tg.items[id] } ) )
+	);
+	public tags$ = this.store.select( 'tags' ).pipe(
+		combineLatest( this.groupID$ ),
+		map( ( [ts, gid] ) => ts.ids.map( tid => ( { ...ts.items[tid] } ) ).filter( i => i.taggroup === gid ) )
+	);
 
-	ngOnInit() {
-	}
+	constructor( private store: Store<AppState>, public us: UtilityService ) { }
+
+	ngOnInit() { }
 
 }

@@ -1,23 +1,48 @@
-<div class="container-fluid">
-	<ng-container *ngIf="tagState$ | async as tagState">
-		<table class="table" *ngIf="tagState.loaded; else loading">
-			<thead>
-				<tr>
-					<th></th>
-				</tr>
-			</thead>
-			<ng-container *ngIf="tagState.ids.length">
-
+<div class="container-fluid" *ngIf="groupID$ | async as groupid; else loading">
+	<div class="row" *ngIf="group$ | async as group; else loading">
+		<div class="col">
+			<form (ngSubmit)="us.update(groupFeature, group, f)" #f="ngForm">
+				<div class="form-group row m-0">
+					<label for="eName" class="col-3 col-md-1 col-form-label font-weight-bold">Group Name:</label>
+					<div class="col-9 col-md-11">
+						<div class="input-group input-group-sm">
+							<input type="text" name="eName" class="form-control" [(ngModel)]="group.name">
+							<span class="input-group-append">
+								<button type="submit" class="btn btn-outline-dark" title="Save Group"><i class="fas fa-save fa-fw"></i></button>
+								<button class="btn btn-outline-danger" type="button" title="Delete Group" (click)="us.delete(groupFeature, group)"><i class="far fa-trash-alt fa-fw "></i></button>
+							</span>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<hr>
+	<div class="form-group row m-0" *ngIf="tags$ | async as tags; else loading">
+		<label class="col-3 col-md-1 col-form-label font-weight-bold">Group Tags:</label>
+		<div class="col-9 col-md-11 pt-1">
+			<div class="input-group input-group-sm pb-1">
+				<input type="text" name="tagNew" class="form-control" placeholder="New Tag" disabled="true">
+				<span class="input-group-append">
+					<button type="button" class="btn btn-outline btn-outline-success" (click)="us.create(tagFeature, {taggroup: groupid})"><i class="fas fa-plus-square fa-fw"></i></button>
+				</span>
+			</div>
+			<ng-container *ngFor="let tag of tags">
+				<form (ngSubmit)="us.update(tagFeature, tag)" #f="ngForm">
+					<div class="input-group input-group-sm pb-1">
+						<input type="text" name="tag{{tag.id}}name" class="form-control form-control-sm" [(ngModel)]="tag.name">
+						<span class="input-group-append">
+							<button type="submit" class="btn btn-outline btn-outline-dark"><i class="fas fa-save fa-fw"></i></button>
+							<button type="button" class="btn btn-outline btn-outline-danger" (click)="us.delete(tagFeature, tag)"><i class="far fa-trash-alt fa-fw"></i></button>
+						</span>
+					</div>
+				</form>
 			</ng-container>
-			<tbody>
-				<tr *ngFor="let id of tagState.ids">
-
-				</tr>
-			</tbody>
-		</table>
-		<ng-template #loading>
-			<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
-		</ng-template>
-		<pre>{{tagState | json}}</pre>
-	</ng-container>
+		</div>
+	</div>
 </div>
+<ng-template #loading>
+	<div class="alert alert-info" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

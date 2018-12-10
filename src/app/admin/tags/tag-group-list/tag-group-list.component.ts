@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
+import { UtilityService } from 'src/app/shared/utility.service';
+import { FEATURE } from '../taggroups.state';
 
 @Component( {
 	selector: 'app-tag-group-list',
@@ -8,11 +10,14 @@ import { AppState } from 'src/app/app.state';
 	styleUrls: ['./tag-group-list.component.scss']
 } )
 export class TagGroupListComponent implements OnInit {
+	public feature = FEATURE;
 	public state$ = this.store.select( 'taggroups' );
 
-	constructor( private store: Store<AppState> ) { }
+	constructor(
+		private store: Store<AppState>,
+		public us: UtilityService
+	) { }
 
-	ngOnInit() {
-	}
+	ngOnInit() { }
 
 }

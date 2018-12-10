@@ -1,20 +1,42 @@
 import { ReducingAction } from 'src/app/shared/reducingaction.model';
-import { FEATURE, TagGroupState } from './taggroups.state';
+import { FEATURE, TagGroupState as State } from './taggroups.state';
 import { TagGroup } from './taggroup.models';
 import { keyBy } from 'lodash';
-import { SortByName } from 'shared/utilities/utility.functions';
+import { SortByPosition } from 'shared/utilities/utility.functions';
 
-export class TagGroupsLoad implements ReducingAction {
+export class Load implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'Load';
 
 	constructor( public payload?: TagGroup[] ) { }
 
-	public reducer = ( state: TagGroupState ): TagGroupState => {
+	public reducer = ( state: State ): State => {
 		if ( this.payload ) {
-			return { ...state, items: keyBy( this.payload, 'id' ), ids: this.payload.sort( SortByName ).map( t => t.id ), loaded: true };
+			return { ...state, items: keyBy( this.payload, 'id' ), ids: this.payload.sort( SortByPosition ).map( t => t.id ), loaded: true };
 		} else {
 			return state;
 		}
 	}
+}
+
+export class Create implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Create';
+
+	constructor( public payload: TagGroup ) { }
+
+}
+
+export class Update implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Update';
+
+	constructor( public payload: TagGroup ) { }
+}
+
+export class Delete implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Delete';
+
+	constructor( public payload: TagGroup ) { }
 }

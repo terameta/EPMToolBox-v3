@@ -18,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
 import { AdminComponent } from './admin/admin/admin.component';
 import { AppReducer, AppMetaReducer } from './app.reducer';
 import { AppEffects } from './app.effects';
+import { SharedModule } from './shared/shared.module';
 
 const routes: Routes = [
 	{ path: '', component: GuestComponent, loadChildren: './guest/guest.module#GuestModule' },
@@ -37,6 +38,7 @@ export function tokenGetter() {
 		FormsModule,
 		HttpClientModule,
 		BrowserAnimationsModule,
+		SharedModule,
 		StoreModule.forRoot( AppReducer, { metaReducers: AppMetaReducer } ),
 		EffectsModule.forRoot( AppEffects ),
 		RouterModule.forRoot( routes ),

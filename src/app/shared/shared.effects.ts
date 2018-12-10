@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions, ofType } from '@ngrx/effects';
 import { Observable, interval, of } from 'rxjs';
-import { tap, withLatestFrom, map, filter, distinctUntilChanged, take } from 'rxjs/operators';
+import { tap, withLatestFrom, map, filter, distinctUntilChanged, take, mergeMap } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { AppState } from '../app.state';
 import { AuthStatus } from '../auth/auth.models';
@@ -10,11 +10,13 @@ import { RouterGo } from './router.actions';
 import { InterestShowAll } from './interest.actions';
 import { FEATURE } from './shared.state';
 import { ReducingAction } from './reducingaction.model';
-import { TagsLoad } from '../admin/tags/tag.actions';
 import { NotificationNew } from '../notification/notification.actions';
-import { DoNothing } from './shared.actions';
+import { DoNothing, SetCurrentFeature, SetCurrentID } from './shared.actions';
 import { NotificationType } from '../notification/notification.models';
-import { TagGroupsLoad } from '../admin/tags/taggroup.actions';
+import * as TagActions from '../admin/tags/tag.actions';
+import { FEATURE as TagFeature } from '../admin/tags/tags.state';
+import * as TagGroupActions from '../admin/tags/taggroup.actions';
+import { FEATURE as TagGroupFeature } from '../admin/tags/taggroups.state';
 
 @Injectable()
 export class SharedEffects {
@@ -30,6 +32,15 @@ export class SharedEffects {
 		} )
 	);
 
+	@Effect()
+	ROUTER_NAVIGATION_GET_CONCEPT$: Observable<any> = this.actions$.pipe(
+		ofType( 'ROUTER_NAVIGATION' ),
+		mergeMap( ( a: ReducingAction ) => [
+			new SetCurrentFeature( a.payload.routerState.url.split( '/' )[2] || null ),
+			new SetCurrentID( a.payload.routerState.url.split( '/' )[3] || null )
+		] )
+	);
+
 	@Effect() SHOWINITIALINTEREST$: Observable<any> = this.actions$.pipe(
 		ofType( 'ROUTER_NAVIGATION' ),
 		withLatestFrom( this.store.pipe( select( 'auth' ) ) ),
@@ -41,8 +52,8 @@ export class SharedEffects {
 	@Effect() DataChange$: Observable<any> = this.actions$.pipe(
 		ofType( FEATURE + 'Data Change' ),
 		map( ( action: ReducingAction ) => {
-			if ( action.payload === 'tags' ) return ( new TagsLoad() );
-			if ( action.payload === 'taggroups' ) return ( new TagGroupsLoad() );
+			if ( action.payload === 'tags' ) return ( new TagActions.Load() );
+			if ( action.payload === 'taggroups' ) return ( new TagGroupActions.Load() );
 			return ( new DoNothing() );
 		} )
 	);

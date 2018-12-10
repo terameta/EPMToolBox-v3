@@ -27,3 +27,13 @@ body {
 .ng-dirty {
 	border-color: theme-color("warning") !important;
 }
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+a:hover {
+	text-decoration: none;
+	color: inherit;
+}

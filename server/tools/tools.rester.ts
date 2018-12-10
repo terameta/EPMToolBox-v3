@@ -28,6 +28,10 @@ export class Rester {
 			this.respond( tool.update, req.body, req, res );
 		} );
 
+		router.put( '/clone', ( req: Request, res: Response ) => {
+			this.respond( tool.clone, req.body, req, res );
+		} );
+
 		router.delete( '/:id', ( req: Request, res: Response ) => {
 			this.respond( tool.delete, req.params.id, req, res );
 		} );

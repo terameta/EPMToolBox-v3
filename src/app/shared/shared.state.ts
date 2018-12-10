@@ -6,14 +6,18 @@ export interface SharedState {
 	interests: Interest[],
 	selectedTags: any,
 	autoShowNotifications: boolean,
-	autoShowNotificationsOnlyError: boolean
+	autoShowNotificationsOnlyError: boolean,
+	currentFeature: string
+	currentID: number
 }
 
 const baseSharedState: SharedState = {
 	interests: [],
 	selectedTags: {},
 	autoShowNotifications: false,
-	autoShowNotificationsOnlyError: false
+	autoShowNotificationsOnlyError: false,
+	currentFeature: null,
+	currentID: null
 };
 
 export const initialSharedState = (): SharedState => {

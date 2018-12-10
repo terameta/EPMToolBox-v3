@@ -9,6 +9,7 @@ import { AutoShowNotificationsToggle, AutoShowNotificationsOnlyErrorToggle } fro
 import { combineLatest, map, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationState } from 'src/app/notification/notification.state';
 import { NotificationDismissWithUUID, NotificationShowDetail } from 'src/app/notification/notification.actions';
+import { RouterGo } from 'src/app/shared/router.actions';
 
 
 @Component( {
@@ -24,6 +25,10 @@ export class NavbarComponent implements OnInit {
 
 	public notificationAutoShow = false;
 	public notificationAutoShowOnlyError = false;
+
+	public sharedState$ = this.store.pipe( select( 'shared' ) );
+
+	public currentFeature$ = this.sharedState$.pipe( map( ss => ss.currentFeature ), map( cf => cf ? cf : '' ) );
 
 	constructor( private store: Store<AppState> ) { }
 
@@ -60,5 +65,7 @@ export class NavbarComponent implements OnInit {
 	public notificationShowDetail = ( uuid: string ) => this.store.dispatch( new NotificationShowDetail( uuid ) );
 	public number2Array = ( length ) => ( new Array( length ) );
 	public url2Feature = ( url: string ) => url.split( '/' ).splice( 0, 3 ).join( '/' );
+
+	public selectionChanged = ( $event ) => this.store.dispatch( new RouterGo( { path: ['admin', $event.target.value] } ) );
 
 }

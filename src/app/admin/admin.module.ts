@@ -8,6 +8,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { TagsComponent } from './tags/tags/tags.component';
+import { TagsToolBarComponent } from './tags/tags-tool-bar/tags-tool-bar.component';
 
 const routes: Routes = [
 	{ path: '', component: FrontPageComponent },
@@ -15,7 +16,7 @@ const routes: Routes = [
 ];
 
 @NgModule( {
-	declarations: [FrontPageComponent, AdminComponent, NavbarComponent],
+	declarations: [FrontPageComponent, AdminComponent, NavbarComponent, TagsToolBarComponent],
 	imports: [
 		CommonModule,
 		FormsModule,
