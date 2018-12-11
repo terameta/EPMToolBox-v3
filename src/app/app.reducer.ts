@@ -8,9 +8,11 @@ import { AppState } from './app.state';
 import { environment } from 'src/environments/environment';
 import { storeFreeze } from 'ngrx-store-freeze';
 import { tagGroupReducer } from './admin/tags/taggroup.reducer';
+import { credentialReducer } from './admin/credentials/credential.reducer';
 
 export const AppReducer: ActionReducerMap<AppState> = {
 	auth: authReducer,
+	credentials: credentialReducer,
 	notification: notificationReducer,
 	router: routerReducer,
 	shared: sharedReducer,

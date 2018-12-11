@@ -90,6 +90,14 @@
 					<app-tags-tool-bar></app-tags-tool-bar>
 				</span>
 			</ng-container>
+			<ng-container *ngSwitchCase="'/admin/credentials'">
+				<span class="navbar-text">
+					<a routerLink="/admin/credentials"><span class="h3 text-onyx"><i class="fas fa-key fa-fw mr-3"></i>Credentials</span></a>
+				</span>
+				<span class="ml-auto">
+					<app-credentials-tool-bar></app-credentials-tool-bar>
+				</span>
+			</ng-container>
 			<span class="navbar-text" *ngSwitchDefault>Not Start Here</span>
 		</ng-container>
 	</ng-container>

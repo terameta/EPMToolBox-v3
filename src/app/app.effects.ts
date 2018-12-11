@@ -5,9 +5,11 @@ import { RouterEffects } from './shared/router.effects';
 import { SharedEffects } from './shared/shared.effects';
 import { TagEffects } from './admin/tags/tag.effects';
 import { TagGroupEffects } from './admin/tags/taggroup.effects';
+import { CredentialEffects } from './admin/credentials/credential.effects';
 
 export const AppEffects = [
 	AuthEffects,
+	CredentialEffects,
 	InterestEffects,
 	NotificationEffects,
 	RouterEffects,

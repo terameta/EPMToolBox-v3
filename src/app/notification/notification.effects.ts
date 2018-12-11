@@ -5,17 +5,19 @@ import { FEATURE } from './notification.state';
 import { tap, filter, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.state';
-import { NotificationCountDown, NotificationDismissWithUUID } from './notification.actions';
+import { NotificationCountDown, NotificationDismissWithUUID, NotificationNew } from './notification.actions';
 import { ReducingAction } from '../shared/reducingaction.model';
 
 @Injectable()
 export class NotificationEffects {
 	@Effect( { dispatch: false } ) new$: Observable<any> = this.actions$.pipe(
 		ofType( FEATURE + 'New' ),
-		tap( ( a: ReducingAction ) => {
-			setTimeout( () => {
-				this.store.dispatch( new NotificationCountDown( a.payload.uuid ) );
-			}, 500 );
+		tap( ( a: NotificationNew ) => {
+			if ( a.payload.countDown ) {
+				setTimeout( () => {
+					this.store.dispatch( new NotificationCountDown( a.payload.uuid ) );
+				}, 500 );
+			}
 		} )
 	);
 

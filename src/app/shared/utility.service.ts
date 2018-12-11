@@ -9,6 +9,8 @@ import * as TagActions from '../admin/tags/tag.actions';
 import { FEATURE as TagFeature } from '../admin/tags/tags.state';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
 import { FEATURE as TagGroupFeature } from '../admin/tags/taggroups.state';
+import * as CredentialActions from '../admin/credentials/credential.actions';
+import { FEATURE as CredentialFeature } from '../admin/credentials/credentials.state';
 import { NotificationNew } from '../notification/notification.actions';
 import { NotificationType } from '../notification/notification.models';
 import { NgForm } from '@angular/forms';
@@ -28,6 +30,7 @@ export class UtilityService {
 	) {
 		this.dispatcher[TagFeature] = TagActions;
 		this.dispatcher[TagGroupFeature] = TagGroupActions;
+		this.dispatcher[CredentialFeature] = CredentialActions;
 	}
 
 	public confirm = ( question: string, okonly = false ): Promise<boolean> => {
@@ -64,6 +67,7 @@ export class UtilityService {
 	}
 
 	public update = async ( feature: string, item: any, form?: NgForm ) => {
+		console.log( 'Update request received at US', feature, item, form );
 		const stopper = new Subject<boolean>();
 		const action = new this.dispatcher[feature].Update( item );
 		this.store.select( 'notification' ).pipe(

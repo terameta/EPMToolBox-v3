@@ -11,4 +11,4 @@ export interface TagState {
 
 const baseState: TagState = { items: {}, ids: [], loaded: false };
 
-export const initialTagState = (): TagState => JSONDeepCopy( baseState );
+export const initialState = (): TagState => JSONDeepCopy( baseState );

@@ -1,5 +1,5 @@
 <div class="align-middle">
-	<i class="fas fa-angle-double-right mr-1 fa-fw"></i>
+	<i class="fas fa-angle-double-right text-onyx mr-1"></i>
 	<select class="border-0" *ngIf="groups$ | async as state" [ngModel]="groupID$ | async" (change)="selectionChanged($event)">
 		<option value="0">Tag Group List</option>
 		<option value="{{id}}" *ngFor="let id of state.ids">{{ state.items[id].name }}</option>

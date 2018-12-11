@@ -15,16 +15,16 @@ export class TagListComponent implements OnInit {
 	public groupFeature = GFEATURE;
 	public tagFeature = TFEATURE;
 
-	public groupID$ = this.store.select( 'shared' ).pipe(
+	public id$ = this.store.select( 'shared' ).pipe(
 		map( rs => rs.currentID ),
 		distinctUntilChanged()
 	);
-	public group$ = this.store.select( 'taggroups' ).pipe(
-		combineLatest( this.groupID$ ),
+	public item$ = this.store.select( 'taggroups' ).pipe(
+		combineLatest( this.id$ ),
 		map( ( [tg, id] ) => ( { ...tg.items[id] } ) )
 	);
 	public tags$ = this.store.select( 'tags' ).pipe(
-		combineLatest( this.groupID$ ),
+		combineLatest( this.id$ ),
 		map( ( [ts, gid] ) => ts.ids.map( tid => ( { ...ts.items[tid] } ) ).filter( i => i.taggroup === gid ) )
 	);
 

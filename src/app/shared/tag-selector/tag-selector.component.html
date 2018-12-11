@@ -1,0 +1,14 @@
+<div class="mt-3">
+	<div class="row mt-1" *ngFor="let group of availableGroups$ | async">
+		<div class="col-6 col-md-2 col-lg-1">{{ group.name }}</div>
+		<div class="col-6 col-md-10 col-lg-11">
+			<ng-container *ngFor="let tag of availableTags$ | async">
+				<span class="checkbox ml-3" *ngIf="tag.taggroup == group.id">
+					<label *ngIf="tags">
+						<input type="checkbox" name="tagName{{tag.id}}" [(ngModel)]="tags[tag.id]"> {{ tag.name }}
+					</label>
+				</span>
+			</ng-container>
+		</div>
+	</div>
+</div>

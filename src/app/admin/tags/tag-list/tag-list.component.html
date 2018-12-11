@@ -1,5 +1,5 @@
-<div class="container-fluid" *ngIf="groupID$ | async as groupid; else loading">
-	<div class="row" *ngIf="group$ | async as group; else loading">
+<div class="container-fluid" *ngIf="id$ | async as id; else loading">
+	<div class="row" *ngIf="item$ | async as group; else loading">
 		<div class="col">
 			<form (ngSubmit)="us.update(groupFeature, group, f)" #f="ngForm">
 				<div class="form-group row m-0">
@@ -24,7 +24,7 @@
 			<div class="input-group input-group-sm pb-1">
 				<input type="text" name="tagNew" class="form-control" placeholder="New Tag" disabled="true">
 				<span class="input-group-append">
-					<button type="button" class="btn btn-outline btn-outline-success" (click)="us.create(tagFeature, {taggroup: groupid})"><i class="fas fa-plus-square fa-fw"></i></button>
+					<button type="button" class="btn btn-outline btn-outline-success" (click)="us.create(tagFeature, {taggroup: id})"><i class="fas fa-plus-square fa-fw"></i></button>
 				</span>
 			</div>
 			<ng-container *ngFor="let tag of tags">
@@ -42,7 +42,7 @@
 	</div>
 </div>
 <ng-template #loading>
-	<div class="alert alert-info" role="alert">
+	<div class="alert alert-info p-3" role="alert">
 		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
 	</div>
 </ng-template>

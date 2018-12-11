@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ConfirmComponent } from './confirm/confirm.component';
 import { PromptComponent } from './prompt/prompt.component';
 import { FormsModule } from '@angular/forms';
+import { TagSelectorComponent } from './tag-selector/tag-selector.component';
 
 @NgModule( {
 	imports: [
@@ -11,7 +12,11 @@ import { FormsModule } from '@angular/forms';
 	],
 	declarations: [
 		ConfirmComponent,
-		PromptComponent
+		PromptComponent,
+		TagSelectorComponent
+	],
+	exports: [
+		TagSelectorComponent
 	],
 	entryComponents: [
 		ConfirmComponent,

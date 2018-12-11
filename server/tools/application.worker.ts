@@ -64,6 +64,10 @@ export class ApplicationWorker {
 
 		this.restAPI = new RestAPI( this.app, this.db, this.mainTools );
 
+		this.app.all( '/api/*', ( req, res ) => {
+			res.status( 500 ).send( new Error( 'Not implemented' ) );
+		} );
+
 		this.app.get( '*', ( req, res ) => {
 			res.sendFile( join( __dirname, '../../dist/index.html' ) );
 		} );
@@ -95,7 +99,6 @@ export class ApplicationWorker {
 	}
 
 	private handleChanges = async ( changedTable: string, interests: Interest[], socket: socketio.Socket ) => {
-		console.log( changedTable, 'has changes' );
 		interests.filter( interest => interest === changedTable ).forEach( interest => socket.emit( 'datachange', interest ) );
 	}
 }

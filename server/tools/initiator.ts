@@ -359,7 +359,7 @@ export class Initiator {
 						return cF;
 					} );
 					atStream.fieldList = streamFields;
-					await this.db.query( 'UPDATE streams SET details = ? WHERE id = ?', [atStreamObj2DB( atStream ), atStream.id] );
+					await this.db.query( 'UPDATE streams SET fieldList = ? WHERE id = ?', [JSON.stringify( atStream.fieldList ), atStream.id] );
 				}
 			}, shouldSetVersion: true
 		} );

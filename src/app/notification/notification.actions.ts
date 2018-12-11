@@ -1,14 +1,15 @@
 import { ReducingAction } from '../shared/reducingaction.model';
 import { FEATURE, NotificationState as NS } from './notification.state';
-import { getBaseNotification, NotificationType as NT } from './notification.models';
+import { getBaseNotification, NotificationType as NT, Notification } from './notification.models';
 import { actionType2Title } from 'shared/utilities/utility.functions';
 
 export class NotificationNew implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'New';
 
-	constructor( public payload: { title: string, message: string, type: NT } ) {
+	constructor( public payload: Partial<Notification> ) {
 		this.payload.title = actionType2Title( this.payload.title );
+		this.payload.countDown = ( this.payload.type === NT.Info || this.payload.type === NT.Success ) ? 10 : null;
 		this.payload = { ...getBaseNotification(), ...this.payload };
 	}
 
@@ -16,7 +17,7 @@ export class NotificationNew implements ReducingAction {
 		...state,
 		notifications: [
 			...state.notifications,
-			{ ...getBaseNotification(), ...this.payload, countDown: ( this.payload.type === NT.Info || this.payload.type === NT.Success ) ? 10 : null }
+			{ ...getBaseNotification(), ...this.payload }
 		]
 	} )
 }

@@ -55,6 +55,17 @@ export const getFormattedDate = () => {
 	toReturn += padDatePart( myDate.getSeconds() );
 	return toReturn;
 };
+export const formatDate = ( payload: Date, dateSeparator = '-', timeSeparator = ':' ) => {
+	const myDate = new Date( payload );
+	let toReturn: string; toReturn = '';
+	toReturn += myDate.getFullYear() + dateSeparator;
+	toReturn += padDatePart( myDate.getMonth() + 1 ) + dateSeparator;
+	toReturn += padDatePart( myDate.getDate() ) + ' ';
+	toReturn += padDatePart( myDate.getHours() ) + timeSeparator;
+	toReturn += padDatePart( myDate.getMinutes() ) + timeSeparator;
+	toReturn += padDatePart( myDate.getSeconds() );
+	return toReturn;
+}
 const padDatePart = ( curPart: string | number ) => {
 	return ( '0' + curPart ).substr( -2 );
 };
