@@ -9,14 +9,17 @@ import * as TagActions from '../admin/tags/tag.actions';
 import { FEATURE as TagFeature } from '../admin/tags/tags.state';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
 import { FEATURE as TagGroupFeature } from '../admin/tags/taggroups.state';
-import * as CredentialActions from '../admin/credentials/credential.actions';
+import * as CredentialActions from '../admin/credentials/credentials.actions';
 import { FEATURE as CredentialFeature } from '../admin/credentials/credentials.state';
+import * as EnvironmentActions from '../admin/environments/environments.actions';
+import { FEATURE as EnvironmentFeature } from '../admin/environments/environments.state';
 import { NotificationNew } from '../notification/notification.actions';
 import { NotificationType } from '../notification/notification.models';
 import { NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, filter, tap } from 'rxjs/operators';
 import { actionType2Title } from 'shared/utilities/utility.functions';
+import { CloneTarget } from 'shared/models/clone.target';
 
 @Injectable( {
 	providedIn: 'root'
@@ -31,6 +34,7 @@ export class UtilityService {
 		this.dispatcher[TagFeature] = TagActions;
 		this.dispatcher[TagGroupFeature] = TagGroupActions;
 		this.dispatcher[CredentialFeature] = CredentialActions;
+		this.dispatcher[EnvironmentFeature] = EnvironmentActions;
 	}
 
 	public confirm = ( question: string, okonly = false ): Promise<boolean> => {
@@ -47,10 +51,11 @@ export class UtilityService {
 		} );
 	}
 
-	public clone = async ( feature: string, item: Partial<{ name: string }> ) => {
+	public clone = async ( feature: string, item: { id: number, name: string } ) => {
 		const newName = await this.prompt( 'What is the new item\'s name?', item.name );
+		const target: CloneTarget = { sourceid: item.id, name: newName };
 		if ( newName ) {
-			this.store.dispatch( new this.dispatcher[feature].Create( { ...item, name: newName } ) );
+			this.store.dispatch( new this.dispatcher[feature].Clone( target ) );
 		} else {
 			this.store.dispatch( new NotificationNew( { title: 'Clone Cancelled', message: 'No action is taken', type: NotificationType.Info } ) );
 		}

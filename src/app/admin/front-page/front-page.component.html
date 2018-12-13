@@ -9,6 +9,10 @@
 {{(state$ | async).notification | json}}</pre>
 		</div>
 		<div class="col">
+			<pre>Environments:
+		{{(state$ | async).environments | json}}</pre>
+		</div>
+		<div class="col">
 			<pre>Router:
 {{(state$ | async).router | json}}</pre>
 		</div>
@@ -20,6 +24,10 @@
 			<pre>Tags:
 {{(state$ | async).tags | json}}</pre>
 		</div>
+	</div>
+	<div class="col">
+		<pre>Tag Groups:
+{{(state$ | async).taggroups | json}}</pre>
 	</div>
 </div>
 <!-- <div class="container-fluid">

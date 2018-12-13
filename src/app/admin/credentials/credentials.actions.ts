@@ -1,8 +1,9 @@
 import { ReducingAction } from 'src/app/shared/reducingaction.model';
 import { FEATURE, CredentialState } from './credentials.state';
-import { Credential } from './credential.models';
+import { Credential } from './credentials.models';
 import { keyBy } from 'lodash';
 import { JSONDeepCopy, SortByName } from 'shared/utilities/utility.functions';
+import { CloneTarget } from 'shared/models/clone.target';
 
 export class Load implements ReducingAction {
 	readonly feature = FEATURE;
@@ -24,6 +25,13 @@ export class Create implements ReducingAction {
 	readonly type = FEATURE + 'Create';
 
 	constructor( public payload: Credential ) { }
+}
+
+export class Clone implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Clone';
+
+	constructor( public payload: CloneTarget ) { }
 }
 
 export class Update implements ReducingAction {

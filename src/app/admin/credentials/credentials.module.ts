@@ -9,6 +9,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 
 const routes: Routes = [
 	{ path: '', component: CredentialListComponent },
+	{ path: '0', redirectTo: '' },
 	{ path: ':credentialid', component: CredentialDetailComponent }
 ];
 

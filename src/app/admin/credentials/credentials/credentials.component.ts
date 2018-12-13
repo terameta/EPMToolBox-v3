@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 
-@Component({
-  selector: 'app-credentials',
-  templateUrl: './credentials.component.html',
-  styleUrls: ['./credentials.component.scss']
-})
+@Component( {
+	selector: 'app-credentials',
+	templateUrl: './credentials.component.html',
+	styleUrls: ['./credentials.component.scss']
+} )
 export class CredentialsComponent implements OnInit {
 
-  constructor() { }
+	constructor() { }
 
-  ngOnInit() {
-  }
+	ngOnInit() {
+	}
 
 }

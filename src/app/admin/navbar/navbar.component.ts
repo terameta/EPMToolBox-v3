@@ -5,11 +5,12 @@ import { Observable } from 'rxjs';
 import { Notification, NotificationType } from 'src/app/notification/notification.models';
 import { getURL } from 'src/app/shared/router.selectors';
 import { getAutoShowNotificationsAndOnlyError } from 'src/app/shared/shared.selectors';
-import { AutoShowNotificationsToggle, AutoShowNotificationsOnlyErrorToggle } from 'src/app/shared/shared.actions';
-import { combineLatest, map, distinctUntilChanged, tap } from 'rxjs/operators';
+import { AutoShowNotificationsToggle, AutoShowNotificationsOnlyErrorToggle, TagsChanged } from 'src/app/shared/shared.actions';
+import { combineLatest, map, distinctUntilChanged, tap, filter } from 'rxjs/operators';
 import { NotificationState } from 'src/app/notification/notification.state';
 import { NotificationDismissWithUUID, NotificationShowDetail } from 'src/app/notification/notification.actions';
 import { RouterGo } from 'src/app/shared/router.actions';
+import { SharedService } from 'src/app/shared/shared.service';
 
 
 @Component( {
@@ -18,23 +19,27 @@ import { RouterGo } from 'src/app/shared/router.actions';
 	styleUrls: ['./navbar.component.scss']
 } )
 export class NavbarComponent implements OnInit {
-	public url$: Observable<string>;
-	public notifications$: Observable<Notification[]>;
+	public url$ = this.store.pipe( select( getURL ) );
+	public notifications$ = this.store.select( 'notification' ).pipe( map( ( ns: NotificationState ) => ns.notifications ) );
 	public notificationType = NotificationType;
 	public shouldShowNotifications = false;
 
 	public notificationAutoShow = false;
 	public notificationAutoShowOnlyError = false;
 
-	public sharedState$ = this.store.pipe( select( 'shared' ) );
+	public sharedState$ = this.store.select( 'shared' );
 
 	public currentFeature$ = this.sharedState$.pipe( map( ss => ss.currentFeature ), map( cf => cf ? cf : '' ) );
 
-	constructor( private store: Store<AppState> ) { }
+	public tagGroups$ = this.store.select( 'taggroups' ).pipe( filter( s => s.loaded ), map( s => s.ids.map( i => s.items[i] ) ) );
+	public tags$ = this.store.select( 'tags' ).pipe( filter( s => s.loaded ), map( s => s.ids.map( i => s.items[i] ) ) );
+
+	constructor(
+		private store: Store<AppState>,
+		public ss: SharedService
+	) { }
 
 	ngOnInit() {
-		this.notifications$ = this.store.pipe( select( 'notification' ), map( ( ns: NotificationState ) => ns.notifications ) );
-		this.url$ = this.store.pipe( select( getURL ) );
 		this.notifications$.pipe(
 			combineLatest( this.store.pipe( select( getAutoShowNotificationsAndOnlyError ) ) )
 		).subscribe( ( [notifications, showState] ) => {
@@ -51,15 +56,9 @@ export class NavbarComponent implements OnInit {
 		} );
 	}
 
-	public notificationAutoShowOnChange = () => {
-		this.store.dispatch( new AutoShowNotificationsToggle() );
-		return false;
-	}
+	public notificationAutoShowOnChange = () => this.store.dispatch( new AutoShowNotificationsToggle() );
 
-	public notificationAutoShowOnlyErrorOnChange = () => {
-		this.store.dispatch( new AutoShowNotificationsOnlyErrorToggle() );
-		return false;
-	}
+	public notificationAutoShowOnlyErrorOnChange = () => this.store.dispatch( new AutoShowNotificationsOnlyErrorToggle() );
 
 	public notificationDismiss = ( uuid: string ) => this.store.dispatch( new NotificationDismissWithUUID( uuid ) );
 	public notificationShowDetail = ( uuid: string ) => this.store.dispatch( new NotificationShowDetail( uuid ) );
@@ -68,4 +67,5 @@ export class NavbarComponent implements OnInit {
 
 	public selectionChanged = ( $event ) => this.store.dispatch( new RouterGo( { path: ['admin', $event.target.value] } ) );
 
+	public tagChanged = ( groupid: number, tagid: number ) => this.store.dispatch( new TagsChanged( { groupid, tagid } ) );
 }

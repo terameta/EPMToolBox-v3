@@ -15,7 +15,7 @@ export class FrontPageComponent implements OnInit {
 	public userRole = UserRole;
 
 	constructor( private store: Store<AppState> ) {
-		this.auth$ = this.store.pipe( select( 'auth' ) );
+		this.auth$ = this.store.select( 'auth' );
 	}
 
 	ngOnInit() {

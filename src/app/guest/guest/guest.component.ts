@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthState } from 'src/app/auth/auth.state';
 import { Observable } from 'rxjs';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
 
 @Component( {
@@ -14,8 +14,8 @@ export class GuestComponent implements OnInit {
 	public router$: Observable<any>;
 
 	constructor( private store: Store<AppState> ) {
-		this.auth$ = this.store.pipe( select( 'auth' ) );
-		this.router$ = this.store.pipe( select( 'router' ) );
+		this.auth$ = this.store.select( 'auth' );
+		this.router$ = this.store.select( 'router' );
 	}
 
 	ngOnInit() {

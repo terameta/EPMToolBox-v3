@@ -22,7 +22,30 @@
 	<!-- <form class="form-inline ml-auto">
 		<input type="text" name="NavbarSearch" class="form-control form-control-sm h-50 text-evwhite border-top-0 border-right-0 border-left-0 rounded-0 border-accent" style="background-color: transparent;" placeholder="Search">
 	</form> -->
-	<div class="btn-group btn-group-sm p-0 ml-auto mr-5" dropdown title="Notifications" [(isOpen)]="shouldShowNotifications" [autoClose]="false">
+	<form class="form-inline ml-auto mr-3">
+		<div class="form-group" *ngIf="tagGroups$ | async as tagGroups">
+			<div class="input-group input-group-sm" *ngFor="let tagGroup of tagGroups">
+				<div class="input-group-prepend">
+					<span class="input-group-text border-0 bg-transparent text-capitalize text-evwhite">{{tagGroup.name}}:</span>
+				</div>
+				<select name="tagSelector{{tagGroup.id}}" class="form-control text-evwhite bg-transparent border-0" (change)="tagChanged(tagGroup.id, $event.target.value)" [ngModel]="(sharedState$ | async).selectedTags[tagGroup.id]">
+					<option class="bg-dark font-weight-bold" value="0">All</option>
+					<ng-container *ngIf="tags$ | async as tags">
+						<ng-container *ngFor="let tag of tags">
+							<option class="bg-dark font-weight-bold" value="{{tag.id}}" *ngIf="tag.taggroup == tagGroup.id">{{tag.name}}</option>
+						</ng-container>
+					</ng-container>
+				</select>
+				<!-- <select name="tagselector{{tagGroup.id}}" class="form-control text-evwhite bg-transparent border-top-0 border-bottom-0 border-dark rounded-0" (change)="ss.tagChanged(tagGroup.id, $event.target.value)" [ngModel]="ss.selectedTags[tagGroup.id]">
+					<option value="0">All</option>
+					<ng-container *ngFor="let tagItem of tags">
+						<option value="{{tagItem.id}}" *ngIf="tagItem.taggroup == tagGroup.id">{{tagItem.name}}</option>
+					</ng-container>
+				</select> -->
+			</div>
+		</div>
+	</form>
+	<div class="btn-group btn-group-sm p-0 mx-5" dropdown title="Notifications" [(isOpen)]="shouldShowNotifications" [autoClose]="false">
 		<button id="button-basic" dropdownToggle type="button" class="btn btn-link navbar-text text-evwhite p-0" aria-controls="dropdown-basic">
 			<i class="fas fa-bell fa-fw"></i>
 		</button>

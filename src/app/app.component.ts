@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		this.store.pipe( select( 'notification' ) ).subscribe( this.handleNotifications );
+		this.store.select( 'notification' ).subscribe( this.handleNotifications );
 	}
 
 	private handleNotifications = ( ns: NotificationState ) => {

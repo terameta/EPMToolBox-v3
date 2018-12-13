@@ -2,6 +2,7 @@ import { ReducingAction } from '../shared/reducingaction.model';
 import { AuthState, FEATURE } from './auth.state';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { AuthStatus } from './auth.models';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export class SignIn implements ReducingAction {
 	readonly feature = FEATURE;
@@ -34,7 +35,7 @@ export class SignInFailure implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'SignIn Failure';
 
-	constructor( public payload: Error ) { }
+	constructor( public payload: HttpErrorResponse ) { }
 
 	public reducer = ( state: AuthState ): AuthState => {
 		return { ...state, ...{ status: AuthStatus.SignedOut } };

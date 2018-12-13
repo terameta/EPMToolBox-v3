@@ -54,6 +54,33 @@ export class SetCurrentID implements ReducingAction {
 	public reducer = ( state: SharedState ): SharedState => ( { ...state, currentID: this.payload ? parseInt( this.payload, 10 ) : null } );
 }
 
+export class TagsChanged implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Tags Changed';
+
+	constructor( public payload: { groupid: number, tagid: number } ) { }
+
+	public reducer = ( state: SharedState ): SharedState => {
+		const newState: SharedState = { ...state, selectedTags: { ...state.selectedTags } };
+		newState.selectedTags[this.payload.groupid] = this.payload.tagid;
+		localStorage.setItem( 'selectedTags', JSON.stringify( newState.selectedTags ) );
+		return newState;
+	}
+}
+
+export class TagSelectionsFromLocalStorage implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Tag Selections From Local Storage';
+
+	constructor() { }
+
+	public reducer = ( state: SharedState ): SharedState => {
+		const newState: SharedState = { ...state, selectedTags: { ...state.selectedTags } };
+		newState.selectedTags = JSON.parse( localStorage.getItem( 'selectedTags' ) ) || {};
+		return newState;
+	}
+}
+
 export class DoNothing implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'Do Nothing';

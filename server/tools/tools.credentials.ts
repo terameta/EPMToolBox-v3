@@ -1,6 +1,7 @@
 import { DB } from './db';
 import { MainTools } from './tools.main';
-import { Credential, credentialProtectionString } from '../../src/app/admin/credentials/credential.models';
+import { Credential, credentialProtectionString } from '../../src/app/admin/credentials/credentials.models';
+import { CloneTarget } from 'shared/models/clone.target';
 
 export class CredentialTools {
 	constructor( private db: DB, private tools: MainTools ) { }
@@ -10,9 +11,9 @@ export class CredentialTools {
 		return tuples.map( this.prepareCredentialToRead );
 	}
 
-	public getOne = async ( id: number ) => this.getCredentialDetails( id );
+	public getOne = async ( id: number ) => this.getDetails( id );
 
-	public getCredentialDetails = async ( id: number, reveal = false, leaveAsItIs = false ) => {
+	public getDetails = async ( id: number, reveal = false, leaveAsItIs = false ) => {
 		const { tuple: credential } = await this.db.queryOne<Credential>( 'SELECT * FROM credentials WHERE id = ?', id );
 		if ( reveal ) {
 			credential.password = this.tools.decryptText( credential.password );
@@ -34,6 +35,12 @@ export class CredentialTools {
 		return payload;
 	}
 
+	public clone = async ( payload: CloneTarget ) => {
+		const credential = await this.getDetails( payload.sourceid, true );
+		credential.name = payload.name;
+		return await this.create( credential );
+	}
+
 	public update = async ( payload: Credential ) => {
 		if ( payload.password === credentialProtectionString ) {
 			delete payload.password;
@@ -51,7 +58,7 @@ export class CredentialTools {
 		return { status: 'success' };
 	}
 
-	public reveal = async ( id: number ) => ( { clearPassword: ( await this.getCredentialDetails( id, true ) ).password } );
+	public reveal = async ( id: number ) => ( { clearPassword: ( await this.getDetails( id, true ) ).password } );
 
 	private prepareCredentialToRead = ( payload: Credential ): Credential => {
 		payload.password = credentialProtectionString;

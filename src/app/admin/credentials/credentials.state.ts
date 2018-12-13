@@ -1,4 +1,4 @@
-import { Credential } from './credential.models';
+import { Credential } from './credentials.models';
 import { JSONDeepCopy } from 'shared/utilities/utility.functions';
 
 export const FEATURE = '[CREDENTIALS]';

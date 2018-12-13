@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { Observable } from 'rxjs';
-import { withLatestFrom, map, filter, distinctUntilChanged, mergeMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { withLatestFrom, map, filter, distinctUntilChanged, mergeMap, tap } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import { AppState } from '../app.state';
 import { AuthStatus } from '../auth/auth.models';
@@ -10,12 +10,13 @@ import { RouterGo } from './router.actions';
 import { InterestShowAll } from './interest.actions';
 import { FEATURE } from './shared.state';
 import { ReducingAction } from './reducingaction.model';
-import { NotificationNew } from '../notification/notification.actions';
-import { DoNothing, SetCurrentFeature, SetCurrentID } from './shared.actions';
+import { NotificationNew, NotificationDismissWithTitle } from '../notification/notification.actions';
+import { DoNothing, SetCurrentFeature, SetCurrentID, TagSelectionsFromLocalStorage } from './shared.actions';
 import { NotificationType } from '../notification/notification.models';
 import * as TagActions from '../admin/tags/tag.actions';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
-import * as CredentialActions from '../admin/credentials/credential.actions';
+import * as CredentialActions from '../admin/credentials/credentials.actions';
+import * as EnvironmentActions from '../admin/environments/environments.actions';
 
 @Injectable()
 export class SharedEffects {
@@ -42,17 +43,17 @@ export class SharedEffects {
 
 	@Effect() SHOWINITIALINTEREST$: Observable<any> = this.actions$.pipe(
 		ofType( 'ROUTER_NAVIGATION' ),
-		withLatestFrom( this.store.pipe( select( 'auth' ) ) ),
-		filter( ( [routerAction, authState] ) => authState.user.role === UserRole.Admin ),
+		withLatestFrom( this.store.select( 'auth' ) ),
+		filter( ( [routerAction, authState] ) => authState.status === AuthStatus.SignedIn ),
 		distinctUntilChanged(),
+		tap( () => this.store.dispatch( new TagSelectionsFromLocalStorage() ) ),
 		map( () => ( new InterestShowAll() ) )
 	);
 
 	@Effect() DETECTSESSION$: Observable<any> = this.actions$.pipe(
 		ofType( 'ROUTER_NAVIGATION' ),
 		filter( ( a: ReducingAction ) => a.payload.routerState.url !== '/' ),
-		map( () => this.store.pipe( select( 'auth' ) ) ),
-		withLatestFrom( this.store.pipe( select( 'auth' ) ) ),
+		withLatestFrom( this.store.select( 'auth' ) ),
 		map( ( [r, a] ) => a ),
 		filter( ( authState ) => authState.status === AuthStatus.SignedOut ),
 		distinctUntilChanged(),
@@ -65,6 +66,7 @@ export class SharedEffects {
 			if ( action.payload === 'tags' ) return ( new TagActions.Load() );
 			if ( action.payload === 'taggroups' ) return ( new TagGroupActions.Load() );
 			if ( action.payload === 'credentials' ) return ( new CredentialActions.Load() );
+			if ( action.payload === 'environments' ) return ( new EnvironmentActions.Load() );
 			return ( new DoNothing() );
 		} )
 	);

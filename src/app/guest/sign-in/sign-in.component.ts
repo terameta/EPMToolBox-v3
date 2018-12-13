@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
 import { SignIn } from 'src/app/auth/auth.actions';
 import { Observable } from 'rxjs';
@@ -25,7 +25,7 @@ export class SignInComponent implements OnInit {
 	constructor( private store: Store<AppState>, private authService: AuthService ) { }
 
 	ngOnInit() {
-		this.auth$ = this.store.pipe( select( 'auth' ) );
+		this.auth$ = this.store.select( 'auth' );
 	}
 
 	public signin = ( f: NgForm ) => {

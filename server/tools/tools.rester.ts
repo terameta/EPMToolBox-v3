@@ -1,6 +1,10 @@
 import { Request, Response, Router } from 'express';
 
 import { MainTools } from './tools.main';
+import { CredentialTools } from './tools.credentials';
+import { TagTools } from './tools.tags';
+import { TagGroupTools } from './tools.taggroups';
+import { EnvironmentTools } from './tools.environments';
 
 export class Rester {
 	constructor( public tools: MainTools ) { }
@@ -11,7 +15,7 @@ export class Rester {
 			catch( ( issue: Error ) => res.status( 500 ).json( { status: 'fail', title: issue.name, message: issue.message } ) );
 	}
 
-	public restify( router: Router, tool: any ) {
+	public restify( router: Router, tool: CredentialTools | EnvironmentTools | TagTools | TagGroupTools ) {
 		router.get( '/', ( req: Request, res: Response ) => {
 			this.respond( tool.getAll, null, req, res );
 		} );
@@ -25,11 +29,11 @@ export class Rester {
 		} );
 
 		router.put( '/', ( req: Request, res: Response ) => {
-			this.respond( tool.update, req.body, req, res );
+			this.respond( tool.clone, req.body, req, res );
 		} );
 
-		router.put( '/clone', ( req: Request, res: Response ) => {
-			this.respond( tool.clone, req.body, req, res );
+		router.patch( '/', ( req: Request, res: Response ) => {
+			this.respond( tool.update, req.body, req, res );
 		} );
 
 		router.delete( '/:id', ( req: Request, res: Response ) => {

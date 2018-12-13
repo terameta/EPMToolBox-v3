@@ -5,8 +5,8 @@ import { AppState } from 'src/app/app.state';
 import { UtilityService } from 'src/app/shared/utility.service';
 import { map, distinctUntilChanged, combineLatest, tap, filter } from 'rxjs/operators';
 import { JSONDeepCopy } from 'shared/utilities/utility.functions';
-import { Conceal, Reveal } from '../credential.actions';
-import { Credential } from '../credential.models';
+import { Conceal, Reveal } from '../credentials.actions';
+import { Credential } from '../credentials.models';
 
 @Component( {
 	selector: 'app-credential-detail',

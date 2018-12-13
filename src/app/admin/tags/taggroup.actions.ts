@@ -3,6 +3,7 @@ import { FEATURE, TagGroupState as State } from './taggroups.state';
 import { TagGroup } from './taggroup.models';
 import { keyBy } from 'lodash';
 import { SortByPosition } from 'shared/utilities/utility.functions';
+import { CloneTarget } from 'shared/models/clone.target';
 
 export class Load implements ReducingAction {
 	readonly feature = FEATURE;
@@ -24,6 +25,14 @@ export class Create implements ReducingAction {
 	readonly type = FEATURE + 'Create';
 
 	constructor( public payload: TagGroup ) { }
+
+}
+
+export class Clone implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Clone';
+
+	constructor( public payload: CloneTarget ) { }
 
 }
 

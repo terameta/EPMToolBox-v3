@@ -1,0 +1,99 @@
+<ng-container *ngIf="state$ | async as state; else loading">
+	<div class="container-fluid" *ngIf="state.loaded; else loading">
+		<div class="row">
+			<div class="col">
+				<div class="table-responsive">
+					<table class="table table-sm table-hover table-borderless m-0">
+						<thead>
+							<tr>
+								<th class="border-bottom border-warning m-0 p-0" width="1">Actions</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Name</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Type</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Server</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Port</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Verified?</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Identity Domain</th>
+								<th width="24"></th>
+								<th class="border-bottom border-warning m-0 p-0">Credential</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="px-0 text-nowrap text-right">
+									<i class="fas fa-plus-square fa-fw ml-auto text-success pointer" (click)="us.create(feature)" title="New Environment"></i>
+								</td>
+								<td>&nbsp;</td>
+								<td class="px-0">
+									<span class="p-0 pointer" (click)="us.create(feature)" title="New Environment">
+										<i class="fas fa-chevron-right text-warning"></i>
+										<i class="fas fa-chevron-right text-warning"></i>
+										New Environment
+									</span>
+								</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+								<td>&nbsp;</td>
+							</tr>
+							<ng-container *ngFor="let id of state.ids; let i = index;">
+								<ng-container *ngIf="state.items[id] as item">
+									<ng-container *ngIf="ss.shouldListItem(item.tags)">
+										<tr>
+											<td class="px-0 text-nowrap">
+												<a [routerLink]="id" title="Edit">
+													<i class="far fa-edit fa-fw"></i>
+												</a>
+												<i class="far fa-clone fa-fw pointer" title="Clone" (click)="us.clone(feature, item)"></i>
+												<i class="fas fa-check-double fa-fw my-auto pointer" title="Verify" (click)="verify(item)"></i>
+												<i class="far fa-trash-alt fa-fw ml-3 pointer text-danger" title="Delete" (click)="us.delete(feature, item)"></i>
+											</td>
+											<td>&nbsp;</td>
+											<td class="px-0">
+												<a [routerLink]="id">
+													<i class="fas fa-chevron-right text-warning"></i>
+													{{ item.name }}
+												</a>
+											</td>
+											<td>&nbsp;</td>
+											<td class="px-0"> {{ types[item.type] }} </td>
+											<td>&nbsp;</td>
+											<td class="px-0"> {{ item.server }} </td>
+											<td>&nbsp;</td>
+											<td class="px-0 text-right"> {{ item.port }} </td>
+											<td>&nbsp;</td>
+											<td class="px-0 text-center" *ngIf="!!item.verified"> <i class="far fa-check-square fa-fw text-success"></i> </td>
+											<td class="px-0 text-center" *ngIf="!item.verified"> <i class="far fa-square fa-fw text-danger"></i> </td>
+											<td>&nbsp;</td>
+											<td class="px-0"> {{ item.identitydomain }} </td>
+											<td>&nbsp;</td>
+											<td class="px-0" *ngIf="credentials$ | async as credentials"> {{ credentials[item.credential]?.name }}</td>
+										</tr>
+									</ng-container>
+								</ng-container>
+							</ng-container>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

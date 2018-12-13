@@ -65,7 +65,7 @@ export const formatDate = ( payload: Date, dateSeparator = '-', timeSeparator = 
 	toReturn += padDatePart( myDate.getMinutes() ) + timeSeparator;
 	toReturn += padDatePart( myDate.getSeconds() );
 	return toReturn;
-}
+};
 const padDatePart = ( curPart: string | number ) => {
 	return ( '0' + curPart ).substr( -2 );
 };

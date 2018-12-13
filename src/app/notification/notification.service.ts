@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { AppState } from '../app.state';
 import { NotificationState } from './notification.state';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -15,7 +15,7 @@ export class NotificationService {
 		private modalService: BsModalService
 	) {
 		console.log( 'Notification service constructed because it is referred to in the app.component.ts, maybe we do not need this' );
-		this.store.pipe( select( 'notification' ) ).subscribe( this.handleNotifications );
+		this.store.select( 'notification' ).subscribe( this.handleNotifications );
 	}
 
 	private handleNotifications = ( state: NotificationState ) => {

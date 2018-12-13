@@ -9,7 +9,9 @@ import { NotificationDismissWithTitle, NotificationNew } from 'src/app/notificat
 import { tap, filter, switchMap, mergeMap, catchError } from 'rxjs/operators';
 import { ReducingAction } from 'src/app/shared/reducingaction.model';
 import { NotificationType } from 'src/app/notification/notification.models';
-import { Load, Create, Update } from './taggroup.actions';
+import { Load, Create, Update, Clone } from './taggroup.actions';
+import { RouterGo } from 'src/app/shared/router.actions';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable() export class TagGroupEffects {
 
@@ -23,10 +25,10 @@ import { Load, Create, Update } from './taggroup.actions';
 				new Load( result ),
 				new NotificationNew( { title: a.type, message: 'Successful', type: NotificationType.Success } )
 			] ),
-			catchError( ( e: Error ) =>
+			catchError( ( e: HttpErrorResponse ) =>
 				of(
 					new NotificationDismissWithTitle( a.type ),
-					new NotificationNew( { title: a.type, message: 'Load failed.\nDetails:\n' + e.message, type: NotificationType.Error } )
+					new NotificationNew( { title: a.type, message: 'Load failed.\nDetails:\n' + e.error.message, type: NotificationType.Error } )
 				)
 			)
 		) )
@@ -39,12 +41,33 @@ import { Load, Create, Update } from './taggroup.actions';
 		switchMap( a => this.service.create( a.payload ).pipe(
 			mergeMap( result => [
 				new NotificationDismissWithTitle( a.type ),
+				new RouterGo( { path: ['admin', 'tags', result.id] } ),
 				new NotificationNew( { title: a.type, message: a.payload.name + ' is created', type: NotificationType.Success } )
 			] ),
-			catchError( ( e: Error ) =>
+			catchError( ( e: HttpErrorResponse ) =>
 				of(
 					new NotificationDismissWithTitle( a.type ),
-					new NotificationNew( { title: a.type, message: 'Create failed for ' + a.payload.name + '\n' + e.message, type: NotificationType.Error } )
+					new NotificationNew( { title: a.type, message: 'Create failed for ' + a.payload.name + '\n' + e.error.message, type: NotificationType.Error } )
+				)
+			)
+		)
+		)
+	);
+
+	@Effect() clone$: Observable<any> = this.actions$.pipe(
+		ofType( FEATURE + 'Clone' ),
+		tap( a => { this.store.dispatch( new NotificationDismissWithTitle( a.type ) ); } ),
+		filter( ( a: Clone ) => !!a.payload ),
+		switchMap( a => this.service.clone( a.payload ).pipe(
+			mergeMap( result => [
+				new NotificationDismissWithTitle( a.type ),
+				new RouterGo( { path: ['admin', 'tags', result.id] } ),
+				new NotificationNew( { title: a.type, message: a.payload.name + ' is created', type: NotificationType.Success } )
+			] ),
+			catchError( ( e: HttpErrorResponse ) =>
+				of(
+					new NotificationDismissWithTitle( a.type ),
+					new NotificationNew( { title: a.type, message: 'Create failed for ' + a.payload.name + '\n' + e.error.message, type: NotificationType.Error } )
 				)
 			)
 		)
@@ -60,10 +83,10 @@ import { Load, Create, Update } from './taggroup.actions';
 				new NotificationDismissWithTitle( a.type ),
 				new NotificationNew( { title: a.type, message: a.payload.name + ' is updated', type: NotificationType.Success } )
 			] ),
-			catchError( ( e: Error ) =>
+			catchError( ( e: HttpErrorResponse ) =>
 				of(
 					new NotificationDismissWithTitle( a.type ),
-					new NotificationNew( { title: a.type, message: 'Update failed for ' + a.payload.name + '\n' + e.message, type: NotificationType.Error } )
+					new NotificationNew( { title: a.type, message: 'Update failed for ' + a.payload.name + '\n' + e.error.message, type: NotificationType.Error } )
 				)
 			)
 		) )
@@ -78,10 +101,10 @@ import { Load, Create, Update } from './taggroup.actions';
 				new NotificationDismissWithTitle( a.type ),
 				new NotificationNew( { title: a.type, message: a.payload.name + ' is deleted', type: NotificationType.Success } )
 			] ),
-			catchError( ( e: Error ) =>
+			catchError( ( e: HttpErrorResponse ) =>
 				of(
 					new NotificationDismissWithTitle( a.type ),
-					new NotificationNew( { title: a.type, message: 'Delete failed for ' + a.payload.name + '\n' + e.message, type: NotificationType.Error } )
+					new NotificationNew( { title: a.type, message: 'Delete failed for ' + a.payload.name + '\n' + e.error.message, type: NotificationType.Error } )
 				)
 			)
 		) )
