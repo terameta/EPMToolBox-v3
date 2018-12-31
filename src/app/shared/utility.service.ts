@@ -67,7 +67,7 @@ export class UtilityService {
 		if ( item.name ) {
 			this.store.dispatch( new this.dispatcher[feature].Create( { ...item } ) );
 		} else {
-			this.store.dispatch( new NotificationNew( { title: 'Clone Cancelled', message: 'No action is taken', type: NotificationType.Info } ) );
+			this.store.dispatch( new NotificationNew( { title: 'Item Creation Cancelled', message: 'No action is taken', type: NotificationType.Info } ) );
 		}
 	}
 

@@ -1,3 +1,88 @@
-<p>
-  environment-detail works!
-</p>
+<ng-container *ngIf="item$ | async as item; else loading">
+	<div class="container-fluid">
+		<form (ngSubmit)="us.update(feature, item, f)" #f="ngForm">
+			<div class="form-group row my-3">
+				<label class="col-6 col-form-label font-weight-bold">Environment Details: {{item.name}}</label>
+				<div class="col-6 text-right">
+					<div class="btn-group btn-group-xs">
+						<button type="submit" class="btn btn-outline-success" title="Save"><i class="fas fa-save fa-fw"></i></button>
+						<button type="button" class="btn btn-outline-dark" (click)="us.clone(feature, item)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
+						<button type="button" class="btn btn-outline-danger" (click)="us.delete(feature, item)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cName" class="col-3 col-md-1 col-form-label font-weight-bold">Name:</label>
+				<div class="col-9 col-md-11"><input type="text" name="cName" class="form-control form-control-sm" [(ngModel)]="item.name"></div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cType" class="col-3 col-md-1 col-form-label font-weight-bold">Type:</label>
+				<div class="col-9 col-md-11">
+					<select name="cType" class="form-control form-control-sm" [(ngModel)]="item.type">
+						<option value="0">Please select a type</option>
+						<option [ngValue]="type.value" *ngFor="let type of types">{{ typeDescription(type.label) }}</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cServer" class="col-3 col-md-1 col-form-label font-weight-bold">Server:</label>
+				<div class="col-9 col-md-11"><input type="text" name="cServer" class="form-control form-control-sm" [(ngModel)]="item.server"></div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cPort" class="col-3 col-md-1 col-form-label font-weight-bold">Port:</label>
+				<div class="col-9 col-md-11"><input type="text" name="cPort" class="form-control form-control-sm" [(ngModel)]="item.port"></div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cCreds" class="col-3 col-md-1 col-form-label font-weight-bold">Credentials:</label>
+				<div class="col-9 col-md-11">
+					<div class="input-group input-group-sm">
+						<select name="cCreds" class="form-control form-control-sm" [(ngModel)]="item.credential">
+							<option value="0">Please select a credential</option>
+							<option [ngValue]="cred.id" *ngFor="let cred of credentials$ | async">{{ cred.name }}</option>
+						</select>
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" type="button" routerLink="/admin/credentials/{{item.credential}}" [disabled]="!item.credential" title="Go to credential details">
+								<i class="fas fa-link fa-fw"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group row my-1" *ngIf="item.type == environmentTypes.PBCS">
+				<label for="eDom" class="col-3 col-md-1 col-form-label font-weight-bold">PBCS Domain:</label>
+				<div class="col-9 col-md-11">
+					<input type="text" name="eDom" class="form-control form-control-sm" [(ngModel)]="item.identitydomain">
+				</div>
+			</div>
+			<div class="form-group row my-1">
+				<label class="col-3 col-md-1 col-form-label font-weight-bold">Verified?</label>
+				<div class="col-9 col-md-11">
+					<div class="input-group input-group-sm">
+						<select name="cVerified" class="form-control form-control-sm" [(ngModel)]="item.verified" disabled>
+							<option value="0" selected>No</option>
+							<option value="false">No</option>
+							<option value="1">Yes</option>
+							<option value="true">Yes</option>
+						</select>
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" type="button" [disabled]="!item.credential" title="Verify Environment" (click)="verify(item)">
+								<i class="fas fa-check-double fa-fw my-auto"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group row my-1">
+				<label class="col-3 col-md-1 col-form-label font-weight-bold">Tags:</label>
+				<div class="col-9 col-md-11">
+					<app-tag-selector [tags]="item.tags"></app-tag-selector>
+				</div>
+			</div>
+		</form>
+	</div>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

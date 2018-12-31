@@ -56,7 +56,7 @@ export enum EnvironmentType {
 	'ORADB' = 4
 }
 
-export const prepareToRead = ( payload: EnvironmentOnDB ): Environment => ( { ...payload, tags: JSON.parse( payload.tags ) } );
+export const prepareToRead = ( payload: EnvironmentOnDB ): Environment => ( { ...payload, tags: payload.tags ? JSON.parse( payload.tags ) : JSON.parse( '{}' ) } );
 
 export const prepareToWrite = ( payload: Environment ): EnvironmentOnDB => {
 	const toReturn = <EnvironmentDetail>{ ...payload };
@@ -86,30 +86,30 @@ export const prepareToWrite = ( payload: Environment ): EnvironmentOnDB => {
 
 // export const getDefaultATEnvironment = () => ( <ATEnvironment>JSONDeepCopy( { tags: {} } ) );
 
-// export function atGetEnvironmentTypeDescription( typecode: number | string ) {
-// 	switch ( typecode ) {
-// 		case 1:
-// 		case '1':
-// 		case 'HP': {
-// 			return 'Hyperion Planning On-Premises';
-// 		}
-// 		case 2:
-// 		case '2':
-// 		case 'MSSQL': {
-// 			return 'Microsoft SQL Server';
-// 		}
-// 		case 3:
-// 		case '3':
-// 		case 'PBCS': {
-// 			return 'Hyperion Planning PBCS';
-// 		}
-// 		case 4:
-// 		case '4':
-// 		case 'ORADB': {
-// 			return 'Oracle Database Server';
-// 		}
-// 	}
-// }
+export function getTypeDescription( typecode: number | string ) {
+	switch ( typecode ) {
+		case 1:
+		case '1':
+		case 'HP': {
+			return 'Hyperion Planning On-Premises';
+		}
+		case 2:
+		case '2':
+		case 'MSSQL': {
+			return 'Microsoft SQL Server';
+		}
+		case 3:
+		case '3':
+		case 'PBCS': {
+			return 'Hyperion Planning PBCS';
+		}
+		case 4:
+		case '4':
+		case 'ORADB': {
+			return 'Oracle Database Server';
+		}
+	}
+}
 
 
 

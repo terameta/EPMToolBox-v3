@@ -17,13 +17,14 @@ import * as TagActions from '../admin/tags/tag.actions';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
 import * as CredentialActions from '../admin/credentials/credentials.actions';
 import * as EnvironmentActions from '../admin/environments/environments.actions';
+import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 
 @Injectable()
 export class SharedEffects {
 	@Effect() ROUTER_NAVIGATION$: Observable<any> = this.actions$.pipe(
-		ofType( 'ROUTER_NAVIGATION' ),
+		ofType( ROUTER_NAVIGATED ),
 		withLatestFrom( this.store ),
-		filter( ( [routerAction, appState] ) => ( routerAction as any ).payload.routerState.url === '/sign-in' && appState.auth.status === AuthStatus.SignedIn ),
+		filter( ( [routerAction, appState] ) => ( routerAction as RouterNavigatedAction ).payload.event.urlAfterRedirects === '/sign-in' && appState.auth.status === AuthStatus.SignedIn ),
 		map( ( [routerAction, appState] ) => {
 			console.log( 'We are actually logged in, let\'s go to correct location' );
 			if ( appState.auth.user.role === UserRole.Admin ) return new RouterGo( { path: ['/', 'admin'] } );
@@ -32,17 +33,18 @@ export class SharedEffects {
 		} )
 	);
 
-	@Effect()
-	ROUTER_NAVIGATION_GET_CONCEPT$: Observable<any> = this.actions$.pipe(
-		ofType( 'ROUTER_NAVIGATION' ),
-		mergeMap( ( a: ReducingAction ) => [
-			new SetCurrentFeature( a.payload.routerState.url.split( '/' )[2] || null ),
-			new SetCurrentID( a.payload.routerState.url.split( '/' )[3] || null )
+	@Effect() ROUTER_NAVIGATION_GET_CONCEPT$: Observable<any> = this.actions$.pipe(
+		ofType( ROUTER_NAVIGATED ),
+		mergeMap( ( a: RouterNavigatedAction ) => [
+			new SetCurrentFeature( a.payload.event.urlAfterRedirects.split( '/' )[2] || null ),
+			new SetCurrentID( a.payload.event.urlAfterRedirects.split( '/' )[3] || null )
+			// new SetCurrentFeature( a.payload.routerState.url.split( '/' )[2] || null ),
+			// new SetCurrentID( a.payload.routerState.url.split( '/' )[3] || null )
 		] )
 	);
 
 	@Effect() SHOWINITIALINTEREST$: Observable<any> = this.actions$.pipe(
-		ofType( 'ROUTER_NAVIGATION' ),
+		ofType( ROUTER_NAVIGATED ),
 		withLatestFrom( this.store.select( 'auth' ) ),
 		filter( ( [routerAction, authState] ) => authState.status === AuthStatus.SignedIn ),
 		distinctUntilChanged(),

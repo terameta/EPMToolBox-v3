@@ -365,6 +365,9 @@ export class Initiator {
 		} );
 		this.steps.push( { expectedCurrentVersion: 100, operatorFunction: () => this.db.query( 'ALTER TABLE logs MODIFY details LONGTEXT NULL DEFAULT NULL' ) } );
 		this.steps.push( { expectedCurrentVersion: 101, operatorFunction: () => this.db.query( 'ALTER TABLE logs MODIFY reftype VARCHAR(256) NULL DEFAULT NULL' ) } );
+		this.steps.push( { expectedCurrentVersion: 102, operatorFunction: () => this.db.query( 'ALTER TABLE environments CHANGE type type BIGINT(20) UNSIGNED NOT NULL DEFAULT 0' ) } );
+		this.steps.push( { expectedCurrentVersion: 103, operatorFunction: () => this.db.query( 'ALTER TABLE environments CHANGE server server VARCHAR(255) NULL' ) } );
+		this.steps.push( { expectedCurrentVersion: 104, operatorFunction: () => this.db.query( 'ALTER TABLE environments CHANGE port port VARCHAR(5) NULL' ) } );
 	}
 
 	public initiate = async () => {

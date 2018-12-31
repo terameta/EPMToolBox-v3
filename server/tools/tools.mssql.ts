@@ -9,7 +9,11 @@ export class MSSQLTool {
 
 	constructor( private db: DB, public tools: MainTools ) { }
 
-	public verify = ( payload: EnvironmentDetail ) => 'Not Yet';
+	public verify = ( payload: EnvironmentDetail ) => {
+		console.log( 'MSSQL Verify Environment Not Yet' );
+		console.log( payload );
+		return 'Not Yet';
+	}
 	// public verify = ( payload: ATEnvironmentDetail ) => this.connect( payload );
 
 	// private connect = async ( payload: ATEnvironmentDetail ) => {

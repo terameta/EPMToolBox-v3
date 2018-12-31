@@ -121,6 +121,14 @@
 					<app-credentials-tool-bar></app-credentials-tool-bar>
 				</span>
 			</ng-container>
+			<ng-container *ngSwitchCase="'/admin/environments'">
+				<span class="navbar-text">
+					<a routerLink="/admin/environments"><span class="h3 text-onyx"><i class="fas fa-building fa-fw mr-3"></i>Environments</span></a>
+				</span>
+				<span class="ml-auto">
+					<app-environments-tool-bar></app-environments-tool-bar>
+				</span>
+			</ng-container>
 			<span class="navbar-text" *ngSwitchDefault>Not Start Here</span>
 		</ng-container>
 	</ng-container>

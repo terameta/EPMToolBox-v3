@@ -1,33 +1,26 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col">
-			<pre>Auth:
-{{(state$ | async).auth | json}}</pre>
+			<pre>Auth:{{(state$ | async).auth | json}}</pre>
 		</div>
 		<div class="col">
-			<pre>Notification:
-{{(state$ | async).notification | json}}</pre>
+			<pre>Notification:{{(state$ | async).notification | json}}</pre>
 		</div>
 		<div class="col">
-			<pre>Environments:
-		{{(state$ | async).environments | json}}</pre>
+			<pre>Environments:{{(state$ | async).environments | json}}</pre>
 		</div>
 		<div class="col">
-			<pre>Router:
-{{(state$ | async).router | json}}</pre>
+			<pre>Shared:{{(state$ | async).shared | json}}</pre>
 		</div>
 		<div class="col">
-			<pre>Shared:
-{{(state$ | async).shared | json}}</pre>
+			<pre>Tags:{{(state$ | async).tags | json}}</pre>
 		</div>
 		<div class="col">
-			<pre>Tags:
-{{(state$ | async).tags | json}}</pre>
+			<pre>Tag Groups:{{(state$ | async).taggroups | json}}</pre>
 		</div>
-	</div>
-	<div class="col">
-		<pre>Tag Groups:
-{{(state$ | async).taggroups | json}}</pre>
+		<div class="col">
+			<pre>Router:{{(state$ | async).router | json}}</pre>
+		</div>
 	</div>
 </div>
 <!-- <div class="container-fluid">
