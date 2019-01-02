@@ -9,34 +9,28 @@ export class MSSQLTool {
 
 	constructor( private db: DB, public tools: MainTools ) { }
 
-	public verify = ( payload: EnvironmentDetail ) => {
-		console.log( 'MSSQL Verify Environment Not Yet' );
-		console.log( payload );
-		return 'Not Yet';
-	}
-	// public verify = ( payload: ATEnvironmentDetail ) => this.connect( payload );
+	public verify = ( payload: EnvironmentDetail ) => this.connect( payload );
 
-	// private connect = async ( payload: ATEnvironmentDetail ) => {
-	// 	const dbConfig: MSSQLConfig = <MSSQLConfig>{
-	// 		user: payload.username || '',
-	// 		password: payload.password || '',
-	// 		server: payload.server || '',
-	// 		connectionTimeout: 300000,
-	// 		requestTimeout: 6000000,
-	// 		options: {
-	// 			encrypt: false
-	// 		}
-	// 	};
-	// 	if ( payload.database ) { dbConfig.database = payload.database; }
-	// 	if ( payload.server ) {
-	// 		dbConfig.server = payload.server;
-	// 		// This means we are not on a named instance.
-	// 		// As per the documentation if you are using a named instance, you shouldn't setup port.
-	// 		// Since we are not on a named instance, we will now setup port.
-	// 		if ( payload.server.split( '\\' ).length === 1 && payload.port ) { dbConfig.port = parseInt( payload.port, 10 ); }
-	// 	}
-	// 	payload.mssql.connection = await new ConnectionPool( dbConfig ).connect();
-	// }
+	private connect = async ( payload: EnvironmentDetail ) => {
+		const dbConfig: MSSQLConfig = <MSSQLConfig>{
+			user: payload.username || '',
+			password: payload.password || '',
+			server: payload.server || '',
+			connectionTimeout: 300000,
+			requestTimeout: 6000000,
+			options: {
+				encrypt: false
+			}
+		};
+		if ( payload.mssql && payload.mssql.database ) { dbConfig.database = payload.mssql.database; }
+		if ( payload.server ) {
+			// This means we are not on a named instance.
+			// As per the documentation if you are using a named instance, you shouldn't setup port.
+			// Since we are not on a named instance, we will now setup port.
+			if ( payload.server.split( '\\' ).length === 1 && payload.port ) { dbConfig.port = parseInt( payload.port, 10 ); }
+		}
+		payload.mssql.connection = await new ConnectionPool( dbConfig ).connect();
+	}
 
 	// public listDatabases = async ( payload: ATEnvironmentDetail ) => {
 	// 	await this.connect( payload );
