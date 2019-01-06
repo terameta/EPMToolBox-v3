@@ -17,4 +17,6 @@ export class EnvironmentsService {
 	public update = ( payload: Environment ) => this.http.patch<Environment>( this.baseUrl, payload );
 	public delete = ( payload: number ) => this.http.delete( this.baseUrl + '/' + payload );
 	public verify = ( payload: number ) => this.http.get( `${ this.baseUrl }/verify/${ payload }` );
+	public listDatabases = ( payload: number ) => this.http.get( `${ this.baseUrl }/listDatabases/${ payload }` );
+	public listTables = ( payload: { environment: number, database: string } ) => this.http.get( `${ this.baseUrl }/listTables/${ payload.environment }/${ payload.database }` );
 }

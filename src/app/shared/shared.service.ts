@@ -24,8 +24,10 @@ export class SharedService {
 		private store: Store<AppState>,
 		private platformLocation: PlatformLocation
 	) {
+		// console.log( 'Shared service is constructed' );
 		this.store.select( 'shared' ).pipe( distinctUntilChanged(), map( s => s.selectedTags ) ).subscribe( st => this.selectedTags = st );
 		this.interests$ = this.store.select( 'shared' ).pipe( debounceTime( 100 ), map( ( state: SharedState ) => state.interests ) );
+		// this.store.select('auth').pipe(distinctUntilChanged(), )
 
 		const protocol = ( platformLocation as any ).location.protocol;
 		const hostname = ( platformLocation as any ).location.hostname;

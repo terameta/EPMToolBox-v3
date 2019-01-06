@@ -6,10 +6,12 @@ import { TagState } from './admin/tags/tags.state';
 import { TagGroupState } from './admin/tags/taggroups.state';
 import { CredentialState } from './admin/credentials/credentials.state';
 import { EnvironmentState } from './admin/environments/environments.state';
+import { StreamState } from './admin/streams/streams.state';
 
 export interface AppState {
 	auth: AuthState,
 	environments: EnvironmentState,
+	streams: StreamState,
 	credentials: CredentialState,
 	notification: NotificationState,
 	router: RouterReducerState,

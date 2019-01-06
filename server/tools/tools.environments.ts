@@ -1,11 +1,12 @@
 import { DB } from './db';
 import { MainTools } from './tools.main';
-import { EnvironmentOnDB, Environment, EnvironmentType, EnvironmentDetail, prepareToWrite, prepareToRead, EnvironmentMSSQL } from '../../shared/models/environments.models';
+import { EnvironmentOnDB, Environment, EnvironmentType, EnvironmentDetail, prepareToWrite, EnvironmentMSSQL, EnvironmentSmartView } from '../../shared/models/environments.models';
 import { CredentialTools } from './tools.credentials';
 import { HPTool } from './tools.hp';
 import { PBCSTool } from './tools.pbcs';
 import { MSSQLTool } from './tools.mssql';
 import { CloneTarget } from '../../shared/models/clone.target';
+import { Tuple } from 'shared/models/tuple';
 
 export class EnvironmentTools {
 	private credentialTool: CredentialTools;
@@ -19,21 +20,23 @@ export class EnvironmentTools {
 	}
 
 	public getAll = async () => {
-		const { tuples } = await this.db.query<EnvironmentOnDB>( 'SELECT * FROM environments' );
-		return tuples.map( prepareToRead );
+		const { tuples } = await this.db.query<Tuple>( 'SELECT * FROM environments' );
+		return tuples.map<EnvironmentDetail>( this.tools.pTR );
 	}
 
 	public getOne = ( id: number ) => this.getDetails( id );
 
 	public getDetails = async ( id: number, reveal = false ) => {
-		const { tuple } = await this.db.queryOne<EnvironmentOnDB>( 'SELECT * FROM environments WHERE id = ?', id );
-		const toReturn = <EnvironmentDetail>prepareToRead( tuple );
+		const { tuple } = await this.db.queryOne<Tuple>( 'SELECT * FROM environments WHERE id = ?', id );
+		const toReturn = this.tools.pTR<EnvironmentDetail>( tuple );
 		if ( reveal ) {
 			const { username, password } = await this.credentialTool.getDetails( toReturn.credential, true );
 			toReturn.username = username;
 			toReturn.password = password;
 		}
 		if ( toReturn.type === EnvironmentType.MSSQL && !toReturn.mssql ) toReturn.mssql = <EnvironmentMSSQL>{};
+		if ( toReturn.type === EnvironmentType.PBCS && !toReturn.smartview ) toReturn.smartview = <EnvironmentSmartView>{};
+		if ( toReturn.type === EnvironmentType.HP && !toReturn.smartview ) toReturn.smartview = <EnvironmentSmartView>{};
 		return toReturn;
 	}
 
@@ -41,7 +44,7 @@ export class EnvironmentTools {
 		delete payload.id;
 		const target = prepareToWrite( payload );
 		if ( !target.name ) target.name = 'New Environment';
-		const result = await this.db.queryOne<any>( 'INSERT INTO environments SET ?', target );
+		const result = await this.db.queryOne<any>( 'INSERT INTO environments SET ?', this.tools.pTW( target ) );
 		target.id = result.tuple.insertId;
 		return target;
 	}
@@ -54,7 +57,7 @@ export class EnvironmentTools {
 	}
 
 	public update = async ( payload: Environment ) => {
-		await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [prepareToWrite( payload ), payload.id] );
+		await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [this.tools.pTW( prepareToWrite( payload ) ), payload.id] );
 		return { status: 'success' };
 	}
 
@@ -73,16 +76,24 @@ export class EnvironmentTools {
 
 	private setVerified = async ( payload: EnvironmentDetail ) => this.update( { ...payload, ...{ verified: true } } );
 	private setUnVerified = async ( payload: EnvironmentDetail ) => this.update( { ...payload, ...{ verified: false } } );
+
+	public listDatabases = async ( id: number ) => {
+		const payload = await this.getDetails( id, true );
+		const databasesReceived = await this.sourceTools[payload.type].listDatabases( payload );
+		if ( !payload.databases ) payload.databases = {};
+		databasesReceived.forEach( db => {
+			if ( !payload.databases[db.name] ) payload.databases[db.name] = { name: db.name, tables: [] };
+		} );
+		await this.update( payload );
+		return { result: 'success' };
+	}
 }
 
 // import { ATTuple } from '../../shared/models/at.tuple';
 // import { ATEnvironmentType, ATEnvironment, ATEnvironmentDetail , atEnvironmentPrepareToSave } from '../../shared/models/at.environment';
 // import { ATStream, ATStreamField } from '../../shared/models/at.stream';
 
-// 	public listDatabases = async ( id: number ) => {
-// 		const payload = await this.getEnvironmentDetails( id, true );
-// 		return await this.sourceTools[payload.type].listDatabases( payload );
-// 	}
+
 // 	public listTables = async ( payload: { id: number, database: string } ) => {
 // 		const lister = await this.getEnvironmentDetails( payload.id, true );
 // 		if ( payload.database ) lister.database = payload.database;

@@ -11,10 +11,8 @@ export class HPTool {
 		this.smartview = new SmartViewTool( this.db, this.tools );
 	}
 
-	public verify = ( payload: EnvironmentDetail ) => 'Not Yet';
-
-	// public verify = ( payload: EnvironmentDetail ) => this.smartview.validateSID( payload );
-	// public listDatabases = ( payload: EnvironmentDetail ) => this.smartview.listApplications( payload );
+	public verify = ( payload: EnvironmentDetail ) => this.smartview.validateSID( payload );
+	public listDatabases = ( payload: EnvironmentDetail ) => this.smartview.listApplications( payload );
 	// public listTables = ( payload: EnvironmentDetail ) => this.smartview.listCubes( payload );
 	// public listFields = ( payload: EnvironmentDetail ) => this.smartview.listDimensions( payload );
 	// public listAliasTables = ( payload: EnvironmentDetail ) => this.smartview.listAliasTables( payload );

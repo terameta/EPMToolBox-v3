@@ -13,6 +13,8 @@ import * as CredentialActions from '../admin/credentials/credentials.actions';
 import { FEATURE as CredentialFeature } from '../admin/credentials/credentials.state';
 import * as EnvironmentActions from '../admin/environments/environments.actions';
 import { FEATURE as EnvironmentFeature } from '../admin/environments/environments.state';
+import * as StreamActions from '../admin/streams/streams.actions';
+import { FEATURE as StreamFeature } from '../admin/streams/streams.state';
 import { NotificationNew } from '../notification/notification.actions';
 import { NotificationType } from '../notification/notification.models';
 import { NgForm } from '@angular/forms';
@@ -35,6 +37,7 @@ export class UtilityService {
 		this.dispatcher[TagGroupFeature] = TagGroupActions;
 		this.dispatcher[CredentialFeature] = CredentialActions;
 		this.dispatcher[EnvironmentFeature] = EnvironmentActions;
+		this.dispatcher[StreamFeature] = StreamActions;
 	}
 
 	public confirm = ( question: string, okonly = false ): Promise<boolean> => {

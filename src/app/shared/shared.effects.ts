@@ -17,6 +17,7 @@ import * as TagActions from '../admin/tags/tag.actions';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
 import * as CredentialActions from '../admin/credentials/credentials.actions';
 import * as EnvironmentActions from '../admin/environments/environments.actions';
+import * as StreamActions from '../admin/streams/streams.actions';
 import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 
 @Injectable()
@@ -38,8 +39,6 @@ export class SharedEffects {
 		mergeMap( ( a: RouterNavigatedAction ) => [
 			new SetCurrentFeature( a.payload.event.urlAfterRedirects.split( '/' )[2] || null ),
 			new SetCurrentID( a.payload.event.urlAfterRedirects.split( '/' )[3] || null )
-			// new SetCurrentFeature( a.payload.routerState.url.split( '/' )[2] || null ),
-			// new SetCurrentID( a.payload.routerState.url.split( '/' )[3] || null )
 		] )
 	);
 
@@ -53,8 +52,8 @@ export class SharedEffects {
 	);
 
 	@Effect() DETECTSESSION$: Observable<any> = this.actions$.pipe(
-		ofType( 'ROUTER_NAVIGATION' ),
-		filter( ( a: ReducingAction ) => a.payload.routerState.url !== '/' ),
+		ofType( ROUTER_NAVIGATED ),
+		filter( ( a: RouterNavigatedAction ) => a.payload.event.urlAfterRedirects !== '/' ),
 		withLatestFrom( this.store.select( 'auth' ) ),
 		map( ( [r, a] ) => a ),
 		filter( ( authState ) => authState.status === AuthStatus.SignedOut ),
@@ -69,6 +68,7 @@ export class SharedEffects {
 			if ( action.payload === 'taggroups' ) return ( new TagGroupActions.Load() );
 			if ( action.payload === 'credentials' ) return ( new CredentialActions.Load() );
 			if ( action.payload === 'environments' ) return ( new EnvironmentActions.Load() );
+			if ( action.payload === 'streams' ) return ( new StreamActions.Load() );
 			return ( new DoNothing() );
 		} )
 	);

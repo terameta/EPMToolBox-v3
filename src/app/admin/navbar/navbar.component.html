@@ -129,6 +129,14 @@
 					<app-environments-tool-bar></app-environments-tool-bar>
 				</span>
 			</ng-container>
+			<ng-container *ngSwitchCase="'/admin/streams'">
+				<span class="navbar-text">
+					<a routerLink="/admin/streams"><span class="h3 text-onyx"><i class="fas fa-arrows-alt fa-fw mr-3"></i>Streams</span></a>
+				</span>
+				<span class="ml-auto">
+					<app-streams-tool-bar></app-streams-tool-bar>
+				</span>
+			</ng-container>
 			<span class="navbar-text" *ngSwitchDefault>Not Start Here</span>
 		</ng-container>
 	</ng-container>

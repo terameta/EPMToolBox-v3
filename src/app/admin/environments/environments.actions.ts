@@ -54,3 +54,17 @@ export class Verify implements ReducingAction {
 
 	constructor( public payload: Environment ) { }
 }
+
+export class DatabasesRefresh implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Databases Refresh';
+
+	constructor( public payload: number ) { }
+}
+
+export class TablesRefresh implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Tables Refresh';
+
+	constructor( public payload: { environment: number, database: string } ) { }
+}

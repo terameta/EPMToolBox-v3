@@ -13,12 +13,15 @@ import { CredentialsComponent } from './credentials/credentials/credentials.comp
 import { CredentialsToolBarComponent } from './credentials/credentials-tool-bar/credentials-tool-bar.component';
 import { EnvironmentsComponent } from './environments/environments/environments.component';
 import { EnvironmentsToolBarComponent } from './environments/environments-tool-bar/environments-tool-bar.component';
+import { StreamsComponent } from './streams/streams/streams.component';
+import { StreamsToolBarComponent } from './streams/streams-tool-bar/streams-tool-bar.component';
 
 const routes: Routes = [
 	{ path: '', component: FrontPageComponent },
 	{ path: 'tags', component: TagsComponent, loadChildren: './tags/tags.module#TagsModule' },
 	{ path: 'credentials', component: CredentialsComponent, loadChildren: './credentials/credentials.module#CredentialsModule' },
-	{ path: 'environments', component: EnvironmentsComponent, loadChildren: './environments/environments.module#EnvironmentsModule' }
+	{ path: 'environments', component: EnvironmentsComponent, loadChildren: './environments/environments.module#EnvironmentsModule' },
+	{ path: 'streams', component: StreamsComponent, loadChildren: './streams/streams.module#StreamsModule' }
 ];
 
 @NgModule( {
@@ -28,6 +31,7 @@ const routes: Routes = [
 		NavbarComponent,
 		CredentialsToolBarComponent,
 		EnvironmentsToolBarComponent,
+		StreamsToolBarComponent,
 		TagsToolBarComponent
 	],
 	imports: [

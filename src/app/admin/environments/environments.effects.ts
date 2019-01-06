@@ -7,7 +7,7 @@ import { Observable, of } from 'rxjs';
 import { FEATURE } from './environments.state';
 import { tap, filter, switchMap, mergeMap, catchError } from 'rxjs/operators';
 import { NotificationDismissWithTitle, NotificationNew } from 'src/app/notification/notification.actions';
-import { Load, Create, Clone, Update, Delete, Verify } from './environments.actions';
+import { Load, Create, Clone, Update, Delete, Verify, DatabasesRefresh, TablesRefresh } from './environments.actions';
 import { NotificationType } from 'src/app/notification/notification.models';
 import { RouterGo } from 'src/app/shared/router.actions';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -127,6 +127,42 @@ export class EnvironmentEffects {
 				return of(
 					new NotificationDismissWithTitle( a.type ),
 					new NotificationNew( { title: a.type, message: 'Verification failed for ' + a.payload.name + '\n' + e.error.message, type: NotificationType.Error } )
+				);
+			} )
+		) )
+	);
+
+	@Effect() databasesrefresh$: Observable<any> = this.actions$.pipe(
+		ofType( FEATURE + 'Databases Refresh' ),
+		tap( a => { this.store.dispatch( new NotificationDismissWithTitle( a.type ) ); } ),
+		switchMap( ( a: DatabasesRefresh ) => this.service.listDatabases( a.payload ).pipe(
+			mergeMap( result => [
+				new NotificationDismissWithTitle( a.type ),
+				new NotificationNew( { title: a.type, message: 'Databases refreshed.', type: NotificationType.Success } )
+			] ),
+			catchError( ( e: HttpErrorResponse ) => {
+				console.log( e );
+				return of(
+					new NotificationDismissWithTitle( a.type ),
+					new NotificationNew( { title: a.type, message: 'Failed to list the databases for environment\n' + e.error.message, type: NotificationType.Error } )
+				);
+			} )
+		) )
+	);
+
+	@Effect() tablesrefresh$: Observable<any> = this.actions$.pipe(
+		ofType( FEATURE + 'Tables Refresh' ),
+		tap( a => { this.store.dispatch( new NotificationDismissWithTitle( a.type ) ); } ),
+		switchMap( ( a: TablesRefresh ) => this.service.listTables( a.payload ).pipe(
+			mergeMap( result => [
+				new NotificationDismissWithTitle( a.type ),
+				new NotificationNew( { title: a.type, message: 'Tables refreshed.', type: NotificationType.Success } )
+			] ),
+			catchError( ( e: HttpErrorResponse ) => {
+				console.log( e );
+				return of(
+					new NotificationDismissWithTitle( a.type ),
+					new NotificationNew( { title: a.type, message: 'Failed to list the tables for environment\n' + e.error.message, type: NotificationType.Error } )
 				);
 			} )
 		) )

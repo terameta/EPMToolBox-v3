@@ -80,7 +80,12 @@
 											<td>&nbsp;</td>
 											<td class="px-0"> {{ item.identitydomain }} </td>
 											<td>&nbsp;</td>
-											<td class="px-0" *ngIf="credentials$ | async as credentials"> {{ credentials[item.credential]?.name }}</td>
+											<td class="px-0" *ngIf="credentials$ | async as credentials">
+												<a routerLink="../../credentials/{{item.credential}}" title="Go to credential: {{ credentials[item.credential]?.name }}">
+													<i class="fas fa-chevron-right text-warning"></i>
+													{{ credentials[item.credential]?.name }}
+												</a>
+											</td>
 										</tr>
 									</ng-container>
 								</ng-container>

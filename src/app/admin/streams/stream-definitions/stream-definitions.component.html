@@ -1,0 +1,125 @@
+<ng-container *ngIf="item$ | async as item; else loading">
+	<form (ngSubmit)="us.update(feature, item, f)" #f="ngForm">
+		<div class="container-fluid">
+			<div class="form-group row my-3">
+				<label class="col-6 col-form-label font-weight-bold">Stream Details: {{item.name}}</label>
+				<div class="col-6 text-right">
+					<div class="btn-group btn-group-xs">
+						<button type="submit" class="btn btn-outline-success" title="Save"><i class="fas fa-save fa-fw"></i></button>
+						<button type="button" class="btn btn-outline-dark" (click)="us.clone(feature, item)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
+						<button type="button" class="btn btn-outline-danger" (click)="us.delete(feature, item)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cName" class="col-3 col-md-1 col-form-label font-weight-bold">Name:</label>
+				<div class="col-9 col-md-11"><input type="text" name="cName" class="form-control form-control-sm" [(ngModel)]="item.name"></div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cType" class="col-3 col-md-1 col-form-label font-weight-bold">Type:</label>
+				<div class="col-9 col-md-11">
+					<select name="cType" class="form-control form-control-sm" [(ngModel)]="item.type">
+						<option value="0">Please select a type</option>
+						<option [ngValue]="type.value" *ngFor="let type of types">{{ typeDescription(type.label) }}</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group row my-1">
+				<label for="cEnvironment" class="col-3 col-md-1 col-form-label font-weight-bold">Environment:</label>
+				<div class="col-9 col-md-11">
+					<div class="input-group input-group-sm">
+						<select name="cEnvironment" class="form-control form-control-sm" [(ngModel)]="item.environment" (change)="environmentChanged$.next(true)">
+							<option [ngValue]="undefined">Please select an environment</option>
+							<option [ngValue]="environment.id" *ngFor="let environment of environments$ | async">{{ environment.name }}</option>
+						</select>
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" type="button" routerLink="/admin/environments/{{item.environment}}" [disabled]="!item.environment" title="Go to environment details">
+								<i class="fas fa-link fa-fw"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<ng-container *ngIf="(environmentChanged$ | async)">
+				<div class="form-group row my-1"><label class="col col-form-label font-weight-bold text-warning">Please save the stream. Environment selection has changed.</label></div>
+			</ng-container>
+			<ng-container *ngIf="!(environmentChanged$ | async)">
+				<ng-container *ngIf="!item.environment">
+					<div class="form-group row my-1"><label class="col col-form-label font-weight-bold text-warning">Please assign an environment to the stream.</label></div>
+				</ng-container>
+				<ng-container *ngIf="item.environment">
+					<div class="form-group row my-1">
+						<label for="cDatabase" class="col-3 col-md-1 col-form-label font-weight-bold">
+							<span *ngIf="item.type != streamTypes.HPDB">Database:</span>
+							<span *ngIf="item.type == streamTypes.HPDB">Application:</span>
+						</label>
+						<div class="col-9 col-md-11">
+							<div class="input-group input-group-sm">
+								<ng-container *ngIf="item.environment">
+									<ng-container *ngIf="environment$ | async as environment">
+										<ng-container *ngIf="environment.databases">
+											<select name="cDatabase" class="form-control form-control-sm" [(ngModel)]="item.dbName" required>
+												<option [ngValue]="undefined">Please select</option>
+												<option [ngValue]="database.name" *ngFor="let database of databases$ | async">{{ database.name }}</option>
+											</select>
+										</ng-container>
+										<ng-container *ngIf="!environment.databases">
+											<input type="text" class="form-control form-control-sm" name="cDatabaseNoDatabaseWarner" value="Please click to refresh databases button on the right" disabled>
+										</ng-container>
+									</ng-container>
+								</ng-container>
+								<ng-container *ngIf="!item.environment">
+									<input type="text" class="form-control form-control-sm" name="cDatabaseNoEnvironmentWarner" value="Please assign an environment to the stream" disabled>
+								</ng-container>
+								<div class="input-group-append">
+									<button class="btn btn-outline-secondary" type="button" (click)="refreshDatabases(item.environment)" title="Refresh Databases/Applications">
+										<i class="fas fa-sync-alt fa-fw"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<ng-container *ngIf="!item.dbName">
+						<div class="form-group row my-1"><label class="col col-form-label font-weight-bold text-warning">Please assign a database/application to the stream.</label></div>
+					</ng-container>
+					<ng-container *ngIf="item.dbName">
+						<div class="form-group row my-1">
+							<label for="sTable" class="col-3 col-md-1 col-form-label font-weight-bold">
+								<span *ngIf="item.type!=streamTypes.HPDB">Table:</span>
+								<span *ngIf="item.type==streamTypes.HPDB">Cube:</span>
+							</label>
+							<div class="col-9 col-md-11">
+								<div class="input-group input-group-sm">
+									<select name="sTables" class="form-control form-control-sm" [(ngModel)]="item.tableName" required>
+										<option [value]="undefined">Please select</option>
+										<option *ngFor="let table of (database$ | async).tables" [value]="table.name">{{table.name}}</option>
+									</select>
+									<div class="input-group-append">
+										<button class="btn btn-outline-secondary" type="button" (click)="refreshTables(item.environment, item.dbName)" title="Refresh Tables/Cubes">
+											<i class="fas fa-sync-alt fa-fw"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</ng-container>
+
+				</ng-container>
+			</ng-container>
+
+			<div class="form-group row my-1">
+				<label class="col-3 col-md-1 col-form-label font-weight-bold">Tags:</label>
+				<div class="col-9 col-md-11">
+					<app-tag-selector [tags]="item.tags"></app-tag-selector>
+				</div>
+			</div>
+		</div>
+	</form>
+	<pre>{{item | json}}</pre>
+	<pre *ngIf="database$ | async as database">{{item.dbName}} {{ database | json}}</pre>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

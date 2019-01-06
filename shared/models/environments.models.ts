@@ -19,6 +19,7 @@ export interface EnvironmentOnDB extends EnvironmentBase { tags: string }
 export interface EnvironmentDetail extends Environment {
 	username: string,
 	password: string,
+	databases: { [key: string]: DatabaseListItem },
 	mssql: EnvironmentMSSQL,
 	smartview: EnvironmentSmartView
 }
@@ -49,6 +50,9 @@ export interface EnvironmentSmartView {
 	form: any
 }
 
+export interface DatabaseListItem { name: string, tables: TableListItem[] }
+export interface TableListItem { name: string, type: string }
+
 export enum EnvironmentType {
 	'HP' = 1,
 	'MSSQL' = 2,
@@ -56,15 +60,12 @@ export enum EnvironmentType {
 	'ORADB' = 4
 }
 
-export const prepareToRead = ( payload: EnvironmentOnDB ): Environment => ( { ...payload, tags: payload.tags ? JSON.parse( payload.tags ) : JSON.parse( '{}' ) } );
-
-export const prepareToWrite = ( payload: Environment ): EnvironmentOnDB => {
+export const prepareToWrite = ( payload: Environment ): EnvironmentDetail => {
 	const toReturn = <EnvironmentDetail>{ ...payload };
-	delete toReturn.mssql;
-	delete toReturn.smartview;
 	delete toReturn.username;
 	delete toReturn.password;
-	return { ...toReturn, tags: JSON.stringify( payload.tags ) };
+	if ( toReturn.mssql && toReturn.mssql.connection ) delete toReturn.mssql.connection;
+	return toReturn;
 };
 
 // export interface ATEnvironmentDetail extends ATEnvironment {

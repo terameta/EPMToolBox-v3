@@ -6,6 +6,7 @@ import { ApiTags } from './api.tags';
 import { ApiTagGroups } from './api.taggroups';
 import { ApiCredentials } from './api.credentials';
 import { ApiEnvironments } from './api.environments';
+import { ApiStreams } from './api.streams';
 
 // export const initializeRestApi = ( app: Application, db: DB, tools: MainTools ) => {
 // 	console.log( 'initializing Rest API' );
@@ -36,6 +37,7 @@ export class RestAPI {
 		const apiAuth = new ApiAuth( this.app, this.db, this.tools );
 		const apiCredential = new ApiCredentials( this.app, this.db, this.tools );
 		const apiEnvironment = new ApiEnvironments( this.app, this.db, this.tools );
+		const apiStream = new ApiStreams( this.app, this.db, this.tools );
 		const apiTags = new ApiTags( this.app, this.db, this.tools );
 		const apiTagGroups = new ApiTagGroups( this.app, this.db, this.tools );
 	}

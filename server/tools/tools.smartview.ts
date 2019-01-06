@@ -1,6 +1,6 @@
 import { DB } from './db';
 import { MainTools } from './tools.main';
-import { EnvironmentDetail, EnvironmentType, prepareToWrite } from '../../shared/models/environments.models';
+import { EnvironmentDetail, EnvironmentType, prepareToWrite, EnvironmentSmartView } from '../../shared/models/environments.models';
 import * as Promisers from '../../shared/utilities/promisers';
 import { join } from 'path';
 import { compile as hbCompile } from 'handlebars';
@@ -21,11 +21,11 @@ export class SmartViewTool {
 	// 	// const body = await this.smartviewGetXMLTemplate( 'req_ExecuteQuery.xml', { SID: payload.SID } );
 	// 	throw new Error( 'Smart view read data MDX is not implemented yet' );
 	// }
-	// private smartviewGetXMLTemplate = async ( name: string, params: any ) => {
-	// 	const bodyXML = await Promisers.readFile( join( __dirname, './tools.smartview.templates/' + name ) );
-	// 	const bodyTemplate = hbCompile( bodyXML );
-	// 	return bodyTemplate( params );
-	// }
+	private smartviewGetXMLTemplate = async ( name: string, params: any ) => {
+		const bodyXML = await Promisers.readFile( join( __dirname, './tools.smartview.templates/' + name ) );
+		const bodyTemplate = hbCompile( bodyXML );
+		return bodyTemplate( params );
+	}
 	// private smartviewOpenCube = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
 	// 	await this.smartviewListCubes( payload );
 	// 	const body = await this.smartviewGetXMLTemplate( 'req_OpenCube.xml', payload );
@@ -55,38 +55,38 @@ export class SmartViewTool {
 	// 	if ( hasFailed ) throw ( new Error( 'Failure to open application ' + payload.name + '@smartviewOpenApplication' ) );
 	// 	return payload;
 	// }
-	// public smartviewListApplications = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	// Validate SID function tries the smartviewListApplicationsValidator
-	// 	// If successful we have the applications listed in the response already
-	// 	// We made this so that we can avoid the circular reference
-	// 	return this.validateSID( payload );
-	// }
-	// public validateSID = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	if ( !payload.smartview.SID ) {
-	// 		delete payload.smartview.cookie;
-	// 		delete payload.smartview.ssotoken;
-	// 		if ( payload.type === EnvironmentType.HP ) await this.hpObtainSID( payload );
-	// 		if ( payload.type === EnvironmentType.PBCS ) await this.pbcsObtainSID( payload );
-	// 	}
-	// 	await this.smartviewPrepareEnvironment( payload );
-	// 	await this.smartviewListApplicationsValidator( payload ).catch( () => {
-	// 		delete payload.smartview.SID;
-	// 		delete payload.smartview.cookie;
-	// 		delete payload.smartview.ssotoken;
-	// 		switch ( payload.type ) {
-	// 			case EnvironmentType.PBCS: {
-	// 				return this.pbcsObtainSID( payload ).then( this.smartviewListApplicationsValidator );
-	// 			}
-	// 			case EnvironmentType.HP: {
-	// 				return this.hpObtainSID( payload ).then( this.smartviewListApplicationsValidator );
-	// 			}
-	// 			default: {
-	// 				throw ( new Error( 'Provided environment type is not valid' ) );
-	// 			}
-	// 		}
-	// 	} );
-	// 	return payload;
-	// }
+	public smartviewListApplications = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		// Validate SID function tries the smartviewListApplicationsValidator
+		// If successful we have the applications listed in the response already
+		// We made this so that we can avoid the circular reference
+		return this.validateSID( payload );
+	}
+	public validateSID = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		if ( !payload.smartview.SID ) {
+			delete payload.smartview.cookie;
+			delete payload.smartview.ssotoken;
+			if ( payload.type === EnvironmentType.HP ) await this.hpObtainSID( payload );
+			if ( payload.type === EnvironmentType.PBCS ) await this.pbcsObtainSID( payload );
+		}
+		await this.smartviewPrepareEnvironment( payload );
+		await this.smartviewListApplicationsValidator( payload ).catch( () => {
+			delete payload.smartview.SID;
+			delete payload.smartview.cookie;
+			delete payload.smartview.ssotoken;
+			switch ( payload.type ) {
+				case EnvironmentType.PBCS: {
+					return this.pbcsObtainSID( payload ).then( this.smartviewListApplicationsValidator );
+				}
+				case EnvironmentType.HP: {
+					return this.hpObtainSID( payload ).then( this.smartviewListApplicationsValidator );
+				}
+				default: {
+					throw ( new Error( 'Provided environment type is not valid' ) );
+				}
+			}
+		} );
+		return payload;
+	}
 	// public smartviewReadDataPrepare = async ( payload ) => {
 	// 	await this.smartviewOpenCube( payload );
 
@@ -844,226 +844,226 @@ export class SmartViewTool {
 	// 	if ( hasFailed ) throw ( new Error( 'Failure to get available services ' + payload.name + '@smartviewGetAvailableServices' ) );
 	// 	return payload;
 	// }
-	// public listApplications = async ( payload: EnvironmentDetail ) => {
-	// 	await this.smartviewListApplications( payload );
-	// 	return payload.smartview.applications;
-	// }
-	// private smartviewListApplicationsValidator = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewListServers( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ListApplications.xml', payload );
-	// 	const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	public listApplications = async ( payload: EnvironmentDetail ) => {
+		await this.smartviewListApplications( payload );
+		return payload.smartview.applications;
+	}
+	private smartviewListApplicationsValidator = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewListServers( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_ListApplications.xml', payload );
+		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const isListed = $( 'body' ).children().toArray().filter( e => ( e.name === 'res_listapplications' ) ).length > 0;
+		const isListed = $( 'body' ).children().toArray().filter( e => ( e.name === 'res_listapplications' ) ).length > 0;
 
-	// 	if ( !isListed ) throw new Error( 'Failure to list applications@smartviewListApplications' );
+		if ( !isListed ) throw new Error( 'Failure to list applications@smartviewListApplications' );
 
-	// 	payload.smartview.applications = $( 'apps' ).text().split( '|' ).map( curApp => ( { name: curApp } ) );
-	// 	return payload;
-	// }
-	// public listServers = async ( payload: EnvironmentDetail ) => {
-	// 	await this.smartviewListServers( payload );
-	// 	return payload.smartview.planningserver;
-	// }
-	// public smartviewListServers = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ListServers.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
-	// 	const isListed = $( 'body' ).children().toArray().filter( e => ( e.name === 'res_listservers' ) ).length > 0;
+		payload.smartview.applications = $( 'apps' ).text().split( '|' ).map( curApp => ( { name: curApp } ) );
+		return payload;
+	}
+	public listServers = async ( payload: EnvironmentDetail ) => {
+		await this.smartviewListServers( payload );
+		return payload.smartview.planningserver;
+	}
+	public smartviewListServers = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_ListServers.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		const isListed = $( 'body' ).children().toArray().filter( e => ( e.name === 'res_listservers' ) ).length > 0;
 
-	// 	if ( !isListed ) throw new Error( 'Failure to list servers@smartviewListServers' );
+		if ( !isListed ) throw new Error( 'Failure to list servers@smartviewListServers' );
 
-	// 	payload.smartview.planningserver = $( 'srvs' ).text();
-	// 	return payload;
-	// }
-	// private smartviewEstablishConnection = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	return new Promise( ( resolve, reject ) => {
-	// 		this.smartviewEstablishConnectionAction( payload )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 01:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 02:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 03:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 04:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 05:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 06:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 07:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 08:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 09:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 10:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 11:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.catch( ( failure: Error ) => { console.error( 'Establish connection failed 12:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
-	// 			.then( resolve )
-	// 			.catch( reject );
-	// 	} );
-	// }
-	// private smartviewEstablishConnectionAction = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewPrepareEnvironment( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProvider.xml', {} );
-	// 	const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
-	// 	let isConnectionEstablished = false;
-	// 	$( 'body' ).children().toArray().forEach( curElem => {
-	// 		if ( curElem.name === 'res_connecttoprovider' ) { isConnectionEstablished = true; }
-	// 	} );
-	// 	if ( !isConnectionEstablished ) {
-	// 		throw new Error( 'Establish Connection - Failure to connect smartview provider: ' + payload.name + '->' + rBody );
-	// 	}
-	// 	return payload;
-	// }
-	// private smartviewWaiter = ( payload: EnvironmentDetail, timeToWait = 5000 ): Promise<EnvironmentDetail> => {
-	// 	return new Promise( ( resolve, reject ) => {
-	// 		setTimeout( () => { resolve( payload ); }, timeToWait );
-	// 	} );
-	// }
-	// private smartviewPrepareEnvironment = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	if ( !payload.smartview ) payload.smartview = <any>{};
-	// 	payload.smartview.url = payload.server + ':' + payload.port + '/workspace/SmartViewProviders';
-	// 	payload.smartview.planningurl = payload.server + ':' + payload.port + '/HyperionPlanning/SmartView';
-	// 	payload.smartview.jar = request.jar();
-	// 	if ( payload.smartview.cookie ) {
-	// 		payload.smartview.jar.setCookie( payload.smartview.cookie, payload.server );
-	// 	}
-	// 	return payload;
-	// }
-	// private hpObtainSID = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	return this.smartviewEstablishConnection( payload ).
-	// 		then( this.hpObtainSID01 ).
-	// 		then( this.hpObtainSID02 );
-	// }
-	// private hpObtainSID01 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_GetProvisionedDataSourcesWithCredentials.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.url, body } );
+		payload.smartview.planningserver = $( 'srvs' ).text();
+		return payload;
+	}
+	private smartviewEstablishConnection = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		return new Promise( ( resolve, reject ) => {
+			this.smartviewEstablishConnectionAction( payload )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 01:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 02:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 03:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 04:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 05:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 06:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 07:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 08:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 09:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 10:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 11:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.catch( ( failure: Error ) => { console.error( 'Establish connection failed 12:', payload.name, failure.message ); return this.smartviewWaiter( payload ).then( this.smartviewEstablishConnectionAction ); } )
+				.then( resolve )
+				.catch( reject );
+		} );
+	}
+	private smartviewEstablishConnectionAction = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewPrepareEnvironment( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProvider.xml', {} );
+		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		let isConnectionEstablished = false;
+		$( 'body' ).children().toArray().forEach( curElem => {
+			if ( curElem.name === 'res_connecttoprovider' ) { isConnectionEstablished = true; }
+		} );
+		if ( !isConnectionEstablished ) {
+			throw new Error( 'Establish Connection - Failure to connect smartview provider: ' + payload.name + '->' + rBody );
+		}
+		return payload;
+	}
+	private smartviewWaiter = ( payload: EnvironmentDetail, timeToWait = 5000 ): Promise<EnvironmentDetail> => {
+		return new Promise( ( resolve, reject ) => {
+			setTimeout( () => { resolve( payload ); }, timeToWait );
+		} );
+	}
+	private smartviewPrepareEnvironment = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		if ( !payload.smartview ) payload.smartview = <EnvironmentSmartView>{};
+		payload.smartview.url = payload.server + ':' + payload.port + '/workspace/SmartViewProviders';
+		payload.smartview.planningurl = payload.server + ':' + payload.port + '/HyperionPlanning/SmartView';
+		payload.smartview.jar = request.jar();
+		if ( payload.smartview.cookie ) {
+			payload.smartview.jar.setCookie( payload.smartview.cookie, payload.server );
+		}
+		return payload;
+	}
+	private hpObtainSID = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		return this.smartviewEstablishConnection( payload ).
+			then( this.hpObtainSID01 ).
+			then( this.hpObtainSID02 );
+	}
+	private hpObtainSID01 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_GetProvisionedDataSourcesWithCredentials.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.url, body } );
 
-	// 	$( 'Product' ).each( ( i: any, elem: any ) => {
-	// 		if ( $( elem ).attr( 'id' ) === 'HP' ) {
-	// 			payload.smartview.planningurl = payload.server + ':' + payload.port + $( elem ).children( 'Server' ).attr( 'context' );
-	// 		}
-	// 	} );
-	// 	payload.smartview.ssotoken = $( 'sso' ).text();
-	// 	if ( !payload.smartview.planningurl ) {
-	// 		throw new Error( 'No planning url could be identified ' + payload.name + '@hpObtainSID01' );
-	// 	} else if ( !payload.smartview.ssotoken ) {
-	// 		throw new Error( 'No sso token was found ' + payload.name + '@hpObtainSID01' );
-	// 	} else {
-	// 		return payload;
-	// 	}
-	// }
-	// private hpObtainSID02 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProviderSSO.xml', { ssotoken: payload.smartview.ssotoken } );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body } );
-	// 	payload.smartview.SID = $( 'sID' ).text();
-	// 	await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [JSONDeepCopy( payload ), payload.id] );
-	// 	if ( payload.smartview.SID ) {
-	// 		return payload;
-	// 	} else {
-	// 		throw new Error( 'No SID found ' + payload.name + '@hpObtainSID02' );
-	// 	}
-	// }
+		$( 'Product' ).each( ( i: any, elem: any ) => {
+			if ( $( elem ).attr( 'id' ) === 'HP' ) {
+				payload.smartview.planningurl = payload.server + ':' + payload.port + $( elem ).children( 'Server' ).attr( 'context' );
+			}
+		} );
+		payload.smartview.ssotoken = $( 'sso' ).text();
+		if ( !payload.smartview.planningurl ) {
+			throw new Error( 'No planning url could be identified ' + payload.name + '@hpObtainSID01' );
+		} else if ( !payload.smartview.ssotoken ) {
+			throw new Error( 'No sso token was found ' + payload.name + '@hpObtainSID01' );
+		} else {
+			return payload;
+		}
+	}
+	private hpObtainSID02 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProviderSSO.xml', { ssotoken: payload.smartview.ssotoken } );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body } );
+		payload.smartview.SID = $( 'sID' ).text();
+		// await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [JSONDeepCopy( payload ), payload.id] );
+		if ( payload.smartview.SID ) {
+			return payload;
+		} else {
+			throw new Error( 'No SID found ' + payload.name + '@hpObtainSID02' );
+		}
+	}
 
-	// private pbcsObtainSIDFillForm = ( payload: EnvironmentDetail, $, response: request.Response ) => {
-	// 	const formData: any = {};
+	private pbcsObtainSIDFillForm = ( payload: EnvironmentDetail, $, response: request.Response ) => {
+		const formData: any = {};
 
-	// 	$( 'form[name=signin_form]' ).each( ( i: any, elem: any ) => {
-	// 		payload.smartview.nexturl = response.request.uri.protocol + '//' + response.request.uri.hostname + $( elem ).attr( 'action' );
-	// 		$( elem ).find( 'input' ).each( ( a: any, input: any ) => {
-	// 			formData[$( input ).attr( 'name' )] = $( input ).val();
-	// 		} );
-	// 	} );
-	// 	formData.username = payload.username;
-	// 	formData.password = payload.password;
-	// 	formData.userid = payload.username;
-	// 	formData.tenantDisplayName = payload.identitydomain;
-	// 	formData.tenantName = payload.identitydomain;
-	// 	return formData;
-	// }
+		$( 'form[name=signin_form]' ).each( ( i: any, elem: any ) => {
+			payload.smartview.nexturl = response.request.uri.protocol + '//' + response.request.uri.hostname + $( elem ).attr( 'action' );
+			$( elem ).find( 'input' ).each( ( a: any, input: any ) => {
+				formData[$( input ).attr( 'name' )] = $( input ).val();
+			} );
+		} );
+		formData.username = payload.username;
+		formData.password = payload.password;
+		formData.userid = payload.username;
+		formData.tenantDisplayName = payload.identitydomain;
+		formData.tenantName = payload.identitydomain;
+		return formData;
+	}
 
-	// private pbcsObtainSID = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewPrepareEnvironment( payload );
-	// 	await this.pbcsObtainSID01( payload );
-	// 	await this.pbcsObtainSID02( payload );
-	// 	await this.pbcsObtainSID03( payload );
-	// 	await this.pbcsObtainSID04( payload );
-	// 	return payload;
-	// }
-	// private pbcsObtainSID00 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const { response, $ } = await this.smartviewGetter( { url: payload.smartview.url, jar: payload.smartview.jar } );
-	// 	payload.smartview.form = this.pbcsObtainSIDFillForm( payload, $, response );
-	// 	return payload;
-	// }
-	// private pbcsObtainSID01 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const { response, $ } = await this.smartviewGetter( { url: payload.smartview.url, jar: payload.smartview.jar } );
-	// 	payload.smartview.form = this.pbcsObtainSIDFillForm( payload, $, response );
-	// 	return payload;
-	// }
-	// private pbcsObtainSID02 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const { response: r } = await this.smartviewPoster( { url: payload.smartview.nexturl, form: payload.smartview.form, jar: payload.smartview.jar, contentType: 'application/x-www-form-urlencoded' } );
-	// 	payload.smartview.nexturl = r.headers.location;
-	// 	const { response } = await this.smartviewPoster( { url: payload.smartview.nexturl, form: payload.smartview.form, jar: payload.smartview.jar, contentType: 'application/x-www-form-urlencoded' } );
-	// 	payload.smartview.nexturl = Url.parse( payload.smartview.nexturl ).protocol + '//' + Url.parse( payload.smartview.nexturl ).hostname + response.headers.location;
-	// 	return payload;
-	// }
-	// private pbcsObtainSID03 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_GetProvisionedDataSources.xml', {} );
-	// 	const { response, $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.nexturl, body, jar: payload.smartview.jar } );
-	// 	$( 'Product' ).each( ( i: any, elem: any ) => {
-	// 		if ( $( elem ).attr( 'id' ) === 'HP' ) {
-	// 			payload.smartview.planningurl = payload.server + ':' + payload.port + $( elem ).children( 'Server' ).attr( 'context' );
-	// 		}
-	// 	} );
-	// 	payload.smartview.ssotoken = $( 'sso' ).text();
-	// 	if ( !payload.smartview.planningurl ) {
-	// 		throw new Error( 'No planning url could be identified ' + payload.name + '@pbcsObtainSID03' );
-	// 	} else if ( !payload.smartview.ssotoken ) {
-	// 		throw new Error( 'No sso token was found ' + payload.name + '@pbcsObtainSID03' );
-	// 	} else {
-	// 		return payload;
-	// 	}
-	// }
+	private pbcsObtainSID = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewPrepareEnvironment( payload );
+		await this.pbcsObtainSID01( payload );
+		await this.pbcsObtainSID02( payload );
+		await this.pbcsObtainSID03( payload );
+		await this.pbcsObtainSID04( payload );
+		return payload;
+	}
+	private pbcsObtainSID00 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const { response, $ } = await this.smartviewGetter( { url: payload.smartview.url, jar: payload.smartview.jar } );
+		payload.smartview.form = this.pbcsObtainSIDFillForm( payload, $, response );
+		return payload;
+	}
+	private pbcsObtainSID01 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const { response, $ } = await this.smartviewGetter( { url: payload.smartview.url, jar: payload.smartview.jar } );
+		payload.smartview.form = this.pbcsObtainSIDFillForm( payload, $, response );
+		return payload;
+	}
+	private pbcsObtainSID02 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const { response: r } = await this.smartviewPoster( { url: payload.smartview.nexturl, form: payload.smartview.form, jar: payload.smartview.jar, contentType: 'application/x-www-form-urlencoded' } );
+		payload.smartview.nexturl = r.headers.location;
+		const { response } = await this.smartviewPoster( { url: payload.smartview.nexturl, form: payload.smartview.form, jar: payload.smartview.jar, contentType: 'application/x-www-form-urlencoded' } );
+		payload.smartview.nexturl = Url.parse( payload.smartview.nexturl ).protocol + '//' + Url.parse( payload.smartview.nexturl ).hostname + response.headers.location;
+		return payload;
+	}
+	private pbcsObtainSID03 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_GetProvisionedDataSources.xml', {} );
+		const { response, $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.nexturl, body, jar: payload.smartview.jar } );
+		$( 'Product' ).each( ( i: any, elem: any ) => {
+			if ( $( elem ).attr( 'id' ) === 'HP' ) {
+				payload.smartview.planningurl = payload.server + ':' + payload.port + $( elem ).children( 'Server' ).attr( 'context' );
+			}
+		} );
+		payload.smartview.ssotoken = $( 'sso' ).text();
+		if ( !payload.smartview.planningurl ) {
+			throw new Error( 'No planning url could be identified ' + payload.name + '@pbcsObtainSID03' );
+		} else if ( !payload.smartview.ssotoken ) {
+			throw new Error( 'No sso token was found ' + payload.name + '@pbcsObtainSID03' );
+		} else {
+			return payload;
+		}
+	}
 
-	// private pbcsObtainSID04 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProviderSSO.xml', { ssotoken: payload.smartview.ssotoken } );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, jar: payload.smartview.jar, body } );
-	// 	payload.smartview.SID = $( 'sID' ).text();
-	// 	payload.smartview.cookie = payload.smartview.jar.getCookieString( payload.server );
-	// 	const toSave = prepareToWrite( JSONDeepCopy( payload ) );
-	// 	await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [toSave, payload.id] );
-	// 	if ( payload.smartview.SID ) {
-	// 		return payload;
-	// 	} else {
-	// 		throw new Error( 'No SID found ' + payload.name + '@pbcsObtainSID04' );
-	// 	}
-	// }
-	// private smartviewRequester = ( options: ATSmartViewRequestOptions ): Promise<{
-	// 	body: any, $: cheerio.CheerioStatic, options: ATSmartViewRequestOptions, response: request.Response
-	// }> => {
-	// 	return new Promise( ( resolve, reject ) => {
-	// 		const requestOptions: any = {
-	// 			url: options.url,
-	// 			method: options.method,
-	// 			body: options.body,
-	// 			form: options.form,
-	// 			headers: {
-	// 				'Content-Type': options.contentType || 'application/xml',
-	// 				'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3508.0 Safari/537.36'
-	// 			},
-	// 			timeout: options.timeout || 120000,
-	// 			followRedirect: options.followRedirect === false ? false : true
-	// 		};
-	// 		if ( options.jar ) {
-	// 			requestOptions.jar = options.jar;
-	// 		} else if ( options.cookie ) {
-	// 			requestOptions.headers.cookie = options.cookie;
-	// 		}
-	// 		if ( options.referer ) requestOptions.headers.referer = options.referer;
-	// 		request( requestOptions, ( err: Error, response: request.Response, body: any ) => {
-	// 			if ( err ) {
-	// 				reject( err );
-	// 			} else {
-	// 				try {
-	// 					resolve( { body, $: cheerio.load( body ), options, response } );
-	// 				} catch ( error ) {
-	// 					reject( error );
-	// 				}
-	// 			}
-	// 		} );
-	// 	} );
-	// }
-	// private smartviewPoster = ( options: ATSmartViewRequestOptions ) => this.smartviewRequester( Object.assign( { method: 'POST' }, options ) );
-	// private smartviewGetter = ( options: ATSmartViewRequestOptions ) => this.smartviewRequester( Object.assign( { method: 'GET' }, options ) );
+	private pbcsObtainSID04 = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProviderSSO.xml', { ssotoken: payload.smartview.ssotoken } );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, jar: payload.smartview.jar, body } );
+		payload.smartview.SID = $( 'sID' ).text();
+		payload.smartview.cookie = payload.smartview.jar.getCookieString( payload.server );
+		const toSave = prepareToWrite( JSONDeepCopy( payload ) );
+		await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [toSave, payload.id] );
+		if ( payload.smartview.SID ) {
+			return payload;
+		} else {
+			throw new Error( 'No SID found ' + payload.name + '@pbcsObtainSID04' );
+		}
+	}
+	private smartviewRequester = ( options: ATSmartViewRequestOptions ): Promise<{
+		body: any, $: cheerio.CheerioStatic, options: ATSmartViewRequestOptions, response: request.Response
+	}> => {
+		return new Promise( ( resolve, reject ) => {
+			const requestOptions: any = {
+				url: options.url,
+				method: options.method,
+				body: options.body,
+				form: options.form,
+				headers: {
+					'Content-Type': options.contentType || 'application/xml',
+					'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3508.0 Safari/537.36'
+				},
+				timeout: options.timeout || 120000,
+				followRedirect: options.followRedirect === false ? false : true
+			};
+			if ( options.jar ) {
+				requestOptions.jar = options.jar;
+			} else if ( options.cookie ) {
+				requestOptions.headers.cookie = options.cookie;
+			}
+			if ( options.referer ) requestOptions.headers.referer = options.referer;
+			request( requestOptions, ( err: Error, response: request.Response, body: any ) => {
+				if ( err ) {
+					reject( err );
+				} else {
+					try {
+						resolve( { body, $: cheerio.load( body ), options, response } );
+					} catch ( error ) {
+						reject( error );
+					}
+				}
+			} );
+		} );
+	}
+	private smartviewPoster = ( options: ATSmartViewRequestOptions ) => this.smartviewRequester( Object.assign( { method: 'POST' }, options ) );
+	private smartviewGetter = ( options: ATSmartViewRequestOptions ) => this.smartviewRequester( Object.assign( { method: 'GET' }, options ) );
 }

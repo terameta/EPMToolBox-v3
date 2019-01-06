@@ -1,26 +1,25 @@
-// After RTDB implementation
 import { JSONDeepCopy } from '../utilities/utility.functions';
 
 export interface Stream {
 	id: number,
 	name: string,
-	type: ATStreamType,
+	type: StreamType,
 	environment: number,
 	dbName: string,
 	tableName: string,
 	customQuery: string,
 	finalQuery: string,
 	tags: any,
-	exports: ATStreamExport[],
+	exports: StreamExport[],
 	databaseList: { name: string }[],
 	tableList: { name: string, type?: string }[],
-	fieldList: ATStreamField[]
+	fieldList: StreamField[]
 }
 
-export const getDefaultATStream = () => ( <Stream>JSONDeepCopy( { tags: {}, exports: [] } ) );
-export const getDefaultATStreamExport = () => ( <ATStreamExport>JSONDeepCopy( { name: '' } ) );
+export const getDefaultStream = () => ( <Stream>JSONDeepCopy( { tags: {}, exports: [] } ) );
+export const getDefaultStreamExport = () => ( <StreamExport>JSONDeepCopy( { name: '' } ) );
 
-export interface ATStreamField {
+export interface StreamField {
 	name: string,
 	type: string,
 	position: number,
@@ -36,17 +35,17 @@ export interface ATStreamField {
 	isMonth: boolean,
 	isData: boolean,
 	aggregateFunction: string,
-	description: ATStreamFieldDescription
-	items: ATStreamFieldItem[]
+	description: StreamFieldDescription
+	items: StreamFieldItem[]
 }
 
-export interface ATStreamFieldItem {
+export interface StreamFieldItem {
 	name: string,
 	description: string,
 	parent: string
 }
 
-export interface ATStreamFieldDescription {
+export interface StreamFieldDescription {
 	database: string,
 	table: string,
 	query: string,
@@ -72,11 +71,11 @@ export interface ATStreamFieldDescription {
 
 // Before new changes
 
-export interface ATStreamExport {
+export interface StreamExport {
 	name: string
 }
 
-export interface ATStreamExportHPDB extends ATStreamExport {
+export interface StreamExportHPDB extends StreamExport {
 	rowDims: ATStreamExportHPDBDimensionDefinition[],
 	colDims: ATStreamExportHPDBDimensionDefinition[],
 	povDims: ATStreamExportHPDBDimensionDefinition[],
@@ -95,7 +94,7 @@ export interface ATStreamExportHPDBDimensionDefinition {
 	limits: any[]
 }
 
-export const getDefaultATStreamExportHPDB = () => ( <ATStreamExportHPDB>JSONDeepCopy( {
+export const getDefaultATStreamExportHPDB = () => ( <StreamExportHPDB>JSONDeepCopy( {
 	name: '',
 	rowDims: [], colDims: [], povDims: [],
 	cellCounts: <any>{},
@@ -143,12 +142,12 @@ export interface ATStreamFieldDetailOLD extends ATStreamFieldOLD {
 	ddfDateFormat: string
 }
 
-export enum ATStreamType {
+export enum StreamType {
 	'RDBT' = 1,
 	'HPDB' = 2
 }
 
-export function atGetStreamTypeDescription( typecode: number | string ) {
+export function getTypeDescription( typecode: number | string ) {
 	switch ( typecode ) {
 		case 1:
 		case '1':

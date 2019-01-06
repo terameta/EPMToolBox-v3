@@ -4,11 +4,12 @@ import { SystemConfig } from '../../shared/models/systemconfig';
 import { DB } from './db';
 import * as tableDefinitions from './initiator.tabledefinitions';
 import { ATEnvironmentType, ATEnvironment } from '../../shared/models/at.environment';
-import { EnumToArray, SortByName } from '../../shared/utilities/utility.functions';
+import { EnumToArray, SortByName, waiter } from '../../shared/utilities/utility.functions';
 import * as _ from 'lodash';
 import { ATCredential } from '../../shared/models/at.credential';
 import { ATStreamType, ATStreamFieldDetailOLD, ATStreamField, ATStream, ATStreamOnDB, atStreamObj2DB } from '../../shared/models/at.stream';
 import { ATProcessStepType } from '../../shared/models/at.process';
+import { Stream } from 'shared/models/streams.models';
 
 // import { EnumToArray, SortByName } from '../../shared/utilities/utilityFunctions';
 // import { ATEnvironmentType } from '../../shared/models/at.environment';
@@ -368,6 +369,23 @@ export class Initiator {
 		this.steps.push( { expectedCurrentVersion: 102, operatorFunction: () => this.db.query( 'ALTER TABLE environments CHANGE type type BIGINT(20) UNSIGNED NOT NULL DEFAULT 0' ) } );
 		this.steps.push( { expectedCurrentVersion: 103, operatorFunction: () => this.db.query( 'ALTER TABLE environments CHANGE server server VARCHAR(255) NULL' ) } );
 		this.steps.push( { expectedCurrentVersion: 104, operatorFunction: () => this.db.query( 'ALTER TABLE environments CHANGE port port VARCHAR(5) NULL' ) } );
+		this.steps.push( { expectedCurrentVersion: 105, operatorFunction: () => this.db.query( 'ALTER TABLE streams ADD details JSON NULL AFTER exports' ) } );
+		this.steps.push( {
+			expectedCurrentVersion: 106,
+			shouldSetVersion: true,
+			operatorFunction: async () => {
+				const { tuples } = await this.db.query<Stream>( 'SELECT * FROM streams' );
+				for ( const tuple of tuples ) {
+					await this.db.queryOne( 'UPDATE streams SET details = ? WHERE id = ?', [this.tools.pTW( tuple ).details, tuple.id] );
+				}
+			}
+		} );
+		this.steps.push( { expectedCurrentVersion: 107, operatorFunction: () => this.db.query( 'ALTER TABLE streams DROP name, DROP type, DROP environment, DROP dbName' ) } );
+		this.steps.push( { expectedCurrentVersion: 108, operatorFunction: () => this.db.query( 'ALTER TABLE streams DROP tableName, DROP customQuery, DROP tags, DROP exports' ) } );
+		this.steps.push( { expectedCurrentVersion: 109, operatorFunction: () => this.db.query( 'ALTER TABLE environments ADD details JSON NULL AFTER tags' ) } );
+		this.steps.push( { expectedCurrentVersion: 110, operatorFunction: async () => this.jsonizeColumns( 'environments' ) } );
+		this.steps.push( { expectedCurrentVersion: 111, operatorFunction: () => this.db.query( 'ALTER TABLE environments DROP name, DROP type, DROP server, DROP port, DROP verified' ) } );
+		this.steps.push( { expectedCurrentVersion: 112, operatorFunction: () => this.db.query( 'ALTER TABLE environments DROP identitydomain, DROP credential, DROP tags' ) } );
 	}
 
 	public initiate = async () => {
@@ -407,6 +425,13 @@ export class Initiator {
 			resultSet.tuples.map( tuple => currentVersion = tuple.version );
 		}
 		return currentVersion;
+	}
+
+	private jsonizeColumns = async ( tableName: string ) => {
+		const { tuples } = await this.db.query<any>( 'SELECT * FROM ??', tableName );
+		for ( const tuple of tuples ) {
+			await this.db.queryOne( 'UPDATE ?? SET details = ? WHERE id = ?', [tableName, this.tools.pTW( tuple ).details, tuple.id] );
+		}
 	}
 }
 

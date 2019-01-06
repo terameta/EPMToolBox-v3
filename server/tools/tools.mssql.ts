@@ -32,11 +32,11 @@ export class MSSQLTool {
 		payload.mssql.connection = await new ConnectionPool( dbConfig ).connect();
 	}
 
-	// public listDatabases = async ( payload: ATEnvironmentDetail ) => {
-	// 	await this.connect( payload );
-	// 	const { recordset } = await payload.mssql.connection.request().query( 'SELECT name FROM sys.databases WHERE name NOT IN (\'master\', \'tempdb\', \'model\', \'msdb\')' );
-	// 	return recordset;
-	// }
+	public listDatabases = async ( payload: EnvironmentDetail ) => {
+		await this.connect( payload );
+		const { recordset } = await payload.mssql.connection.request().query( 'SELECT name FROM sys.databases WHERE name NOT IN (\'master\', \'tempdb\', \'model\', \'msdb\')' );
+		return recordset.map<{ name: string }>( a => a );
+	}
 
 	// public listTables = async ( payload: ATEnvironmentDetail ) => {
 	// 	await this.connect( payload );

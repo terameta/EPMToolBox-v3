@@ -2,6 +2,7 @@ import { Pool } from 'mysql';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { SystemConfig } from 'shared/models/systemconfig';
+import { Tuple } from 'shared/models/tuple';
 
 export class MainTools {
 	// config: any;
@@ -127,5 +128,24 @@ export class MainTools {
 				}
 			} );
 		} );
+	}
+
+	public pTR = <T extends { id: any, tags: any }>( payload: Tuple ): T => {
+		const toReturn: T = { ...this.jsonParseIf( payload.details ) };
+		toReturn.id = payload.id;
+		if ( toReturn.tags ) {
+			if ( typeof toReturn.tags === 'string' ) {
+				toReturn.tags = JSON.parse( toReturn.tags );
+			}
+		} else {
+			toReturn.tags = {};
+		}
+		delete ( toReturn as any ).details;
+		return toReturn;
+	}
+	public pTW = ( payload: any ): Tuple => {
+		const { id, ...details } = payload;
+		const tuple: Tuple = { id, details: this.jsonStringifyIf( details ) };
+		return tuple;
 	}
 }
