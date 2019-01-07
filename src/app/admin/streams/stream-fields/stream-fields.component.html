@@ -1,3 +1,9 @@
-<p>
-  stream-fields works!
-</p>
+<ng-container *ngIf="type$ | async as type; else loading">
+	<app-stream-fields-hpdb *ngIf="type == types.HPDB"></app-stream-fields-hpdb>
+	<app-stream-fields-rdbt *ngIf="type == types.RDBT"></app-stream-fields-rdbt>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

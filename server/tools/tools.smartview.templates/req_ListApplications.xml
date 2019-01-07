@@ -1,5 +1,5 @@
 <req_ListApplications>
-	<sID>{{SID}}</sID>
+	<sID>{{smartview.SID}}</sID>
 	<srv>{{server}}</srv>
 	<type></type>
 	<url></url>

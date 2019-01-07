@@ -1,3 +1,7 @@
-<p>
-  streams-tool-bar works!
-</p>
+<div class="align-middle">
+	<i class="fas fa-angle-double-right text-onyx mr-1"></i>
+	<select class="border-0" *ngIf="state$ | async as state" [ngModel]="currentID$ | async" (change)="selectionChanged($event)">
+		<option value="0">Stream List</option>
+		<option value="{{id}}" *ngFor="let id of state.ids">{{ state.items[id].name }}</option>
+	</select>
+</div>

@@ -1,5 +1,5 @@
 <req_GetAvailableServices>
-	<sID>{{SID}}</sID>
-	<app>{{database}}</app>
+	<sID>{{smartview.SID}}</sID>
+	<app>{{smartview.application}}</app>
 	<CubeView/>
 </req_GetAvailableServices>

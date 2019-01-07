@@ -29,6 +29,7 @@ export class MSSQLTool {
 			// Since we are not on a named instance, we will now setup port.
 			if ( payload.server.split( '\\' ).length === 1 && payload.port ) { dbConfig.port = parseInt( payload.port, 10 ); }
 		}
+		console.log( dbConfig );
 		payload.mssql.connection = await new ConnectionPool( dbConfig ).connect();
 	}
 
@@ -38,12 +39,12 @@ export class MSSQLTool {
 		return recordset.map<{ name: string }>( a => a );
 	}
 
-	// public listTables = async ( payload: ATEnvironmentDetail ) => {
-	// 	await this.connect( payload );
-	// 	const { recordset } = await payload.mssql.connection.request().query( 'SELECT TABLE_NAME, TABLE_TYPE FROM ' + payload.database + '.INFORMATION_SCHEMA.Tables ORDER BY 2, 1' );
-	// 	recordset.push( { TABLE_NAME: 'Custom Query', TABLE_TYPE: 'Custom Query' } );
-	// 	return recordset.map( tuple => ( { name: tuple.TABLE_NAME, type: tuple.TABLE_TYPE } ) );
-	// }
+	public listTables = async ( payload: EnvironmentDetail ) => {
+		await this.connect( payload );
+		const { recordset } = await payload.mssql.connection.request().query( 'SELECT TABLE_NAME, TABLE_TYPE FROM ' + payload.mssql.database + '.INFORMATION_SCHEMA.Tables ORDER BY 2, 1' );
+		recordset.push( { TABLE_NAME: 'Custom Query', TABLE_TYPE: 'Custom Query' } );
+		return recordset.map( tuple => ( { name: tuple.TABLE_NAME, type: tuple.TABLE_TYPE } ) );
+	}
 
 	// public listFields = async ( payload: ATEnvironmentDetail ) => {
 	// 	await this.connect( payload );

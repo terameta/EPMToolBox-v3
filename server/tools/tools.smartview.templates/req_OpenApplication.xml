@@ -1,7 +1,7 @@
 <req_OpenApplication>
-	<sID>{{SID}}</sID>
+	<sID>{{smartview.SID}}</sID>
 	<srv>{{smartview.planningserver}}</srv>
-	<app>{{database}}</app>
+	<app>{{smartview.application}}</app>
 	<type></type>
 	<url></url>
 </req_OpenApplication>

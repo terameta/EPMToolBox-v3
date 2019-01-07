@@ -10,6 +10,10 @@ import { StreamDefinitionsComponent } from './stream-definitions/stream-definiti
 import { StreamFieldsComponent } from './stream-fields/stream-fields.component';
 import { StreamFielddescriptionsComponent } from './stream-fielddescriptions/stream-fielddescriptions.component';
 import { StreamExportsComponent } from './stream-exports/stream-exports.component';
+import { StreamFieldsHpdbComponent } from './stream-fields-hpdb/stream-fields-hpdb.component';
+import { StreamFieldsRdbtComponent } from './stream-fields-rdbt/stream-fields-rdbt.component';
+import { StreamFielddescriptionsHpdbComponent } from './stream-fielddescriptions-hpdb/stream-fielddescriptions-hpdb.component';
+import { StreamFielddescriptionsRdbtComponent } from './stream-fielddescriptions-rdbt/stream-fielddescriptions-rdbt.component';
 
 const routes: Routes = [
 	{ path: '', component: StreamListComponent },
@@ -26,7 +30,7 @@ const routes: Routes = [
 ];
 
 @NgModule( {
-	declarations: [StreamsComponent, StreamDetailComponent, StreamListComponent, StreamDefinitionsComponent, StreamFieldsComponent, StreamFielddescriptionsComponent, StreamExportsComponent],
+	declarations: [StreamsComponent, StreamDetailComponent, StreamListComponent, StreamDefinitionsComponent, StreamFieldsComponent, StreamFielddescriptionsComponent, StreamExportsComponent, StreamFieldsHpdbComponent, StreamFieldsRdbtComponent, StreamFielddescriptionsHpdbComponent, StreamFielddescriptionsRdbtComponent],
 	imports: [
 		CommonModule,
 		FormsModule,

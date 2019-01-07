@@ -58,7 +58,7 @@
 								<ng-container *ngIf="item.environment">
 									<ng-container *ngIf="environment$ | async as environment">
 										<ng-container *ngIf="environment.databases">
-											<select name="cDatabase" class="form-control form-control-sm" [(ngModel)]="item.dbName" required>
+											<select name="cDatabase" class="form-control form-control-sm" [(ngModel)]="item.dbName" (change)="databaseChanged$.next(true)" required>
 												<option [ngValue]="undefined">Please select</option>
 												<option [ngValue]="database.name" *ngFor="let database of databases$ | async">{{ database.name }}</option>
 											</select>
@@ -83,30 +83,47 @@
 						<div class="form-group row my-1"><label class="col col-form-label font-weight-bold text-warning">Please assign a database/application to the stream.</label></div>
 					</ng-container>
 					<ng-container *ngIf="item.dbName">
-						<div class="form-group row my-1">
-							<label for="sTable" class="col-3 col-md-1 col-form-label font-weight-bold">
-								<span *ngIf="item.type!=streamTypes.HPDB">Table:</span>
-								<span *ngIf="item.type==streamTypes.HPDB">Cube:</span>
-							</label>
-							<div class="col-9 col-md-11">
-								<div class="input-group input-group-sm">
-									<select name="sTables" class="form-control form-control-sm" [(ngModel)]="item.tableName" required>
-										<option [value]="undefined">Please select</option>
-										<option *ngFor="let table of (database$ | async).tables" [value]="table.name">{{table.name}}</option>
-									</select>
-									<div class="input-group-append">
-										<button class="btn btn-outline-secondary" type="button" (click)="refreshTables(item.environment, item.dbName)" title="Refresh Tables/Cubes">
-											<i class="fas fa-sync-alt fa-fw"></i>
-										</button>
+						<ng-container *ngIf="(databaseChanged$ | async)">
+							<div class="form-group row my-1"><label class="col col-form-label font-weight-bold text-warning">Please save the stream after database changes.</label></div>
+						</ng-container>
+						<ng-container *ngIf="!(databaseChanged$ | async)">
+							<div class="form-group row my-1">
+								<label for="sTable" class="col-3 col-md-1 col-form-label font-weight-bold">
+									<span *ngIf="item.type!=streamTypes.HPDB">Table:</span>
+									<span *ngIf="item.type==streamTypes.HPDB">Cube:</span>
+								</label>
+								<div class="col-9 col-md-11">
+									<div class="input-group input-group-sm">
+										<select name="sTables" class="form-control form-control-sm" [(ngModel)]="item.tableName" required>
+											<option [value]="undefined">Please select</option>
+											<option *ngFor="let table of (database$ | async).tables" [value]="table.name">{{table.name}}</option>
+										</select>
+										<div class="input-group-append">
+											<button class="btn btn-outline-secondary" type="button" (click)="refreshTables(item.environment, item.dbName)" title="Refresh Tables/Cubes">
+												<i class="fas fa-sync-alt fa-fw"></i>
+											</button>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
+						</ng-container>
 					</ng-container>
 
 				</ng-container>
 			</ng-container>
-
+			<div class="form-group row my-1" *ngIf="item.tableName == 'Custom Query'">
+				<label for="sType" class="col-3 col-md-1 col-form-label font-weight-bold">Custom Query:</label>
+				<div class="col-9 col-md-11">
+					<div class="input-group input-group-sm">
+						<input type="text" name="sCQuery" class="form-control form-control-sm" value="{{item.customQuery}}" disabled>
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" type="button" (click)="codeCustomQuery(item, f)" title="Edit Custom Query">
+								<i class="fas fa-edit fa-fw"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="form-group row my-1">
 				<label class="col-3 col-md-1 col-form-label font-weight-bold">Tags:</label>
 				<div class="col-9 col-md-11">
@@ -115,8 +132,6 @@
 			</div>
 		</div>
 	</form>
-	<pre>{{item | json}}</pre>
-	<pre *ngIf="database$ | async as database">{{item.dbName}} {{ database | json}}</pre>
 </ng-container>
 <ng-template #loading>
 	<div class="alert alert-info mx-3" role="alert">

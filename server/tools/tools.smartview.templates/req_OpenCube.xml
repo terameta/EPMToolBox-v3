@@ -1,7 +1,7 @@
 <req_OpenCube>
-	<sID>{{SID}}</sID>
+	<sID>{{smartview.SID}}</sID>
 	<srv>{{server}}</srv>
-	<app>{{database}}</app>
+	<app>{{smartview.application}}</app>
 	<cube>{{table}}</cube>
 	<type></type>
 	<url></url>

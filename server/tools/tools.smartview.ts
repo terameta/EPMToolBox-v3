@@ -35,26 +35,26 @@ export class SmartViewTool {
 	// 	if ( hasFailed ) throw ( new Error( 'Failure to open cube ' + payload.name + '@smartviewOpenCube' ) );
 	// 	return payload;
 	// }
-	// private smartviewListCubes = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewOpenApplication( payload );
-	// 	await this.smartviewGetAvailableServices( payload );
-	// 	await this.smartviewListDocuments( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ListCubes.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	private smartviewListCubes = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewOpenApplication( payload );
+		await this.smartviewGetAvailableServices( payload );
+		await this.smartviewListDocuments( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_ListCubes.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_listcubes' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to list cubes ' + payload.name + '@smartviewListCubes' ) );
-	// 	payload.smartview.cubes = $( 'cubes' ).text().split( '|' );
-	// 	return payload;
-	// }
-	// private smartviewOpenApplication = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const appList = await this.listApplications( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_OpenApplication.xml', payload );
-	// 	const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_openapplication' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to open application ' + payload.name + '@smartviewOpenApplication' ) );
-	// 	return payload;
-	// }
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_listcubes' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to list cubes ' + payload.name + '@smartviewListCubes' ) );
+		payload.smartview.cubes = $( 'cubes' ).text().split( '|' );
+		return payload;
+	}
+	private smartviewOpenApplication = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const appList = await this.listApplications( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_OpenApplication.xml', payload );
+		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_openapplication' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to open application ' + payload.name + '@smartviewOpenApplication' ) );
+		return payload;
+	}
 	public smartviewListApplications = ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
 		// Validate SID function tries the smartviewListApplicationsValidator
 		// If successful we have the applications listed in the response already
@@ -824,26 +824,26 @@ export class SmartViewTool {
 	// 	payload.smartview.dimensions.forEach( ( dimension, index ) => dimension.position = index + 1 );
 	// 	return payload;
 	// }
-	// public listCubes = async ( payload: EnvironmentDetail ) => {
-	// 	await this.smartviewListCubes( payload );
-	// 	return payload.smartview.cubes.map( c => ( { name: c, type: 'cube' } ) );
-	// }
-	// private smartviewListDocuments = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ListDocuments.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	public listCubes = async ( payload: EnvironmentDetail ) => {
+		await this.smartviewListCubes( payload );
+		return payload.smartview.cubes.map( c => ( { name: c, type: 'cube' } ) );
+	}
+	private smartviewListDocuments = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_ListDocuments.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_listdocuments' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to list documents ' + payload.name + '@smartviewListDocuments' ) );
-	// 	return payload;
-	// }
-	// private smartviewGetAvailableServices = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_GetAvailableServices.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_listdocuments' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to list documents ' + payload.name + '@smartviewListDocuments' ) );
+		return payload;
+	}
+	private smartviewGetAvailableServices = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		const body = await this.smartviewGetXMLTemplate( 'req_GetAvailableServices.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_getavailableservices' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to get available services ' + payload.name + '@smartviewGetAvailableServices' ) );
-	// 	return payload;
-	// }
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_getavailableservices' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to get available services ' + payload.name + '@smartviewGetAvailableServices' ) );
+		return payload;
+	}
 	public listApplications = async ( payload: EnvironmentDetail ) => {
 		await this.smartviewListApplications( payload );
 		return payload.smartview.applications;
@@ -948,7 +948,7 @@ export class SmartViewTool {
 		const body = await this.smartviewGetXMLTemplate( 'req_ConnectToProviderSSO.xml', { ssotoken: payload.smartview.ssotoken } );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body } );
 		payload.smartview.SID = $( 'sID' ).text();
-		// await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [JSONDeepCopy( payload ), payload.id] );
+		await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [this.tools.pTW( prepareToWrite( payload ) ), payload.id] );
 		if ( payload.smartview.SID ) {
 			return payload;
 		} else {
@@ -1021,8 +1021,7 @@ export class SmartViewTool {
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, jar: payload.smartview.jar, body } );
 		payload.smartview.SID = $( 'sID' ).text();
 		payload.smartview.cookie = payload.smartview.jar.getCookieString( payload.server );
-		const toSave = prepareToWrite( JSONDeepCopy( payload ) );
-		await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [toSave, payload.id] );
+		await this.db.queryOne( 'UPDATE environments SET ? WHERE id = ?', [this.tools.pTW( prepareToWrite( payload ) ), payload.id] );
 		if ( payload.smartview.SID ) {
 			return payload;
 		} else {

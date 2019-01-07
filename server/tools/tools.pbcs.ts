@@ -16,7 +16,7 @@ export class PBCSTool {
 
 	public verify = ( payload: EnvironmentDetail ) => this.smartview.validateSID( payload );
 	public listDatabases = ( payload: EnvironmentDetail ) => this.smartview.listApplications( payload );
-	// public listTables = ( payload: ATEnvironmentDetail ) => this.smartview.listCubes( payload );
+	public listTables = ( payload: EnvironmentDetail ) => this.smartview.listCubes( payload );
 	// public listFields = ( payload: ATEnvironmentDetail ) => this.smartview.listDimensions( payload );
 	// public listAliasTables = ( payload: ATEnvironmentDetail ) => this.smartview.listAliasTables( payload );
 	// public getDescriptions = ( payload: ATEnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptions( payload, field );

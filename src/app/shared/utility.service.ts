@@ -22,6 +22,7 @@ import { Subject } from 'rxjs';
 import { takeUntil, filter, tap } from 'rxjs/operators';
 import { actionType2Title } from 'shared/utilities/utility.functions';
 import { CloneTarget } from 'shared/models/clone.target';
+import { CoderComponent } from './coder/coder.component';
 
 @Injectable( {
 	providedIn: 'root'
@@ -51,6 +52,25 @@ export class UtilityService {
 		const modalRef: BsModalRef = this.modalService.show( PromptComponent, { initialState: { question, defaultValue } } );
 		return new Promise( ( resolve, reject ) => {
 			modalRef.content.onClose.subscribe( resolve, reject );
+		} );
+	}
+
+	public coder = ( code: string, options: any, name?: string ): Promise<string | boolean> => {
+		const modalRef: BsModalRef = this.modalService.show( CoderComponent, {
+			initialState: { code, options, name },
+			class: 'modal-lg',
+			animated: false
+		} );
+		return new Promise( ( resolve, reject ) => {
+			modalRef.content.onClose.subscribe( ( result: string ) => {
+				resolve( result );
+			}, ( e: Error ) => {
+				console.log( 'Coder Component failed' );
+				console.log( e );
+				resolve( false );
+			}, ( c ) => {
+				resolve( false );
+			} );
 		} );
 	}
 

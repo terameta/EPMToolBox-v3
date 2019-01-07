@@ -22,5 +22,6 @@ export class ApiEnvironments {
 	private setRoutes = () => {
 		this.apiRoutes.get( '/verify/:id', ( req, res ) => { this.rester.respond( this.tool.verify, req.params.id, req, res ); } );
 		this.apiRoutes.get( '/listDatabases/:id', ( req, res ) => { this.rester.respond( this.tool.listDatabases, req.params.id, req, res ); } );
+		this.apiRoutes.get( '/listTables/:id/:db', ( req, res ) => { this.rester.respond( this.tool.listTables, { id: req.params.id, database: req.params.db }, req, res ); } );
 	}
 }
