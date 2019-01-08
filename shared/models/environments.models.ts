@@ -27,6 +27,8 @@ export interface EnvironmentDetail extends Environment {
 export interface EnvironmentMSSQL {
 	connection: ConnectionPool,
 	database: string,
+	table: string,
+	query: string
 }
 
 export interface EnvironmentSmartView {

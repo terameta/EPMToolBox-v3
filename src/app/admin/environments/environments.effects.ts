@@ -7,7 +7,7 @@ import { Observable, of } from 'rxjs';
 import { FEATURE } from './environments.state';
 import { tap, filter, switchMap, mergeMap, catchError } from 'rxjs/operators';
 import { NotificationDismissWithTitle, NotificationNew } from 'src/app/notification/notification.actions';
-import { Load, Create, Clone, Update, Delete, Verify, DatabasesRefresh, TablesRefresh } from './environments.actions';
+import { Load, Create, Clone, Update, Delete, Verify, DatabasesRefresh, TablesRefresh, FieldsRefresh } from './environments.actions';
 import { NotificationType } from 'src/app/notification/notification.models';
 import { RouterGo } from 'src/app/shared/router.actions';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -163,6 +163,24 @@ export class EnvironmentEffects {
 				return of(
 					new NotificationDismissWithTitle( a.type ),
 					new NotificationNew( { title: a.type, message: 'Failed to list the tables for environment\n' + e.error.message, type: NotificationType.Error } )
+				);
+			} )
+		) )
+	);
+
+	@Effect() fieldrefresh$: Observable<any> = this.actions$.pipe(
+		ofType( FEATURE + 'Fields Refresh' ),
+		tap( a => { this.store.dispatch( new NotificationDismissWithTitle( a.type ) ); } ),
+		switchMap( ( a: FieldsRefresh ) => this.service.listFields( a.payload ).pipe(
+			mergeMap( result => [
+				new NotificationDismissWithTitle( a.type ),
+				new NotificationNew( { title: a.type, message: 'Fields refreshed.', type: NotificationType.Success } )
+			] ),
+			catchError( ( e: HttpErrorResponse ) => {
+				console.log( e );
+				return of(
+					new NotificationDismissWithTitle( a.type ),
+					new NotificationNew( { title: a.type, message: 'Failed to list the fields for environment\n' + e.error.message, type: NotificationType.Error } )
 				);
 			} )
 		) )

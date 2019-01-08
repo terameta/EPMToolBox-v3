@@ -26,15 +26,15 @@ export class SmartViewTool {
 		const bodyTemplate = hbCompile( bodyXML );
 		return bodyTemplate( params );
 	}
-	// private smartviewOpenCube = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewListCubes( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_OpenCube.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	private smartviewOpenCube = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewListCubes( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_OpenCube.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_opencube' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to open cube ' + payload.name + '@smartviewOpenCube' ) );
-	// 	return payload;
-	// }
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_opencube' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to open cube ' + payload.name + '@smartviewOpenCube' ) );
+		return payload;
+	}
 	private smartviewListCubes = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
 		await this.smartviewOpenApplication( payload );
 		await this.smartviewGetAvailableServices( payload );
@@ -803,27 +803,27 @@ export class SmartViewTool {
 	// 	payload.smartview.aliastables = $( 'alstbls' ).text().split( '|' );
 	// 	return payload;
 	// }
-	// public listDimensions = async ( payload: EnvironmentDetail ) => {
-	// 	await this.smartviewListDimensions( payload );
-	// 	return payload.smartview.dimensions;
-	// }
-	// private smartviewListDimensions = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewOpenCube( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_EnumDims.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	public listDimensions = async ( payload: EnvironmentDetail ) => {
+		await this.smartviewListDimensions( payload );
+		return payload.smartview.dimensions;
+	}
+	private smartviewListDimensions = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewOpenCube( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_EnumDims.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_enumdims' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to list dimensions ' + payload.name + '@smartviewListDimensions' ) );
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_enumdims' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to list dimensions ' + payload.name + '@smartviewListDimensions' ) );
 
-	// 	payload.smartview.dimensions = [];
-	// 	$( 'dim' ).toArray().
-	// 		filter( d => d.attribs.type !== 'Attribute' ).
-	// 		forEach( curDim => {
-	// 			payload.smartview.dimensions.push( { name: curDim.attribs.name, type: ( curDim.attribs.type === 'None' ? 'Generic' : curDim.attribs.type ), isDescribed: 1 } );
-	// 		} );
-	// 	payload.smartview.dimensions.forEach( ( dimension, index ) => dimension.position = index + 1 );
-	// 	return payload;
-	// }
+		payload.smartview.dimensions = [];
+		$( 'dim' ).toArray().
+			filter( d => d.attribs.type !== 'Attribute' ).
+			forEach( curDim => {
+				payload.smartview.dimensions.push( { name: curDim.attribs.name, type: ( curDim.attribs.type === 'None' ? 'Generic' : curDim.attribs.type ), isDescribed: 1 } );
+			} );
+		payload.smartview.dimensions.forEach( ( dimension, index ) => dimension.position = index + 1 );
+		return payload;
+	}
 	public listCubes = async ( payload: EnvironmentDetail ) => {
 		await this.smartviewListCubes( payload );
 		return payload.smartview.cubes.map( c => ( { name: c, type: 'cube' } ) );

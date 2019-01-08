@@ -1,8 +1,8 @@
 <req_EnumDims>
-	<sID>{{SID}}</sID>
+	<sID>{{smartview.SID}}</sID>
 	<srv>{{server}}</srv>
-	<app>{{database}}</app>
-	<cube>{{table}}</cube>
+	<app>{{smartview.application}}</app>
+	<cube>{{smartview.cube}}</cube>
 	<alsTbl>Default</alsTbl>
 	<ODL_ECID>0000</ODL_ECID>
 </req_EnumDims>

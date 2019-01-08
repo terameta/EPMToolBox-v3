@@ -19,4 +19,5 @@ export class EnvironmentsService {
 	public verify = ( payload: number ) => this.http.get( `${ this.baseUrl }/verify/${ payload }` );
 	public listDatabases = ( payload: number ) => this.http.get( `${ this.baseUrl }/listDatabases/${ payload }` );
 	public listTables = ( payload: { environment: number, database: string } ) => this.http.get( `${ this.baseUrl }/listTables/${ payload.environment }/${ payload.database }` );
+	public listFields = ( payload: { environment: number, stream: number } ) => this.http.get( `${ this.baseUrl }/listFields/${ payload.environment }/${ payload.stream }` );
 }

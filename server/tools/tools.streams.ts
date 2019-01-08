@@ -3,6 +3,7 @@ import { MainTools } from './tools.main';
 import { Stream } from 'shared/models/streams.models';
 import { Tuple } from 'shared/models/tuple';
 import { CloneTarget } from 'shared/models/clone.target';
+import { SortByPosition } from '../../shared/utilities/utility.functions';
 
 export class StreamTools {
 	constructor( private db: DB, private tools: MainTools ) { }
@@ -31,6 +32,7 @@ export class StreamTools {
 	}
 
 	public update = async ( payload: Stream ) => {
+		if ( payload.fieldList ) payload.fieldList.sort( SortByPosition );
 		await this.db.queryOne( 'UPDATE streams SET ? WHERE id = ?', [this.tools.pTW( payload ), payload.id] );
 		return { status: 'success' };
 	}

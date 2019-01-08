@@ -68,3 +68,10 @@ export class TablesRefresh implements ReducingAction {
 
 	constructor( public payload: { environment: number, database: string } ) { }
 }
+
+export class FieldsRefresh implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Fields Refresh';
+
+	constructor( public payload: { environment: number, stream: number } ) { }
+}

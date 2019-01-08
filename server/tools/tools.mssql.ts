@@ -4,6 +4,7 @@ import { MainTools } from './tools.main';
 import { EnvironmentDetail } from '../../shared/models/environments.models';
 // import { ATStreamField } from 'shared/models/at.stream';
 import { DB } from './db';
+import { StreamField } from 'shared/models/streams.models';
 
 export class MSSQLTool {
 
@@ -29,7 +30,6 @@ export class MSSQLTool {
 			// Since we are not on a named instance, we will now setup port.
 			if ( payload.server.split( '\\' ).length === 1 && payload.port ) { dbConfig.port = parseInt( payload.port, 10 ); }
 		}
-		console.log( dbConfig );
 		payload.mssql.connection = await new ConnectionPool( dbConfig ).connect();
 	}
 
@@ -46,35 +46,35 @@ export class MSSQLTool {
 		return recordset.map( tuple => ( { name: tuple.TABLE_NAME, type: tuple.TABLE_TYPE } ) );
 	}
 
-	// public listFields = async ( payload: ATEnvironmentDetail ) => {
-	// 	await this.connect( payload );
-	// 	payload.query = payload.query ? payload.query : 'SELECT * FROM ' + payload.table;
-	// 	const { recordset } = await payload.mssql.connection.request().query( 'SELECT TOP 100 * FROM (' + payload.query + ') T' );
-	// 	if ( recordset.length === 0 ) throw new Error( 'No records received, can\'t process the fields' );
-	// 	// const fields: ATStreamField[] = [];
-	// 	const fields: ATStreamField[] = Object.keys( recordset[0] ).map( ( field, key ) => ( <ATStreamField>{ name: field, position: ( key + 1 ) } ) );
-	// 	fields.forEach( field => {
-	// 		let isString = 0;
-	// 		let isNumber = 0;
-	// 		let isDate = 0;
-	// 		recordset.forEach( tuple => {
-	// 			if ( typeof tuple[field.name] === 'string' ) {
-	// 				isString++;
-	// 			} else if ( typeof tuple[field.name] === 'number' ) {
-	// 				isNumber++;
-	// 			} else {
-	// 				const checker = new Date( tuple[field.name] );
-	// 				if ( checker instanceof Date && !isNaN( checker.valueOf() ) ) isDate++;
-	// 			}
-	// 		} );
-	// 		field.type = 'undefined';
-	// 		let typemax = 0;
-	// 		if ( isString > typemax ) { field.type = 'string'; typemax = isString; }
-	// 		if ( isNumber > typemax ) { field.type = 'number'; typemax = isNumber; }
-	// 		if ( isDate > typemax ) { field.type = 'date'; }
-	// 	} );
-	// 	return fields;
-	// }
+	public listFields = async ( payload: EnvironmentDetail ) => {
+		await this.connect( payload );
+		const query = payload.mssql.query || 'SELECT * FROM ' + payload.mssql.table;
+		const { recordset } = await payload.mssql.connection.request().query( 'SELECT TOP 100 * FROM (' + query + ') T' );
+		if ( recordset.length === 0 ) throw new Error( 'No records received, can\'t process the fields' );
+		// const fields: ATStreamField[] = [];
+		const fields: StreamField[] = Object.keys( recordset[0] ).map( ( field, key ) => ( <StreamField>{ name: field, position: ( key + 1 ) } ) );
+		fields.forEach( field => {
+			let isString = 0;
+			let isNumber = 0;
+			let isDate = 0;
+			recordset.forEach( tuple => {
+				if ( typeof tuple[field.name] === 'string' ) {
+					isString++;
+				} else if ( typeof tuple[field.name] === 'number' ) {
+					isNumber++;
+				} else {
+					const checker = new Date( tuple[field.name] );
+					if ( checker instanceof Date && !isNaN( checker.valueOf() ) ) isDate++;
+				}
+			} );
+			field.type = 'undefined';
+			let typemax = 0;
+			if ( isString > typemax ) { field.type = 'string'; typemax = isString; }
+			if ( isNumber > typemax ) { field.type = 'number'; typemax = isNumber; }
+			if ( isDate > typemax ) { field.type = 'date'; }
+		} );
+		return fields;
+	}
 
 	// public listAliasTables = async ( payload: ATEnvironmentDetail ) => {
 	// 	return ['default'];

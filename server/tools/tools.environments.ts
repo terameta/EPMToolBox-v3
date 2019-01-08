@@ -7,16 +7,19 @@ import { PBCSTool } from './tools.pbcs';
 import { MSSQLTool } from './tools.mssql';
 import { CloneTarget } from '../../shared/models/clone.target';
 import { Tuple } from 'shared/models/tuple';
+import { StreamTools } from './tools.streams';
 
 export class EnvironmentTools {
 	private credentialTool: CredentialTools;
 	private sourceTools: { [key: number]: HPTool | PBCSTool | MSSQLTool } = {};
+	private streamTools: StreamTools;
 
 	constructor( private db: DB, private tools: MainTools ) {
 		this.credentialTool = new CredentialTools( this.db, this.tools );
 		this.sourceTools[EnvironmentType.HP] = new HPTool( this.db, this.tools );
 		this.sourceTools[EnvironmentType.PBCS] = new PBCSTool( this.db, this.tools );
 		this.sourceTools[EnvironmentType.MSSQL] = new MSSQLTool( this.db, this.tools );
+		this.streamTools = new StreamTools( this.db, this.tools );
 	}
 
 	public getAll = async () => {
@@ -99,6 +102,22 @@ export class EnvironmentTools {
 		await this.update( lister );
 		return { result: 'success' };
 	}
+
+	public listFields = async ( payload: { id: number, streamid: number } ) => {
+		const ce = await this.getDetails( payload.id, true );
+		const cs = await this.streamTools.getOne( payload.streamid );
+		if ( ce.smartview ) {
+			ce.smartview.application = cs.dbName;
+			ce.smartview.cube = cs.tableName;
+		}
+		if ( ce.mssql ) {
+			ce.mssql.database = cs.dbName;
+			ce.mssql.table = cs.tableName;
+			ce.mssql.query = cs.customQuery;
+		}
+		cs.fieldList = await this.sourceTools[ce.type].listFields( ce );
+		return await this.streamTools.update( cs );
+	}
 }
 
 // import { ATTuple } from '../../shared/models/at.tuple';
@@ -117,13 +136,7 @@ export class EnvironmentTools {
 // 			return await this.sourceTools[cEnv.type].listTables( cEnv );
 // 		}
 // 	}
-// 	public listFields = async ( payload: { id: number, database: string, table: string, query: string } ) => {
-// 		const currentEnvironment = await this.getEnvironmentDetails( payload.id, true );
-// 		if ( payload.database ) currentEnvironment.database = payload.database;
-// 		if ( payload.table ) currentEnvironment.table = payload.table;
-// 		if ( payload.query ) currentEnvironment.query = payload.query;
-// 		return await this.sourceTools[currentEnvironment.type].listFields( currentEnvironment );
-// 	}
+
 // 	public listAliasTables = async ( id: number, database: string, query: string, table: string ) => {
 // 		const payload = await this.getEnvironmentDetails( id, true );
 // 		if ( database ) payload.database = database;

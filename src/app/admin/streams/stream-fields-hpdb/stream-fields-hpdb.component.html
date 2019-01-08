@@ -1,3 +1,74 @@
-<p>
-  stream-fields-hpdb works!
-</p>
+<ng-container *ngIf="item$ | async as item; else loading">
+	<form (ngSubmit)="us.update(feature, item, f)" #f="ngForm">
+		<div class="container-fluid">
+			<div class="row my-1">
+				<div class="col">
+					<div class="btn-toolbar">
+						<div class="btn-group btn-group-xs ml-auto">
+							<button type="submit" class="btn btn-outline-success" title="Save"><i class="fas fa-save fa-fw"></i></button>
+							<button class="btn btn-outline-warning" type="button" (click)="startOver(item, f)" [disabled]="!item.fieldList || item.fieldList.length == 0" title="Start Over">
+								<i class="fas fa-eraser fa-fw"></i>
+							</button>
+							<button class="btn btn-outline-dark" type="button" (click)="refreshFields(item)" [disabled]="item.fieldList && item.fieldList.length > 0" title="Refresh from Environment">
+								<i class="fas fa-sync-alt fa-fw"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row my-1" *ngIf="!item.fieldList || item.fieldList.length == 0">
+				<div class="col">
+					<div class="jumbotron">
+						<h1>No Fields Exist</h1>
+						<hr class="my-4">
+						<p>To get the list of fields please click to "<i class="fas fa-sync-alt fa-fw"></i> Refresh from Server" button on the toolbar above.</p>
+					</div>
+				</div>
+			</div>
+			<div class="row my-1" *ngIf="item.fieldList && item.fieldList.length > 0">
+				<div class="col">
+					<div class="table-responsive">
+						<table class="table table-sm table-hover table-borderless">
+							<thead>
+								<tr>
+									<th class="border-bottom border-warning m-0 p-0 text-center" width="1">Sort</th>
+									<th width="24"></th>
+									<th class="border-bottom border-warning m-0 p-0">Name</th>
+									<th width="24"></th>
+									<th class="border-bottom border-warning m-0 p-0">Type</th>
+									<th width="24"></th>
+									<th class="border-bottom border-warning m-0 p-0">Described?</th>
+									<th width="24"></th>
+									<th class="border-bottom border-warning m-0 p-0">Crosstab Ignore?</th>
+								</tr>
+							</thead>
+							<tbody>
+								<ng-container *ngFor="let field of item.fieldList; let i = index; let first = first; let last = last;">
+									<tr>
+										<td class="text-nowrap">
+											<i class="fas fa-caret-square-up pointer mr-1" (click)="fieldMove(item, i, -1)"></i>
+											<i class="fas fa-caret-square-down pointer" (click)="fieldMove(item, i, +1)"></i>
+										</td>
+										<td>&nbsp;</td>
+										<td>{{field.name}}</td>
+										<td>&nbsp;</td>
+										<td>{{field.type}}</td>
+										<td>&nbsp;</td>
+										<td><input type="checkbox" name="{{field.name}}isDescribed" [(ngModel)]="field.isDescribed" disabled></td>
+										<td>&nbsp;</td>
+										<td><input type="checkbox" name="{{field.name}}shouldCross" [(ngModel)]="field.shouldIgnoreCrossTab"></td>
+									</tr>
+								</ng-container>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>
