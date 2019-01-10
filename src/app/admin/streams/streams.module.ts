@@ -14,6 +14,9 @@ import { StreamFieldsHpdbComponent } from './stream-fields-hpdb/stream-fields-hp
 import { StreamFieldsRdbtComponent } from './stream-fields-rdbt/stream-fields-rdbt.component';
 import { StreamFielddescriptionsHpdbComponent } from './stream-fielddescriptions-hpdb/stream-fielddescriptions-hpdb.component';
 import { StreamFielddescriptionsRdbtComponent } from './stream-fielddescriptions-rdbt/stream-fielddescriptions-rdbt.component';
+import { StreamFielddescriptionsRouterComponent } from './stream-fielddescriptions-router/stream-fielddescriptions-router.component';
+import { StreamFielddescriptionsRedirectorComponent } from './stream-fielddescriptions-redirector/stream-fielddescriptions-redirector.component';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 
 const routes: Routes = [
 	{ path: '', component: StreamListComponent },
@@ -23,18 +26,38 @@ const routes: Routes = [
 			{ path: '', redirectTo: 'definitions', pathMatch: 'prefix' },
 			{ path: 'definitions', component: StreamDefinitionsComponent },
 			{ path: 'fields', component: StreamFieldsComponent },
-			{ path: 'fielddescriptions', component: StreamFielddescriptionsComponent },
+			{
+				path: 'fielddescriptions', component: StreamFielddescriptionsComponent, children: [
+					{ path: '', component: StreamFielddescriptionsRedirectorComponent },
+					{ path: ':fieldname', component: StreamFielddescriptionsRouterComponent }
+				]
+			},
 			{ path: 'exports', component: StreamExportsComponent }
 		]
 	}
 ];
 
 @NgModule( {
-	declarations: [StreamsComponent, StreamDetailComponent, StreamListComponent, StreamDefinitionsComponent, StreamFieldsComponent, StreamFielddescriptionsComponent, StreamExportsComponent, StreamFieldsHpdbComponent, StreamFieldsRdbtComponent, StreamFielddescriptionsHpdbComponent, StreamFielddescriptionsRdbtComponent],
+	declarations: [
+		StreamsComponent,
+		StreamDetailComponent,
+		StreamListComponent,
+		StreamDefinitionsComponent,
+		StreamFieldsComponent,
+		StreamFielddescriptionsComponent,
+		StreamExportsComponent,
+		StreamFieldsHpdbComponent,
+		StreamFieldsRdbtComponent,
+		StreamFielddescriptionsHpdbComponent,
+		StreamFielddescriptionsRdbtComponent,
+		StreamFielddescriptionsRouterComponent,
+		StreamFielddescriptionsRedirectorComponent
+	],
 	imports: [
 		CommonModule,
 		FormsModule,
 		SharedModule,
+		TypeaheadModule,
 		RouterModule.forChild( routes )
 	]
 } )

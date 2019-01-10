@@ -82,13 +82,7 @@ export class EnvironmentTools {
 
 	public listDatabases = async ( id: number ) => {
 		const payload = await this.getDetails( id, true );
-		const databasesReceived = await this.sourceTools[payload.type].listDatabases( payload );
-		if ( !payload.databases ) payload.databases = {};
-		databasesReceived.forEach( db => {
-			if ( !payload.databases[db.name] ) payload.databases[db.name] = { name: db.name, tables: [] };
-		} );
-		await this.update( payload );
-		return { result: 'success' };
+		return await this.sourceTools[payload.type].listDatabases( payload );
 	}
 	public listTables = async ( payload: { id: number, database: string } ) => {
 		const lister = await this.getDetails( payload.id, true );
@@ -96,11 +90,7 @@ export class EnvironmentTools {
 			if ( lister.smartview ) lister.smartview.application = payload.database;
 			if ( lister.mssql ) lister.mssql.database = payload.database;
 		}
-		if ( !lister.databases ) lister.databases = {};
-		if ( !lister.databases[payload.database] ) lister.databases[payload.database] = { name: payload.database, tables: [] };
-		lister.databases[payload.database].tables = await this.sourceTools[lister.type].listTables( lister );
-		await this.update( lister );
-		return { result: 'success' };
+		return await this.sourceTools[lister.type].listTables( lister );
 	}
 
 	public listFields = async ( payload: { id: number, streamid: number } ) => {
@@ -118,6 +108,27 @@ export class EnvironmentTools {
 		cs.fieldList = await this.sourceTools[ce.type].listFields( ce );
 		return await this.streamTools.update( cs );
 	}
+
+	public listDescriptiveTables = async ( payload: { id: number, database: string, table: string } ) => {
+		const cEnv = await this.getDetails( payload.id, true );
+		if ( cEnv.type === EnvironmentType.HP || cEnv.type === EnvironmentType.PBCS ) {
+			cEnv.smartview.application = payload.database;
+			cEnv.smartview.cube = payload.table;
+			// return await ( this.sourceTools[cEnv.type] as any ).listAliasTables( cEnv );
+			cEnv.smartview.aliastables = await ( this.sourceTools[cEnv.type] as any ).listAliasTables( cEnv );
+			await this.update( cEnv );
+			return { result: 'success' };
+		} else {
+			return await this.sourceTools[cEnv.type].listTables( cEnv );
+		}
+		// if ( payload.database ) cEnv.database = payload.database;
+		// if ( payload.table ) cEnv.table = payload.table;
+		// if ( cEnv.type === ATEnvironmentType.HP || cEnv.type === ATEnvironmentType.PBCS ) {
+		// 	return await this.sourceTools[cEnv.type].listAliasTables( cEnv );
+		// } else {
+		// 	return await this.sourceTools[cEnv.type].listTables( cEnv );
+		// }
+	}
 }
 
 // import { ATTuple } from '../../shared/models/at.tuple';
@@ -126,16 +137,7 @@ export class EnvironmentTools {
 
 
 
-// 	public listDescriptiveTables = async ( payload: { id: number, database: string, table: string } ) => {
-// 		const cEnv = await this.getEnvironmentDetails( payload.id, true );
-// 		if ( payload.database ) cEnv.database = payload.database;
-// 		if ( payload.table ) cEnv.table = payload.table;
-// 		if ( cEnv.type === ATEnvironmentType.HP || cEnv.type === ATEnvironmentType.PBCS ) {
-// 			return await this.sourceTools[cEnv.type].listAliasTables( cEnv );
-// 		} else {
-// 			return await this.sourceTools[cEnv.type].listTables( cEnv );
-// 		}
-// 	}
+
 
 // 	public listAliasTables = async ( id: number, database: string, query: string, table: string ) => {
 // 		const payload = await this.getEnvironmentDetails( id, true );

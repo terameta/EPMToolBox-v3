@@ -19,7 +19,6 @@ export interface EnvironmentOnDB extends EnvironmentBase { tags: string }
 export interface EnvironmentDetail extends Environment {
 	username: string,
 	password: string,
-	databases: { [key: string]: DatabaseListItem },
 	mssql: EnvironmentMSSQL,
 	smartview: EnvironmentSmartView
 }

@@ -1,0 +1,9 @@
+<ng-container *ngIf="type$ | async as type; else loading">
+	<app-stream-fielddescriptions-hpdb *ngIf="type == types.HPDB"></app-stream-fielddescriptions-hpdb>
+	<app-stream-fielddescriptions-rdbt *ngIf="type == types.RDBT"></app-stream-fielddescriptions-rdbt>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

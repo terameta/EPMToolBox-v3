@@ -389,3 +389,10 @@ export const tableDef: TableDefiner = {
 		'sOrder INT UNSIGNED'],
 	primaryKey: 'id'
 };
+
+export const artifacts: TableDefiner = {
+	name: 'artifacts',
+	fields: ['id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT',
+		'details JSON NULL'],
+	primaryKey: 'id'
+};

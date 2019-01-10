@@ -15,7 +15,7 @@ export class HPTool {
 	public listDatabases = ( payload: EnvironmentDetail ) => this.smartview.listApplications( payload );
 	public listTables = ( payload: EnvironmentDetail ) => this.smartview.listCubes( payload );
 	public listFields = ( payload: EnvironmentDetail ) => this.smartview.listDimensions( payload );
-	// public listAliasTables = ( payload: EnvironmentDetail ) => this.smartview.listAliasTables( payload );
+	public listAliasTables = ( payload: EnvironmentDetail ) => this.smartview.listAliasTables( payload );
 	// public getDescriptions = ( payload: EnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptions( payload, field );
 	// public getDescriptionsWithHierarchy = ( payload: EnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptionsWithHierarchy( payload, field );
 	// public listProcedures = ( payload: EnvironmentDetail ) => this.smartview.listBusinessRules( payload );

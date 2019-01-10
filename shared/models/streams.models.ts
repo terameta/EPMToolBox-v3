@@ -49,7 +49,6 @@ export interface StreamFieldDescription {
 	database: string,
 	table: string,
 	query: string,
-	tableList: any[],
 	fieldList: any[],
 	referenceField: {
 		name: string,

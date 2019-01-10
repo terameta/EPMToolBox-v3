@@ -24,5 +24,8 @@ export class ApiEnvironments {
 		this.apiRoutes.get( '/listDatabases/:id', ( req, res ) => { this.rester.respond( this.tool.listDatabases, req.params.id, req, res ); } );
 		this.apiRoutes.get( '/listTables/:id/:db', ( req, res ) => { this.rester.respond( this.tool.listTables, { id: parseInt( req.params.id, 10 ), database: req.params.db }, req, res ); } );
 		this.apiRoutes.get( '/listFields/:id/:stream', ( req, res ) => { this.rester.respond( this.tool.listFields, { id: parseInt( req.params.id, 10 ), streamid: parseInt( req.params.stream, 10 ) }, req, res ); } );
+		this.apiRoutes.get( '/listDescriptiveTables/:id/:db/:table', ( req, res ) => {
+			this.rester.respond( this.tool.listDescriptiveTables, { id: req.params.id, database: req.params.db, table: req.params.table }, req, res );
+		} );
 	}
 }

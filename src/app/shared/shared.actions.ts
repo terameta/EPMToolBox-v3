@@ -54,6 +54,15 @@ export class SetCurrentID implements ReducingAction {
 	public reducer = ( state: SharedState ): SharedState => ( { ...state, currentID: this.payload ? parseInt( this.payload, 10 ) : null } );
 }
 
+export class SetCurrentURL implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Set Current URL';
+
+	constructor( public payload: string ) { }
+
+	public reducer = ( state: SharedState ): SharedState => ( { ...state, currentURL: this.payload || '' } );
+}
+
 export class TagsChanged implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'Tags Changed';

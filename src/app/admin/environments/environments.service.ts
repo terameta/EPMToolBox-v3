@@ -20,4 +20,7 @@ export class EnvironmentsService {
 	public listDatabases = ( payload: number ) => this.http.get( `${ this.baseUrl }/listDatabases/${ payload }` );
 	public listTables = ( payload: { environment: number, database: string } ) => this.http.get( `${ this.baseUrl }/listTables/${ payload.environment }/${ payload.database }` );
 	public listFields = ( payload: { environment: number, stream: number } ) => this.http.get( `${ this.baseUrl }/listFields/${ payload.environment }/${ payload.stream }` );
+	public listDescriptiveTables = ( payload: LDTI ) => this.http.get( `${ this.baseUrl }/listDescriptiveTables/${ payload.environment }/${ payload.database }/${ payload.table }` );
 }
+
+interface LDTI { environment: number, database: string, table: string }

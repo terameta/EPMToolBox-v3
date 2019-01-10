@@ -7,8 +7,10 @@ import { TagGroupState } from './admin/tags/taggroups.state';
 import { CredentialState } from './admin/credentials/credentials.state';
 import { EnvironmentState } from './admin/environments/environments.state';
 import { StreamState } from './admin/streams/streams.state';
+import { ArtifactState } from './shared/artifacts.state';
 
 export interface AppState {
+	artifacts: ArtifactState,
 	auth: AuthState,
 	environments: EnvironmentState,
 	streams: StreamState,

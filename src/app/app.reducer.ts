@@ -11,8 +11,10 @@ import { tagGroupReducer } from './admin/tags/taggroup.reducer';
 import { credentialReducer } from './admin/credentials/credentials.reducer';
 import { environmentReducer } from './admin/environments/environments.reducer';
 import { streamReducer } from './admin/streams/streams.reducer';
+import { artifactReducer } from './shared/artifacts.reducer';
 
 export const AppReducer: ActionReducerMap<AppState> = {
+	artifacts: artifactReducer,
 	auth: authReducer,
 	credentials: credentialReducer,
 	environments: environmentReducer,

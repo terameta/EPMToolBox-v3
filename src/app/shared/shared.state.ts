@@ -7,8 +7,9 @@ export interface SharedState {
 	selectedTags: any,
 	autoShowNotifications: boolean,
 	autoShowNotificationsOnlyError: boolean,
-	currentFeature: string
-	currentID: number
+	currentFeature: string,
+	currentID: number,
+	currentURL: string
 }
 
 const baseSharedState: SharedState = {
@@ -17,7 +18,8 @@ const baseSharedState: SharedState = {
 	autoShowNotifications: false,
 	autoShowNotificationsOnlyError: false,
 	currentFeature: null,
-	currentID: null
+	currentID: null,
+	currentURL: null
 };
 
 export const initialSharedState = (): SharedState => {

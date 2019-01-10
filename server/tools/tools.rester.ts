@@ -6,6 +6,7 @@ import { TagTools } from './tools.tags';
 import { TagGroupTools } from './tools.taggroups';
 import { EnvironmentTools } from './tools.environments';
 import { StreamTools } from './tools.streams';
+import { ArtifactTools } from './tools.artifacts';
 
 export class Rester {
 	constructor( public tools: MainTools ) { }
@@ -16,7 +17,7 @@ export class Rester {
 			catch( ( issue: Error ) => res.status( 500 ).json( { status: 'fail', title: issue.name, message: issue.message } ) );
 	}
 
-	public restify( router: Router, tool: CredentialTools | EnvironmentTools | StreamTools | TagTools | TagGroupTools ) {
+	public restify( router: Router, tool: ArtifactTools | CredentialTools | EnvironmentTools | StreamTools | TagTools | TagGroupTools ) {
 		router.get( '/', ( req: Request, res: Response ) => {
 			this.respond( tool.getAll, null, req, res );
 		} );

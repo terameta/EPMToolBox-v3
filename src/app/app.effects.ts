@@ -8,8 +8,10 @@ import { TagGroupEffects } from './admin/tags/taggroup.effects';
 import { CredentialEffects } from './admin/credentials/credentials.effects';
 import { EnvironmentEffects } from './admin/environments/environments.effects';
 import { StreamEffects } from './admin/streams/streams.effects';
+import { ArtifactEffects } from './shared/artifacts.effects';
 
 export const AppEffects = [
+	ArtifactEffects,
 	AuthEffects,
 	CredentialEffects,
 	EnvironmentEffects,

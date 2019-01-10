@@ -10,6 +10,9 @@ import { DatabasesRefresh, TablesRefresh } from '../../environments/environments
 import { Observable, BehaviorSubject } from 'rxjs';
 import { EnvironmentDetail } from 'shared/models/environments.models';
 import { NgForm } from '@angular/forms';
+import { Load } from 'src/app/shared/artifacts.actions';
+import { ArtifactType } from 'shared/models/artifacts.models';
+import { LoadState } from 'shared/models/generic.loadstate';
 
 @Component( {
 	selector: 'app-stream-definitions',
@@ -17,7 +20,9 @@ import { NgForm } from '@angular/forms';
 	styleUrls: ['./stream-definitions.component.scss']
 } )
 export class StreamDefinitionsComponent {
+	public kekele = '';
 	public types = EnumToArray( StreamType );
+	public loadStates = LoadState;
 	public typeDescription = getTypeDescription;
 	public streamTypes = StreamType;
 	public feature = FEATURE;
@@ -34,23 +39,45 @@ export class StreamDefinitionsComponent {
 		combineLatest( this.item$ ),
 		map( ( [e, s] ) => e.items[s.environment] )
 	);
-	public databases$ = this.environment$.pipe(
-		map( e => <EnvironmentDetail>e ),
-		map( e => Object.values( e.databases ).sort( SortByName ) )
-	);
-	public database$ = this.environment$.pipe(
-		map( e => <EnvironmentDetail>e ),
+	public databases$ = this.store.select( 'artifacts' ).pipe(
 		combineLatest( this.item$ ),
-		map( ( [e, s] ) => e.databases[s.dbName] )
+		distinctUntilChanged(),
+		filter( ( [a, i] ) => ( !!i.environment ) ),
+		tap( ( [a, i] ) => {
+			if ( !a.databaseLists[i.environment] || a.databaseLists[i.environment].loadState === LoadState.NotLoaded ) {
+				this.store.dispatch( new Load( { environment: i.environment, type: ArtifactType.DatabaseList } ) );
+			}
+		} ),
+		map( ( [a, i] ) => ( a.databaseLists[i.environment] ) ),
+		filter( a => !!a )
 	);
+	public tables$ = this.store.select( 'artifacts' ).pipe(
+		combineLatest( this.item$ ),
+		distinctUntilChanged(),
+		filter( ( [a, i] ) => ( !!i.environment ) ),
+		filter( ( [a, i] ) => ( !!i.dbName ) ),
+		tap( ( [a, i] ) => {
+			if ( !a.tableLists[i.environment + '_' + i.dbName] || a.tableLists[i.environment + '_' + i.dbName].loadState === LoadState.NotLoaded ) {
+				this.store.dispatch( new Load( { environment: i.environment, database: i.dbName, type: ArtifactType.TableList } ) );
+			}
+		} ),
+		map( ( [a, i] ) => ( a.tableLists[i.environment + '_' + i.dbName] ) ),
+		filter( a => !!a ),
+		// map( l => ( { ...l, list: [{ name: 'Custom Query', type: 'Custom Query' }, ...l.list] } ) )
+	);
+	// public tableList$ = this.tables$.pipe( map( t => t.list.map( l => l.name ) ), map( l => ['Custom Query', ...l] ) );
 
 	public environmentChanged$ = new BehaviorSubject( false );
 	public databaseChanged$ = new BehaviorSubject( false );
 
+	public artifacts$ = this.store.select( 'artifacts' ).pipe(
+
+	);
+
 	constructor( private store: Store<AppState>, public us: UtilityService ) { }
 
-	public refreshDatabases = ( eid: number ) => this.store.dispatch( new DatabasesRefresh( eid ) );
-	public refreshTables = ( eid: number, dbName: string ) => this.store.dispatch( new TablesRefresh( { environment: eid, database: dbName } ) );
+	public refreshDatabases = ( eid: number ) => this.store.dispatch( new Load( { environment: eid, type: ArtifactType.DatabaseList } ) );
+	public refreshTables = ( eid: number, dbName: string ) => this.store.dispatch( new Load( { environment: eid, database: dbName, type: ArtifactType.TableList } ) );
 	public codeCustomQuery = async ( item: Stream, f: NgForm ) => {
 		let result = await this.us.coder( item.customQuery, { language: 'sql' }, 'Custom Query for ' + item.name );
 		if ( result !== false && result !== true ) {

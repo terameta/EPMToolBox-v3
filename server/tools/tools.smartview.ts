@@ -789,20 +789,20 @@ export class SmartViewTool {
 	// 	}
 	// 	return payload;
 	// }
-	// public listAliasTables = async ( payload: EnvironmentDetail ) => {
-	// 	await this.smartviewListAliasTables( payload );
-	// 	return payload.smartview.aliastables.map( t => ( { name: t, type: 'Alias Table' } ) );
-	// }
-	// private smartviewListAliasTables = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewOpenCube( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_EnumAliasTables.xml', payload );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	public listAliasTables = async ( payload: EnvironmentDetail ) => {
+		await this.smartviewListAliasTables( payload );
+		return payload.smartview.aliastables.map( t => ( { name: t, type: 'Alias Table' } ) );
+	}
+	private smartviewListAliasTables = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewOpenCube( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_EnumAliasTables.xml', payload );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_enumaliastables' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to list alias tables ' + payload.name + '@smartviewListAliasTables' ) );
-	// 	payload.smartview.aliastables = $( 'alstbls' ).text().split( '|' );
-	// 	return payload;
-	// }
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_enumaliastables' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to list alias tables ' + payload.name + '@smartviewListAliasTables' ) );
+		payload.smartview.aliastables = $( 'alstbls' ).text().split( '|' );
+		return payload;
+	}
 	public listDimensions = async ( payload: EnvironmentDetail ) => {
 		await this.smartviewListDimensions( payload );
 		return payload.smartview.dimensions;

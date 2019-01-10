@@ -14,6 +14,7 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { NotificationModule } from './notification/notification.module';
 import { AdminComponent } from './admin/admin/admin.component';
 import { AppReducer, AppMetaReducer } from './app.reducer';
@@ -49,6 +50,7 @@ export function tokenGetter() {
 		ModalModule.forRoot(),
 		ProgressbarModule.forRoot(),
 		BsDropdownModule.forRoot(),
+		TypeaheadModule.forRoot(),
 		NotificationModule
 	],
 	providers: [],

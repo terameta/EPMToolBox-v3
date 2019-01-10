@@ -7,33 +7,11 @@ import { ApiTagGroups } from './api.taggroups';
 import { ApiCredentials } from './api.credentials';
 import { ApiEnvironments } from './api.environments';
 import { ApiStreams } from './api.streams';
-
-// export const initializeRestApi = ( app: Application, db: DB, tools: MainTools ) => {
-// 	console.log( 'initializing Rest API' );
-
-// 	// const apiLog = new ApiLog( app, refDB, refTools );
-
-// 	// const apiDimeTag = new ApiDimeTag( app, refDB, refTools );
-// 	// const apiDimeTagGroup = new ApiDimeTagGroup( app, refDB, refTools );
-// 	// const apiDimeCredential = new ApiDimeCredential( app, refDB, refTools );
-// 	// const apiDimeEnvironment = new ApiDimeEnvironment( app, refDB, refTools );
-// 	// const apiDimeStream = new ApiDimeStream( app, refDB, refTools );
-// 	// const apiDimeMap = new ApiDimeMap( app, refDB, refTools );
-// 	// const apiDimeMatrix = new ApiDimeMatrix( app, refDB, refTools );
-// 	// const apiDimeProcess = new ApiDimeProcess( app, refDB, refTools );
-// 	// const apiDimeAsyncProcess = new ApiDimeAsyncProcess( app, refDB, refTools );
-// 	// const apiDimeSchedule = new ApiDimeSchedule( app, refDB, refTools );
-// 	// const apiDimeSecret = new ApiDimeSecret( app, refDB, refTools );
-
-// 	// const apiAcmServer = new ApiAcmServers( app, refDB, refTools );
-// 	// const apiAcmUser = new ApiAcmUsers( app, refDB, refTools );
-
-// 	// const apiAuth = new ApiAuth( app, refDB, refTools );
-// 	// const apiSettings = new ApiSettings( app, refDB, refTools );
-// };
+import { ApiArtifacts } from './api.artifacts';
 
 export class RestAPI {
 	constructor( private app: Application, private db: DB, private tools: MainTools ) {
+		const apiArtifacts = new ApiArtifacts( this.app, this.db, this.tools );
 		const apiAuth = new ApiAuth( this.app, this.db, this.tools );
 		const apiCredential = new ApiCredentials( this.app, this.db, this.tools );
 		const apiEnvironment = new ApiEnvironments( this.app, this.db, this.tools );

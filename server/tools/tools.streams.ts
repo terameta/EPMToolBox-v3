@@ -1,6 +1,6 @@
 import { DB } from './db';
 import { MainTools } from './tools.main';
-import { Stream } from 'shared/models/streams.models';
+import { Stream, StreamFieldDescription } from 'shared/models/streams.models';
 import { Tuple } from 'shared/models/tuple';
 import { CloneTarget } from 'shared/models/clone.target';
 import { SortByPosition } from '../../shared/utilities/utility.functions';
@@ -32,7 +32,12 @@ export class StreamTools {
 	}
 
 	public update = async ( payload: Stream ) => {
-		if ( payload.fieldList ) payload.fieldList.sort( SortByPosition );
+		if ( payload.fieldList ) {
+			payload.fieldList.sort( SortByPosition );
+			payload.fieldList.forEach( f => {
+				if ( f.isDescribed && !f.description ) f.description = <StreamFieldDescription>{};
+			} );
+		}
 		await this.db.queryOne( 'UPDATE streams SET ? WHERE id = ?', [this.tools.pTW( payload ), payload.id] );
 		return { status: 'success' };
 	}

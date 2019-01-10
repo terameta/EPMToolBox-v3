@@ -1,6 +1,7 @@
 import { SystemConfig } from 'shared/models/systemconfig';
 import { DB } from './db';
 import * as express from 'express';
+import * as compression from 'compression';
 import { Server } from 'http';
 import * as socketio from 'socket.io';
 import * as multer from 'multer';
@@ -61,6 +62,7 @@ export class ApplicationWorker {
 		this.app.use( morgan( 'short' ) );
 
 		this.app.use( '/api', jwt( { secret: config.hash } ).unless( { path: ['/api/auth/signin', /\/api\/dime\/secret\/givemysecret/i] } ) );
+		this.app.use( compression() );
 
 		this.restAPI = new RestAPI( this.app, this.db, this.mainTools );
 

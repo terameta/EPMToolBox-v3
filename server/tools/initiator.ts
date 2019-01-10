@@ -386,6 +386,7 @@ export class Initiator {
 		this.steps.push( { expectedCurrentVersion: 110, operatorFunction: async () => this.jsonizeColumns( 'environments' ) } );
 		this.steps.push( { expectedCurrentVersion: 111, operatorFunction: () => this.db.query( 'ALTER TABLE environments DROP name, DROP type, DROP server, DROP port, DROP verified' ) } );
 		this.steps.push( { expectedCurrentVersion: 112, operatorFunction: () => this.db.query( 'ALTER TABLE environments DROP identitydomain, DROP credential, DROP tags' ) } );
+		this.steps.push( { expectedCurrentVersion: 113, operatorFunction: () => this.utils.checkAndCreateTable( tableDefinitions.artifacts ) } );
 	}
 
 	public initiate = async () => {

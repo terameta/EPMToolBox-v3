@@ -11,7 +11,7 @@ import { InterestShowAll } from './interest.actions';
 import { FEATURE } from './shared.state';
 import { ReducingAction } from './reducingaction.model';
 import { NotificationNew, NotificationDismissWithTitle } from '../notification/notification.actions';
-import { DoNothing, SetCurrentFeature, SetCurrentID, TagSelectionsFromLocalStorage } from './shared.actions';
+import { DoNothing, SetCurrentFeature, SetCurrentID, TagSelectionsFromLocalStorage, SetCurrentURL } from './shared.actions';
 import { NotificationType } from '../notification/notification.models';
 import * as TagActions from '../admin/tags/tag.actions';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
@@ -38,7 +38,8 @@ export class SharedEffects {
 		ofType( ROUTER_NAVIGATED ),
 		mergeMap( ( a: RouterNavigatedAction ) => [
 			new SetCurrentFeature( a.payload.event.urlAfterRedirects.split( '/' )[2] || null ),
-			new SetCurrentID( a.payload.event.urlAfterRedirects.split( '/' )[3] || null )
+			new SetCurrentID( a.payload.event.urlAfterRedirects.split( '/' )[3] || null ),
+			new SetCurrentURL( a.payload.event.urlAfterRedirects )
 		] )
 	);
 

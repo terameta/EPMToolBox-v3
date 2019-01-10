@@ -6,15 +6,20 @@ import { ConfirmComponent } from './confirm/confirm.component';
 import { PromptComponent } from './prompt/prompt.component';
 
 import * as TagActions from '../admin/tags/tag.actions';
-import { FEATURE as TagFeature } from '../admin/tags/tags.state';
+import * as fromTagsState from '../admin/tags/tags.state';
+// import { FEATURE as TagFeature } from '../admin/tags/tags.state';
 import * as TagGroupActions from '../admin/tags/taggroup.actions';
-import { FEATURE as TagGroupFeature } from '../admin/tags/taggroups.state';
+import * as fromTagGroupsState from '../admin/tags/taggroups.state';
+// import { FEATURE as TagGroupFeature } from '../admin/tags/taggroups.state';
 import * as CredentialActions from '../admin/credentials/credentials.actions';
-import { FEATURE as CredentialFeature } from '../admin/credentials/credentials.state';
+import * as fromCredentialsState from '../admin/credentials/credentials.state';
+// import { FEATURE as CredentialFeature } from '../admin/credentials/credentials.state';
 import * as EnvironmentActions from '../admin/environments/environments.actions';
-import { FEATURE as EnvironmentFeature } from '../admin/environments/environments.state';
+import * as fromEnvironmentsState from '../admin/environments/environments.state';
+// import { FEATURE as EnvironmentFeature } from '../admin/environments/environments.state';
 import * as StreamActions from '../admin/streams/streams.actions';
-import { FEATURE as StreamFeature } from '../admin/streams/streams.state';
+import * as fromStreamsState from '../admin/streams/streams.state';
+// import { FEATURE as StreamFeature } from '../admin/streams/streams.state';
 import { NotificationNew } from '../notification/notification.actions';
 import { NotificationType } from '../notification/notification.models';
 import { NgForm } from '@angular/forms';
@@ -34,11 +39,11 @@ export class UtilityService {
 		private store: Store<AppState>,
 		private modalService: BsModalService
 	) {
-		this.dispatcher[TagFeature] = TagActions;
-		this.dispatcher[TagGroupFeature] = TagGroupActions;
-		this.dispatcher[CredentialFeature] = CredentialActions;
-		this.dispatcher[EnvironmentFeature] = EnvironmentActions;
-		this.dispatcher[StreamFeature] = StreamActions;
+		this.dispatcher[fromTagsState.FEATURE] = TagActions;
+		this.dispatcher[fromTagGroupsState.FEATURE] = TagGroupActions;
+		this.dispatcher[fromCredentialsState.FEATURE] = CredentialActions;
+		this.dispatcher[fromEnvironmentsState.FEATURE] = EnvironmentActions;
+		this.dispatcher[fromStreamsState.FEATURE] = StreamActions;
 	}
 
 	public confirm = ( question: string, okonly = false ): Promise<boolean> => {
