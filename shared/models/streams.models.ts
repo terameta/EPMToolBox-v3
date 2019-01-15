@@ -71,13 +71,14 @@ export interface StreamFieldDescription {
 // Before new changes
 
 export interface StreamExport {
+	id: string,
 	name: string
 }
 
 export interface StreamExportHPDB extends StreamExport {
-	rowDims: ATStreamExportHPDBDimensionDefinition[],
-	colDims: ATStreamExportHPDBDimensionDefinition[],
-	povDims: ATStreamExportHPDBDimensionDefinition[],
+	rowDims: StreamExportHPDBDimensionDefinition[],
+	colDims: StreamExportHPDBDimensionDefinition[],
+	povDims: StreamExportHPDBDimensionDefinition[],
 	cellCounts: any,
 	cellCount: number,
 	rows: any[],
@@ -85,7 +86,7 @@ export interface StreamExportHPDB extends StreamExport {
 	povs: any[]
 }
 
-export interface ATStreamExportHPDBDimensionDefinition {
+export interface StreamExportHPDBDimensionDefinition {
 	name: string,
 	position: number,
 	selectable: boolean,

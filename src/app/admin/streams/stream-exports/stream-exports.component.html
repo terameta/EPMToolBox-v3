@@ -1,3 +1,29 @@
-<p>
-  stream-exports works!
-</p>
+<ng-container *ngIf="item$ | async as item">
+	<div class="container-fluid">
+		<div class="row my-1">
+			<div class="col">
+				<div class="btn-toolbar">
+					<div class="btn-group btn-group-xs ml-auto mr-3">
+						<button type="button" class="btn btn-outline-dark" (click)="create(item)">
+							<i class="fas fa-plus fa-fw"></i> New Export
+						</button>
+					</div>
+					<form #goForm="ngForm">
+						<div class="input-group input-group-sm">
+							<div class="input-group-prepend">
+								<span class="input-group-text"><i class="fas fa-angle-double-right fa-fw"></i></span>
+							</div>
+							<select name="GoTo" class="form-control" [ngModel]="id$ | async" (change)="goToExport($event, item.id, goForm)">
+								<option value="0">List</option>
+								<option [value]="export.id" *ngFor="let export of item.exports">{{export.name}}</option>
+							</select>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="row my-1">
+			<router-outlet></router-outlet>
+		</div>
+	</div>
+</ng-container>

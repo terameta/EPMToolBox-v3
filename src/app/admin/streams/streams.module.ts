@@ -17,6 +17,10 @@ import { StreamFielddescriptionsRdbtComponent } from './stream-fielddescriptions
 import { StreamFielddescriptionsRouterComponent } from './stream-fielddescriptions-router/stream-fielddescriptions-router.component';
 import { StreamFielddescriptionsRedirectorComponent } from './stream-fielddescriptions-redirector/stream-fielddescriptions-redirector.component';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { StreamExportListComponent } from './stream-export-list/stream-export-list.component';
+import { StreamExportDetailComponent } from './stream-export-detail/stream-export-detail.component';
+import { StreamExportDetailRdbtComponent } from './stream-export-detail-rdbt/stream-export-detail-rdbt.component';
+import { StreamExportDetailHpdbComponent } from './stream-export-detail-hpdb/stream-export-detail-hpdb.component';
 
 const routes: Routes = [
 	{ path: '', component: StreamListComponent },
@@ -32,7 +36,13 @@ const routes: Routes = [
 					{ path: ':fieldname', component: StreamFielddescriptionsRouterComponent }
 				]
 			},
-			{ path: 'exports', component: StreamExportsComponent }
+			{
+				path: 'exports', component: StreamExportsComponent, children: [
+					{ path: '0', component: StreamExportListComponent },
+					{ path: '', redirectTo: '0', pathMatch: 'prefix' },
+					{ path: ':id', component: StreamExportDetailComponent }
+				]
+			}
 		]
 	}
 ];
@@ -51,7 +61,11 @@ const routes: Routes = [
 		StreamFielddescriptionsHpdbComponent,
 		StreamFielddescriptionsRdbtComponent,
 		StreamFielddescriptionsRouterComponent,
-		StreamFielddescriptionsRedirectorComponent
+		StreamFielddescriptionsRedirectorComponent,
+		StreamExportListComponent,
+		StreamExportDetailComponent,
+		StreamExportDetailRdbtComponent,
+		StreamExportDetailHpdbComponent
 	],
 	imports: [
 		CommonModule,
