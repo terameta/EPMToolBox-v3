@@ -60,6 +60,9 @@
 								<button class="btn btn-outline-secondary" type="button" (click)="refreshDatabases(item.environment)" title="Refresh Databases/Applications">
 									<i class="fas fa-sync-alt fa-fw" [ngClass]="{'fa-spin':databases.loadState == loadStates.Loading}"></i>
 								</button>
+								<button class="btn btn-outline-secondary" type="button" (click)="refreshDatabases(item.environment, true)" title="Refresh Databases/Applications from Source Environment">
+									<i class="fas fa-cloud-download-alt fa-fw" [ngClass]="{'fa-spin':databases.loadState == loadStates.Loading}"></i>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -79,29 +82,11 @@
 								<button class="btn btn-outline-secondary" type="button" (click)="refreshTables(item.environment, item.dbName)" title="Refresh Tables/Cubes">
 									<i class="fas fa-sync-alt fa-fw" [ngClass]="{'fa-spin':tables.loadState == loadStates.Loading}"></i>
 								</button>
+								<button class="btn btn-outline-secondary" type="button" (click)="refreshTables(item.environment, item.dbName)" title="Refresh Tables/Cubes from Source Environment">
+									<i class="fas fa-cloud-download-alt fa-fw" [ngClass]="{'fa-spin':tables.loadState == loadStates.Loading}"></i>
+								</button>
 							</div>
 						</div>
-
-
-						<!-- <ng-container *ngIf="database.tables && database.tables.length > 0">
-							<div class="input-group input-group-sm">
-								<select name="sTables" class="form-control form-control-sm" [(ngModel)]="item.tableName" required>
-									<option [value]="undefined">Please select</option>
-									<option [value]="'Custom Query'">Custom Query</option>
-									<ng-container *ngIf="database.tables.length <= 1000">
-										<option *ngFor="let table of database.tables" [value]="table.name">{{table.name}}</option>
-									</ng-container>
-								</select>
-
-							</div>
-							<ng-container *ngIf="database.tables.length > 1000">
-								<div class="alert alert-danger mt-2">
-									System has identified more than 1000 tables/views. To be precise, the number is {{ database.tables.length }}. <br>
-									As a result selection is limited to "Custom Query". <br>
-									Please write a custom query.
-								</div>
-							</ng-container>
-						</ng-container> -->
 					</div>
 				</div>
 				<div class="form-group row my-1" *ngIf="item.tableName == 'Custom Query' && item.dbName && !(databaseChanged$ | async)">

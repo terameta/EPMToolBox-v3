@@ -129,7 +129,25 @@ export class EnvironmentTools {
 		// 	return await this.sourceTools[cEnv.type].listTables( cEnv );
 		// }
 	}
+
+	public listDescriptiveFields = async ( payload: { id: number, streamid: number, field: string } ) => {
+		const ce = await this.getDetails( payload.id, true );
+		const cs = await this.streamTools.getOne( payload.streamid );
+		if ( ce.type === EnvironmentType.HP || ce.type === EnvironmentType.PBCS ) {
+			throw new Error( 'Planning Databases do not have descriptive field definitions' );
+		} else {
+			if ( ce.mssql ) {
+				const field = cs.fieldList.filter( f => f.name === payload.field )[0];
+				if ( !field ) throw new Error( 'Field definition is corrupted@tools.environments@listDescriptiveFields' );
+				ce.mssql.database = field.description.database;
+				ce.mssql.table = field.description.table;
+				ce.mssql.query = field.description.query;
+			}
+			return await this.sourceTools[ce.type].listFields( ce );
+		}
+	}
 }
+
 
 // import { ATTuple } from '../../shared/models/at.tuple';
 // import { ATEnvironmentType, ATEnvironment, ATEnvironmentDetail , atEnvironmentPrepareToSave } from '../../shared/models/at.environment';

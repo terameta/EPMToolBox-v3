@@ -2,7 +2,7 @@ import { DB } from './db';
 import { MainTools } from './tools.main';
 import { Tuple } from 'shared/models/tuple';
 import { CloneTarget } from 'shared/models/clone.target';
-import { ArtifactQuery, ArtifactType, DatabaseList, TableList } from '../../shared/models/artifacts.models';
+import { ArtifactQuery, ArtifactType, DatabaseList, TableList, Artifact, DescriptiveFieldList } from '../../shared/models/artifacts.models';
 import { EnvironmentTools } from './tools.environments';
 
 export class ArtifactTools {
@@ -50,7 +50,12 @@ export class ArtifactTools {
 		if ( payload.type === ArtifactType.DatabaseList ) {
 			const { tuple } = await this.db.queryOne<Tuple>( 'SELECT * FROM artifacts WHERE details->"$.environment" = ? AND details->"$.type" = ?', [payload.environment, payload.type] ).catch( () => ( { tuple: null } ) );
 			if ( tuple ) {
-				return this.tools.pTR( tuple );
+				const artifact: DatabaseList = this.tools.pTR<any>( tuple );
+				if ( payload.forceRefetch ) {
+					artifact.list = await this.environmentTools.listDatabases( payload.environment );
+					this.update( artifact );
+				}
+				return artifact;
 			} else {
 				const artifact = <DatabaseList>{
 					type: ArtifactType.DatabaseList,
@@ -66,13 +71,40 @@ export class ArtifactTools {
 				queryOne<Tuple>( 'SELECT * FROM artifacts WHERE details->"$.environment" = ? AND details->"$.database" = ? AND details->"$.type" = ?', [payload.environment, payload.database, payload.type] ).
 				catch( () => ( { tuple: null } ) );
 			if ( tuple ) {
-				return this.tools.pTR( tuple );
+				const artifact: TableList = this.tools.pTR<any>( tuple );
+				if ( payload.forceRefetch ) {
+					artifact.list = await this.environmentTools.listTables( { id: payload.environment, database: payload.database } );
+					this.update( artifact );
+				}
+				return artifact;
 			} else {
 				const artifact = <TableList>{
 					type: ArtifactType.TableList,
 					list: await this.environmentTools.listTables( { id: payload.environment, database: payload.database } ),
 					environment: payload.environment,
 					database: payload.database
+				};
+				this.create( artifact );
+				return artifact;
+			}
+		}
+		if ( payload.type === ArtifactType.DescriptiveFieldList ) {
+			const { tuple } = await this.db.
+				queryOne<Tuple>( 'SELECT * FROM artifacts WHERE details->"$.stream" = ? AND details->"$.field" = ? AND details->"$.type" = ?', [payload.stream, payload.field, payload.type] ).
+				catch( () => ( { tuple: null } ) );
+			if ( tuple ) {
+				const artifact: DescriptiveFieldList = this.tools.pTR<any>( tuple );
+				if ( payload.forceRefetch ) {
+					artifact.list = await this.environmentTools.listDescriptiveFields( { id: payload.environment, streamid: payload.stream, field: payload.field } );
+					this.update( artifact );
+				}
+				return artifact;
+			} else {
+				const artifact = <DescriptiveFieldList>{
+					type: ArtifactType.DescriptiveFieldList,
+					stream: payload.stream,
+					field: payload.field,
+					list: await this.environmentTools.listDescriptiveFields( { id: payload.environment, streamid: payload.stream, field: payload.field } )
 				};
 				this.create( artifact );
 				return artifact;

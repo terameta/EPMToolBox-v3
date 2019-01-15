@@ -19,15 +19,25 @@ export interface TableList extends Artifact {
 	list: { name: string, type: string }[]
 }
 
+export interface DescriptiveFieldList extends Artifact {
+	type: ArtifactType.DescriptiveFieldList,
+	stream: number,
+	field: string,
+	list: { name: string, type: string }[]
+}
+
 export interface ArtifactQuery {
 	type: ArtifactType,
 	environment?: number,
 	stream?: number,
 	database?: string,
-	table?: string
+	table?: string,
+	field?: string,
+	forceRefetch?: boolean
 }
 
 export enum ArtifactType {
 	'DatabaseList' = 1,
-	'TableList' = 2
+	'TableList' = 2,
+	'DescriptiveFieldList' = 3
 }

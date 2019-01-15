@@ -76,8 +76,8 @@ export class StreamDefinitionsComponent {
 
 	constructor( private store: Store<AppState>, public us: UtilityService ) { }
 
-	public refreshDatabases = ( eid: number ) => this.store.dispatch( new Load( { environment: eid, type: ArtifactType.DatabaseList } ) );
-	public refreshTables = ( eid: number, dbName: string ) => this.store.dispatch( new Load( { environment: eid, database: dbName, type: ArtifactType.TableList } ) );
+	public refreshDatabases = ( eid: number, force = false ) => this.store.dispatch( new Load( { environment: eid, type: ArtifactType.DatabaseList, forceRefetch: force } ) );
+	public refreshTables = ( eid: number, dbName: string, force = false ) => this.store.dispatch( new Load( { environment: eid, database: dbName, type: ArtifactType.TableList, forceRefetch: force } ) );
 	public codeCustomQuery = async ( item: Stream, f: NgForm ) => {
 		let result = await this.us.coder( item.customQuery, { language: 'sql' }, 'Custom Query for ' + item.name );
 		if ( result !== false && result !== true ) {

@@ -1,6 +1,6 @@
 import { ReducingAction } from './reducingaction.model';
 import { FEATURE, ArtifactState } from './artifacts.state';
-import { ArtifactQuery, Artifact, ArtifactType, DatabaseList, TableList } from 'shared/models/artifacts.models';
+import { ArtifactQuery, Artifact, ArtifactType, DatabaseList, TableList, DescriptiveFieldList } from 'shared/models/artifacts.models';
 import { LoadState } from 'shared/models/generic.loadstate';
 
 export class Load implements ReducingAction {
@@ -38,7 +38,10 @@ export class LoadComplete implements ReducingAction {
 			const artifact = { ...( this.payload as TableList ), loadState: LoadState.Loaded };
 			return { ...state, ...{ tableLists: { ...state.tableLists, [artifact.environment + '_' + artifact.database]: artifact } } };
 		}
-
+		if ( this.payload.type === ArtifactType.DescriptiveFieldList ) {
+			const artifact = { ...( this.payload as DescriptiveFieldList ), loadState: LoadState.Loaded };
+			return { ...state, ...{ descriptiveFieldLists: { ...state.descriptiveFieldLists, [artifact.stream + '_' + artifact.field]: artifact } } };
+		}
 		return state;
 	}
 }
