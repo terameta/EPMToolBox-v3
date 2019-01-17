@@ -1,3 +1,45 @@
-<p>
-  stream-export-list works!
-</p>
+<ng-container *ngIf="item$ | async as item; else loading">
+	<div class="table-responsive">
+		<table class="table table-sm table-hover table-borderless m-0">
+			<thead>
+				<tr>
+					<th class="border-bottom border-warning m-0 p-0" width="1">Actions</th>
+					<th width="24">&nbsp;</th>
+					<th class="border-bottom border-warning m-0 p-0">Name</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="px-0 text-nowrap text-right">
+						<i class="fas fa-plus-square fa-fw ml-auto text-success pointer" (click)="create(item)"></i>
+					</td>
+					<td>&nbsp;</td>
+					<td class="px-0">
+						<span class="p-0 pointer" title="Create New Export" (click)="create(item)">
+							<i class="fas fa-chevron-right text-warningn"></i>
+							<i class="fas fa-chevron-right text-warningn"></i>
+							Create New Export
+						</span>
+					</td>
+				</tr>
+				<tr *ngFor="let ce of item.exports">
+					<td class="px-0 text-nowrap">
+						<a routerLink="../{{ce.id}}" title="Edit">
+							<i class="far fa-edit fa-fw"></i>
+						</a>
+						<i class="far fa-trash-alt fa-fw ml-3 pointer text-danger" title="Delete" (click)="delete(item, ce)"></i>
+					</td>
+					<td>&nbsp;</td>
+					<td class="px-0">
+						<a routerLink="../{{ce.id}}">{{ce.name}}</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

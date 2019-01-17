@@ -33,7 +33,7 @@ export class DB {
 			this.rtdbSub = this.rtdb.errors$.subscribe( ( error ) => {
 				console.log( '===========================================' );
 				console.log( '===========================================' );
-				console.log( 'We have caught RTDB error at tools.db.ts' );
+				console.log( 'We have caught RTDB error at tools/db.ts' );
 				console.log( error );
 				console.log( '===========================================' );
 				console.log( '===========================================' );

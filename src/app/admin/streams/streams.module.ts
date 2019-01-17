@@ -6,6 +6,7 @@ import { StreamListComponent } from './stream-list/stream-list.component';
 import { FormsModule } from '@angular/forms';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { StreamDefinitionsComponent } from './stream-definitions/stream-definitions.component';
 import { StreamFieldsComponent } from './stream-fields/stream-fields.component';
 import { StreamFielddescriptionsComponent } from './stream-fielddescriptions/stream-fielddescriptions.component';
@@ -72,7 +73,8 @@ const routes: Routes = [
 		FormsModule,
 		SharedModule,
 		TypeaheadModule,
-		RouterModule.forChild( routes )
+		RouterModule.forChild( routes ),
+		DragDropModule
 	]
 } )
 export class StreamsModule { }

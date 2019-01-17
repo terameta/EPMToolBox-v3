@@ -396,3 +396,10 @@ export const artifacts: TableDefiner = {
 		'details JSON NULL'],
 	primaryKey: 'id'
 };
+
+export const artifactsTester: TableDefiner = {
+	name: 'artifactsTester',
+	fields: ['id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT',
+		'details JSON NULL'],
+	primaryKey: 'id'
+};

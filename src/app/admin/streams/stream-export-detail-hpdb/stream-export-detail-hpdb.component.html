@@ -1,3 +1,26 @@
-<p>
-  stream-export-detail-hpdb works!
-</p>
+<ng-container *ngIf="stream$ | async as stream; else loading">
+	<div class="form-group row mt-3">
+		<label class="col-6 col-form-label font-weight-bold">Export Details: {{ sxport.name }}</label>
+		<div class="col-6">
+			<div class="btn-toolbar py-1">
+				<div class="btn-group btn-group-xs ml-auto">
+					<button type="submit" class="btn btn-outline-success" title="Save"><i class="fas fa-save fa-fw"></i></button>
+					<button type="button" class="btn btn-outline-dark" (click)="xclone(feature, item)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
+					<button type="button" class="btn btn-outline-danger" (click)="xdelete(feature, item)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<div cdkDropList #pagDims="cdkDropList" style="min-height:60px;border: solid 1px #ccc">HEYOO WE WILL DRAG&DROP TO HERE</div>
+		</div>
+	</div>
+	<pre>{{sxport | json}}</pre>
+	<pre>{{stream.fieldList | json}}</pre>
+</ng-container>
+<ng-template #loading>
+	<div class="alert alert-info mx-3" role="alert">
+		<i class="fas fa-circle-notch fa-spin"></i> Please wait loading...
+	</div>
+</ng-template>

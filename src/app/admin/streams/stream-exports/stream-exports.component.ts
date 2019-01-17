@@ -28,14 +28,14 @@ export class StreamExportsComponent implements OnInit {
 	ngOnInit() { }
 
 	public goToExport = ( $event: any, streamid: number, f: NgForm ) => {
-		this.store.dispatch( new RouterGo( { path: ['admin', 'streams', streamid, 'exports', parseInt( $event.target.value, 10 ) || 0] } ) );
+		this.store.dispatch( new RouterGo( { path: ['admin', 'streams', streamid, 'exports', $event.target.value || 0] } ) );
 		f.form.markAsPristine();
 	}
 
 	public create = async ( s: Stream ) => {
-		const target: Stream = JSONDeepCopy( s );
 		const name = await this.us.prompt( 'Please name the new export', 'New Export' );
 		if ( name ) {
+			const target: Stream = JSONDeepCopy( s );
 			const newExport: StreamExport = { id: uuid(), name };
 			if ( !Array.isArray( target.exports ) ) {
 				target.exports = [];
@@ -43,8 +43,7 @@ export class StreamExportsComponent implements OnInit {
 			target.exports.push( newExport );
 			target.exports.sort( SortByName );
 			this.store.dispatch( new Update( target ) );
-		} else {
-			console.log( 'We do not need to create the new export' );
+			this.store.dispatch( new RouterGo( { path: ['admin', 'streams', s.id, 'exports', newExport.id] } ) );
 		}
 	}
 

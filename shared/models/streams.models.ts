@@ -79,11 +79,13 @@ export interface StreamExportHPDB extends StreamExport {
 	rowDims: StreamExportHPDBDimensionDefinition[],
 	colDims: StreamExportHPDBDimensionDefinition[],
 	povDims: StreamExportHPDBDimensionDefinition[],
+	pagDims: StreamExportHPDBDimensionDefinition[],
 	cellCounts: any,
 	cellCount: number,
 	rows: any[],
 	cols: any[],
-	povs: any[]
+	povs: any[],
+	pags: any[]
 }
 
 export interface StreamExportHPDBDimensionDefinition {

@@ -1,5 +1,8 @@
 import { DB } from './db';
 import { SystemConfig } from 'shared/models/systemconfig';
+import * as uuid from 'uuid';
+import { Tuple } from '../../shared/models/tuple';
+import { ArtifactType } from '../../shared/models/artifacts.models';
 
 // import { ATCronStructure } from '../../shared/models/at.cronstructure';
 // import { ATSchedule } from '../../shared/models/at.schedule';
@@ -15,13 +18,20 @@ export class CronWorker {
 	// // private scheduleTool: DimeScheduleTool;
 	// private mainTools: MainTools;
 
-	constructor( private db: DB, refConfig: SystemConfig ) {
+	constructor( private db: DB, private config: SystemConfig ) {
 		// 	this.mainTools = new MainTools( db.pool, refConfig );
 		// 	// this.scheduleTool = new DimeScheduleTool( db, this.mainTools );
 		// 	this.registeredCrons = [];
 		// 	this.initiate();
+		this.startTest();
 	}
 
+	private startTest = async () => {
+		// console.log( '>>> We are at startTest of croner' );
+		// console.log( '>>> Initiating another test now' );
+		// console.log( '>>> Initiating another test now' );
+		// console.log( '>>> A', await this.db.queryOne( 'UPDATE artifactsTester SET details = JSON_SET(details, "$.map.\\"04\\"", "Apr") WHERE id = ?', 136006 ) );
+	}
 	// private initiate = () => {
 	// 	// this.everyminute = new Cron.CronJob(
 	// 	// 	'*/10 * * * * *',
