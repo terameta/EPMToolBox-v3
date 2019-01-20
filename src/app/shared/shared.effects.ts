@@ -54,11 +54,10 @@ export class SharedEffects {
 
 	@Effect() DETECTSESSION$: Observable<any> = this.actions$.pipe(
 		ofType( ROUTER_NAVIGATED ),
-		filter( ( a: RouterNavigatedAction ) => a.payload.event.urlAfterRedirects !== '/' ),
+		filter( ( a: RouterNavigatedAction ) => a.payload.event.urlAfterRedirects !== '/' && a.payload.event.urlAfterRedirects !== '/sign-in' ),
 		withLatestFrom( this.store.select( 'auth' ) ),
 		map( ( [r, a] ) => a ),
 		filter( ( authState ) => authState.status === AuthStatus.SignedOut ),
-		distinctUntilChanged(),
 		map( () => ( new RouterGo( { path: ['/'] } ) ) )
 	);
 

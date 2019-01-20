@@ -1,23 +1,65 @@
 <ng-container *ngIf="stream$ | async as stream; else loading">
-	<div class="form-group row mt-3">
-		<label class="col-6 col-form-label font-weight-bold">Export Details: {{ sxport.name }}</label>
-		<div class="col-6">
-			<div class="btn-toolbar py-1">
-				<div class="btn-group btn-group-xs ml-auto">
-					<button type="submit" class="btn btn-outline-success" title="Save"><i class="fas fa-save fa-fw"></i></button>
-					<button type="button" class="btn btn-outline-dark" (click)="xclone(feature, item)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
-					<button type="button" class="btn btn-outline-danger" (click)="xdelete(feature, item)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
+	<ng-container *ngIf="sxport$ | async as sxport; else loading">
+		<div class="row my-1">
+			<div class="col font-weight-bold">
+				Export Details:
+			</div>
+		</div>
+		<div class="row my-3">
+			<div class="col">
+				<div class="input-group input-group-sm">
+					<div class="input-group-prepend">
+						<span class="input-group-text">Name:</span>
+					</div>
+					<input type="text" name="ExportName" class="form-control" [(ngModel)]="sxport.name">
+				</div>
+			</div>
+			<div class="col">
+				<div class="btn-toolbar py-1">
+					<div class="btn-group btn-group-xs ml-auto">
+						<button type="submit" class="btn btn-outline-success" title="Save" (click)="update(stream, sxport)"><i class="fas fa-save fa-fw"></i></button>
+						<button type="button" class="btn btn-outline-dark" (click)="clone(stream, sxport)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
+						<button type="button" class="btn btn-outline-danger" (click)="delete(stream, sxport)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="row">
-		<div class="col">
-			<div cdkDropList #pagDims="cdkDropList" style="min-height:60px;border: solid 1px #ccc">HEYOO WE WILL DRAG&DROP TO HERE</div>
+		<div class="row my-1">
+			<div class="col">
+				Pages:
+				<div cdkDropList #pagDims="cdkDropList" [cdkDropListData]="sxport.pagDims" [cdkDropListConnectedTo]="[povDims, rowDims, colDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
+					<div class="btn-toolbar m-1" *ngFor="let dim of sxport.pagDims" cdkDrag>
+						<div class="btn-group btn-group-xs">
+							<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
+							<button class="btn btn-outline-dark">{{dim.name}}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				POVs:
+				<div cdkDropList #povDims="cdkDropList" [cdkDropListData]="sxport.povDims" [cdkDropListConnectedTo]="[pagDims, rowDims, colDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
+					<div class="dim" *ngFor="let dim of sxport.povDims" cdkDrag>{{dim.name}}</div>
+				</div>
+			</div>
 		</div>
-	</div>
-	<pre>{{sxport | json}}</pre>
-	<pre>{{stream.fieldList | json}}</pre>
+		<div class="row my-1">
+			<div class="col">
+				Rows:
+				<div cdkDropList #rowDims="cdkDropList" [cdkDropListData]="sxport.rowDims" [cdkDropListConnectedTo]="[pagDims, povDims, colDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
+					<div class="dim" *ngFor="let dim of sxport.rowDims" cdkDrag>{{dim.name}}</div>
+				</div>
+			</div>
+			<div class="col">
+				Columns:
+				<div cdkDropList #colDims="cdkDropList" [cdkDropListData]="sxport.colDims" [cdkDropListConnectedTo]="[pagDims, povDims, rowDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
+					<div class="dim" *ngFor="let dim of sxport.colDims" cdkDrag>{{dim.name}}</div>
+				</div>
+			</div>
+		</div>
+		<pre>{{sxport | json}}</pre>
+		<pre>{{stream.fieldList | json}}</pre>
+	</ng-container>
 </ng-container>
 <ng-template #loading>
 	<div class="alert alert-info mx-3" role="alert">

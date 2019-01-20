@@ -26,6 +26,13 @@ export interface DescriptiveFieldList extends Artifact {
 	list: { name: string, type: string }[]
 }
 
+export interface FieldDescriptionList extends Artifact {
+	type: ArtifactType.FieldDescriptionList,
+	stream: number,
+	field: string,
+	list: any[]
+}
+
 export interface ArtifactQuery {
 	type: ArtifactType,
 	environment?: number,
@@ -39,5 +46,6 @@ export interface ArtifactQuery {
 export enum ArtifactType {
 	'DatabaseList' = 1,
 	'TableList' = 2,
-	'DescriptiveFieldList' = 3
+	'DescriptiveFieldList' = 3,
+	'FieldDescriptionList' = 4
 }

@@ -17,7 +17,9 @@ export class Load implements ReducingAction {
 		if ( this.payload.type === ArtifactType.TableList ) {
 			return { ...state, tableLists: { ...state.tableLists, [this.payload.environment + '_' + this.payload.database]: <TableList>{ loadState: LoadState.Loading } } };
 		}
-
+		if ( this.payload.type === ArtifactType.DescriptiveFieldList ) {
+			return { ...state, descriptiveFieldLists: { ...state.descriptiveFieldLists, [this.payload.stream + '_' + this.payload.field]: <DescriptiveFieldList>{ loadState: LoadState.Loading } } };
+		}
 		return state;
 	}
 }
