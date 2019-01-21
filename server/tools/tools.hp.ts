@@ -1,8 +1,8 @@
 import { SmartViewTool } from './tools.smartview';
 import { DB } from './db';
 import { MainTools } from './tools.main';
-import { ATStreamField } from '../../shared/models/at.stream';
 import { EnvironmentDetail } from '../../shared/models/environments.models';
+import { StreamField, Stream } from 'shared/models/streams.models';
 
 export class HPTool {
 	smartview: SmartViewTool;
@@ -16,8 +16,7 @@ export class HPTool {
 	public listTables = ( payload: EnvironmentDetail ) => this.smartview.listCubes( payload );
 	public listFields = ( payload: EnvironmentDetail ) => this.smartview.listDimensions( payload );
 	public listAliasTables = ( payload: EnvironmentDetail ) => this.smartview.listAliasTables( payload );
-	// public getDescriptions = ( payload: EnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptions( payload, field );
-	// public getDescriptionsWithHierarchy = ( payload: EnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptionsWithHierarchy( payload, field );
+	public listDescriptions = ( payload: EnvironmentDetail, stream: Stream, field: StreamField ) => this.smartview.listDescriptions( { environment: payload, stream, field } );
 	// public listProcedures = ( payload: EnvironmentDetail ) => this.smartview.listBusinessRules( payload );
 	// public listProcedureDetails = ( payload: EnvironmentDetail ) => this.smartview.listBusinessRuleDetails( payload );
 	// public writeData = ( refObj ) => this.smartview.writeData( refObj );

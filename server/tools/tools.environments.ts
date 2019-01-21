@@ -114,20 +114,12 @@ export class EnvironmentTools {
 		if ( cEnv.type === EnvironmentType.HP || cEnv.type === EnvironmentType.PBCS ) {
 			cEnv.smartview.application = payload.database;
 			cEnv.smartview.cube = payload.table;
-			// return await ( this.sourceTools[cEnv.type] as any ).listAliasTables( cEnv );
 			cEnv.smartview.aliastables = await ( this.sourceTools[cEnv.type] as any ).listAliasTables( cEnv );
 			await this.update( cEnv );
 			return { result: 'success' };
 		} else {
 			return await this.sourceTools[cEnv.type].listTables( cEnv );
 		}
-		// if ( payload.database ) cEnv.database = payload.database;
-		// if ( payload.table ) cEnv.table = payload.table;
-		// if ( cEnv.type === ATEnvironmentType.HP || cEnv.type === ATEnvironmentType.PBCS ) {
-		// 	return await this.sourceTools[cEnv.type].listAliasTables( cEnv );
-		// } else {
-		// 	return await this.sourceTools[cEnv.type].listTables( cEnv );
-		// }
 	}
 
 	public listDescriptiveFields = async ( payload: { id: number, streamid: number, field: string } ) => {
@@ -146,6 +138,23 @@ export class EnvironmentTools {
 			return await this.sourceTools[ce.type].listFields( ce );
 		}
 	}
+
+	public listDescriptions = async ( payload: { id: number, stream: number, field: string } ) => {
+		const ce = await this.getDetails( payload.id, true );
+		const cs = await this.streamTools.getOne( payload.stream );
+		if ( ce.type === EnvironmentType.HP || ce.type === EnvironmentType.PBCS ) {
+			ce.smartview.application = cs.dbName;
+			ce.smartview.cube = cs.tableName;
+			ce.smartview.dimension = payload.field;
+		}
+		return await this.sourceTools[ce.type].listDescriptions( ce, cs, cs.fieldList.find( f => f.name === payload.field ) );
+	}
+	// public listDescriptions = async ( stream: Stream, field: StreamField ) => {
+	// 	const payload = await this.getDetails( stream.environment, true );
+	// 	payload.database = stream.dbName;
+	// 	payload.table = stream.tableName;
+	// 	return await this.sourceTools[payload.type].getDescriptionsWithHierarchy( payload, field );
+	// }
 }
 
 
@@ -197,12 +206,7 @@ export class EnvironmentTools {
 // 		payload.table = stream.tableName;
 // 		return await this.sourceTools[payload.type].getDescriptions( payload, field );
 // 	}
-// 	public getDescriptionsWithHierarchy = async ( stream: ATStream, field: ATStreamField ) => {
-// 		const payload = await this.getEnvironmentDetails( stream.environment, true );
-// 		payload.database = stream.dbName;
-// 		payload.table = stream.tableName;
-// 		return await this.sourceTools[payload.type].getDescriptionsWithHierarchy( payload, field );
-// 	}
+
 // 	public writeData = async ( refObj: any ) => {
 // 		const payload: any = await this.getEnvironmentDetails( refObj.id, true );
 // 		payload.database = refObj.db;

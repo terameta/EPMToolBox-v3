@@ -2,7 +2,7 @@ import { DB } from './db';
 import { MainTools } from './tools.main';
 import { Tuple } from 'shared/models/tuple';
 import { CloneTarget } from 'shared/models/clone.target';
-import { ArtifactQuery, ArtifactType, DatabaseList, TableList, Artifact, DescriptiveFieldList } from '../../shared/models/artifacts.models';
+import { ArtifactQuery, ArtifactType, DatabaseList, TableList, Artifact, DescriptiveFieldList, FieldDescriptionList } from '../../shared/models/artifacts.models';
 import { EnvironmentTools } from './tools.environments';
 
 export class ArtifactTools {
@@ -107,6 +107,35 @@ export class ArtifactTools {
 					list: await this.environmentTools.listDescriptiveFields( { id: payload.environment, streamid: payload.stream, field: payload.field } )
 				};
 				this.create( artifact );
+				return artifact;
+			}
+		}
+		if ( payload.type === ArtifactType.FieldDescriptionList ) {
+			console.log( `>>> ${ JSON.stringify( payload ) }` );
+			const { tuple } = await this.db.
+				queryOne<Tuple>( 'SELECT * FROM artifacts WHERE details->"$.stream" = ? AND details->"$.field" = ? AND details->"$.type" = ?', [payload.stream, payload.field, payload.type] ).
+				catch( () => ( { tuple: null } ) );
+			if ( tuple ) {
+				console.log( `>>> ${ JSON.stringify( payload ) } - we have tuple` );
+				const artifact: FieldDescriptionList = this.tools.pTR<any>( tuple );
+				if ( payload.forceRefetch ) {
+					console.log( `>>> ${ JSON.stringify( payload ) } - we have tuple & forceRefetch` );
+					artifact.list = await this.environmentTools.listDescriptions( { id: payload.environment, stream: payload.stream, field: payload.field } );
+					this.update( artifact );
+				}
+				console.log( `>>> ${ JSON.stringify( payload ) } - we have tuple & we are returning` );
+				return artifact;
+			} else {
+				console.log( `>>> ${ JSON.stringify( payload ) } - we do not have tuple` );
+				const artifact = <FieldDescriptionList>{
+					type: ArtifactType.FieldDescriptionList,
+					stream: payload.stream,
+					field: payload.field,
+					list: await this.environmentTools.listDescriptions( { id: payload.environment, stream: payload.stream, field: payload.field } )
+				};
+				console.log( `>>> ${ JSON.stringify( payload ) } - we do not have tuple & we will now create` );
+				this.create( artifact );
+				console.log( `>>> ${ JSON.stringify( payload ) } - we do not have tuple & we will now create & we are returning` );
 				return artifact;
 			}
 		}

@@ -4,7 +4,7 @@ import { MainTools } from './tools.main';
 import { EnvironmentDetail } from '../../shared/models/environments.models';
 // import { ATStreamField } from 'shared/models/at.stream';
 import { DB } from './db';
-import { StreamField } from 'shared/models/streams.models';
+import { StreamField, Stream } from 'shared/models/streams.models';
 
 export class MSSQLTool {
 
@@ -85,21 +85,21 @@ export class MSSQLTool {
 	// 	const { recordset } = await payload.mssql.connection.request().query( payload.procedure );
 	// 	return recordset;
 	// }
-
-	// public getDescriptions = async ( payload: ATEnvironmentDetail, field: ATStreamField ) => {
-	// 	await this.connect( payload );
-	// 	let query = '';
-	// 	query += 'SELECT DISTINCT ' + field.description.referenceField.name + ' AS RefField, ' + field.description.descriptionField.name + ' AS Description ';
-	// 	query += 'FROM ';
-	// 	if ( field.description.table === 'Custom Query' ) {
-	// 		query += '(' + field.description.query + ') AS TCQ';
-	// 	} else {
-	// 		query += field.description.table;
-	// 	}
-	// 	query += ' ORDER BY 1, 2';
-	// 	const { recordset } = await payload.mssql.connection.request().query( query );
-	// 	return recordset;
-	// }
+	// public listDescriptions = ( payload: EnvironmentDetail, stream: Stream, field: StreamField ) => this.smartview.listDescriptions( { environment: payload, stream, field } );
+	public listDescriptions = async ( payload: EnvironmentDetail, stream: Stream, field: StreamField ) => {
+		await this.connect( payload );
+		let query = '';
+		query += 'SELECT DISTINCT ' + field.description.referenceField.name + ' AS RefField, ' + field.description.descriptionField.name + ' AS Description ';
+		query += 'FROM ';
+		if ( field.description.table === 'Custom Query' ) {
+			query += '(' + field.description.query + ') AS TCQ';
+		} else {
+			query += field.description.table;
+		}
+		query += ' ORDER BY 1, 2';
+		const { recordset } = await payload.mssql.connection.request().query( query );
+		return recordset;
+	}
 
 	// public getDescriptionsWithHierarchy = ( payload: ATEnvironmentDetail, field: ATStreamField ) => this.getDescriptions( payload, field );
 

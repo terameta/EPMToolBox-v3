@@ -43,6 +43,7 @@ export interface EnvironmentSmartView {
 	cubes: string[],
 	cube: string,
 	dimensions: any[],
+	dimension: string,
 	aliastables: any[],
 	memberList: any[],
 	ruleList: any[],

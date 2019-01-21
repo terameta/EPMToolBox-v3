@@ -31,7 +31,8 @@
 					<div class="btn-toolbar m-1" *ngFor="let dim of sxport.pagDims" cdkDrag>
 						<div class="btn-group btn-group-xs">
 							<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
-							<button class="btn btn-outline-dark">{{dim.name}}</button>
+							<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+							<button class="btn btn-outline-dark" *ngIf="artifacts$ | async as artifacts">{{artifacts[stream.id + '_' + dim.name]?.loadState}}</button>
 						</div>
 					</div>
 				</div>
@@ -39,7 +40,13 @@
 			<div class="col">
 				POVs:
 				<div cdkDropList #povDims="cdkDropList" [cdkDropListData]="sxport.povDims" [cdkDropListConnectedTo]="[pagDims, rowDims, colDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
-					<div class="dim" *ngFor="let dim of sxport.povDims" cdkDrag>{{dim.name}}</div>
+					<div class="btn-toolbar m-1" *ngFor="let dim of sxport.povDims" cdkDrag>
+						<div class="btn-group btn-group-xs">
+							<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
+							<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+							<button class="btn btn-outline-dark" *ngIf="artifacts$ | async as artifacts">{{artifacts[stream.id + '_' + dim.name]?.loadState}}</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -47,13 +54,25 @@
 			<div class="col">
 				Rows:
 				<div cdkDropList #rowDims="cdkDropList" [cdkDropListData]="sxport.rowDims" [cdkDropListConnectedTo]="[pagDims, povDims, colDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
-					<div class="dim" *ngFor="let dim of sxport.rowDims" cdkDrag>{{dim.name}}</div>
+					<div class="btn-toolbar m-1" *ngFor="let dim of sxport.rowDims" cdkDrag>
+						<div class="btn-group btn-group-xs">
+							<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
+							<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+							<button class="btn btn-outline-dark" *ngIf="artifacts$ | async as artifacts">{{artifacts[stream.id + '_' + dim.name]?.loadState}}</button>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="col">
 				Columns:
 				<div cdkDropList #colDims="cdkDropList" [cdkDropListData]="sxport.colDims" [cdkDropListConnectedTo]="[pagDims, povDims, rowDims]" class="section-container mt-2" (cdkDropListDropped)="dimensionDrop($event)">
-					<div class="dim" *ngFor="let dim of sxport.colDims" cdkDrag>{{dim.name}}</div>
+					<div class="btn-toolbar m-1" *ngFor="let dim of sxport.colDims" cdkDrag>
+						<div class="btn-group btn-group-xs">
+							<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
+							<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+							<button class="btn btn-outline-dark" *ngIf="artifacts$ | async as artifacts">{{artifacts[stream.id + '_' + dim.name]?.loadState}}</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

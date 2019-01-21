@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
-import { filter, combineLatest, map } from 'rxjs/operators';
+import { filter, combineLatest, map, tap, debounceTime, distinctUntilKeyChanged, distinctUntilChanged, take } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { StreamExport, StreamExportHPDB, StreamExportHPDBDimensionDefinition, Stream } from 'shared/models/streams.models';
 import { JSONDeepCopy, SortByPosition } from 'shared/utilities/utility.functions';
@@ -12,6 +12,10 @@ import { NotificationType } from 'src/app/notification/notification.models';
 import { NotificationNew } from 'src/app/notification/notification.actions';
 import { v4 as uuid } from 'uuid';
 import { RouterGo } from 'src/app/shared/router.actions';
+import { Load } from 'src/app/shared/artifacts.actions';
+import { ArtifactType } from 'shared/models/artifacts.models';
+import { from } from 'rxjs';
+import { LoadState } from 'shared/models/generic.loadstate';
 
 @Component( {
 	selector: 'app-stream-export-detail-hpdb',
@@ -20,11 +24,37 @@ import { RouterGo } from 'src/app/shared/router.actions';
 } )
 export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 	public feature = FEATURE;
+	private debouncer = 0;
 	public stream$ = this.store.select( 'streams' ).pipe(
 		filter( s => s.loaded ),
 		combineLatest( this.store.select( 'shared' ) ),
-		map( ( [t, h] ) => <Stream>JSONDeepCopy( t.items[h.currentID] ) )
+		map( ( [t, h] ) => <Stream>JSONDeepCopy( t.items[h.currentID] ) ),
+		distinctUntilKeyChanged( 'id' ),
+		// tap( a => console.log( JSON.stringify( a ) ) )
+		// combineLatest( this.store.select( 'artifacts' ) ),
+		// // tap( s => s.fieldList.forEach( f => this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) ) ) )
+		// tap( ( [s, a] ) => {
+		// 	s.fieldList.forEach( f => {
+		// 		this.debouncer += 1000;
+		// 		if ( !a.fieldDescriptionLists[s.id + '_' + f.name] || a.fieldDescriptionLists[s.id + '_' + f.name].loadState === LoadState.NotLoaded ) {
+		// 			console.log( 'Dispatching', s.id + '_' + f.name, JSON.stringify( a.fieldDescriptionLists ) );
+		// 			// this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) );
+		// 			setTimeout( () => {
+		// 				this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) );
+		// 			}, this.debouncer );
+		// 		}
+		// 	} );
+		// 	console.log( a );
+		// } ),
+		// map( ( [s, a] ) => s )
 	);
+	private artifactDispatcher = this.stream$.pipe(
+		filter( s => !!s.fieldList ),
+		tap( s => console.log( 'We will now dispatch for all' ) ),
+		tap( s => s.fieldList.forEach( f => this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) ) ) )
+	).subscribe();
+
+	public artifacts$ = this.store.select( 'artifacts' ).pipe( map( a => a.fieldDescriptionLists ) );
 
 	public xid$ = this.store.select( 'shared' ).pipe( map( s => s.currentURL.split( '/' ).splice( -1 ).join( '' ) ) );
 	public sxport$ = this.stream$.pipe(
@@ -52,7 +82,7 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 
 	ngOnInit() { }
 
-	ngOnDestroy() { }
+	ngOnDestroy() { this.artifactDispatcher.unsubscribe(); this.artifactDispatcher = null; }
 
 	public dimensionDrop = ( event: CdkDragDrop<StreamExportHPDBDimensionDefinition[]> ) => {
 		if ( event.previousContainer === event.container ) {
@@ -68,7 +98,7 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 	public clone = async ( item: Stream, sx: StreamExport ) => {
 		const newName = await this.us.prompt( 'What is the new item\'s name?', sx.name );
 		if ( newName ) {
-			const newExport = { ...sx, id: uuid(), name: newName }
+			const newExport = { ...sx, id: uuid(), name: newName };
 			item.exports.push( newExport );
 			this.us.update( this.feature, item );
 			this.store.dispatch( new RouterGo( { path: ['admin', 'streams', item.id, 'exports', newExport.id] } ) );

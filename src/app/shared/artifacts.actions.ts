@@ -1,6 +1,6 @@
 import { ReducingAction } from './reducingaction.model';
 import { FEATURE, ArtifactState } from './artifacts.state';
-import { ArtifactQuery, Artifact, ArtifactType, DatabaseList, TableList, DescriptiveFieldList } from 'shared/models/artifacts.models';
+import { ArtifactQuery, Artifact, ArtifactType, DatabaseList, TableList, DescriptiveFieldList, FieldDescriptionList } from 'shared/models/artifacts.models';
 import { LoadState } from 'shared/models/generic.loadstate';
 
 export class Load implements ReducingAction {
@@ -19,6 +19,9 @@ export class Load implements ReducingAction {
 		}
 		if ( this.payload.type === ArtifactType.DescriptiveFieldList ) {
 			return { ...state, descriptiveFieldLists: { ...state.descriptiveFieldLists, [this.payload.stream + '_' + this.payload.field]: <DescriptiveFieldList>{ loadState: LoadState.Loading } } };
+		}
+		if ( this.payload.type === ArtifactType.FieldDescriptionList ) {
+			return { ...state, fieldDescriptionLists: { ...state.fieldDescriptionLists, [this.payload.stream + '_' + this.payload.field]: <FieldDescriptionList>{ loadState: LoadState.Loading } } };
 		}
 		return state;
 	}
@@ -43,6 +46,10 @@ export class LoadComplete implements ReducingAction {
 		if ( this.payload.type === ArtifactType.DescriptiveFieldList ) {
 			const artifact = { ...( this.payload as DescriptiveFieldList ), loadState: LoadState.Loaded };
 			return { ...state, ...{ descriptiveFieldLists: { ...state.descriptiveFieldLists, [artifact.stream + '_' + artifact.field]: artifact } } };
+		}
+		if ( this.payload.type === ArtifactType.FieldDescriptionList ) {
+			const artifact = { ...( this.payload as FieldDescriptionList ), loadState: LoadState.Loaded };
+			return { ...state, ...{ fieldDescriptionLists: { ...state.fieldDescriptionLists, [artifact.stream + '_' + artifact.field]: artifact } } };
 		}
 		return state;
 	}

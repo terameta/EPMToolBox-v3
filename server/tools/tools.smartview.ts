@@ -8,9 +8,9 @@ import { ATSmartViewRequestOptions } from '../../shared/models/smartview';
 import * as cheerio from 'cheerio';
 import * as request from 'request';
 import * as Url from 'url';
-import { ATStreamField } from '../../shared/models/at.stream';
 import { SortByName, encodeXML, SortByPosition, arrayCartesian, JSONDeepCopy } from '../../shared/utilities/utility.functions';
 import { findMembers } from '../../shared/utilities/hp.utilities';
+import { StreamField, Stream } from 'shared/models/streams.models';
 
 export class SmartViewTool {
 	constructor( private db: DB, private tools: MainTools ) { }
@@ -27,18 +27,23 @@ export class SmartViewTool {
 		return bodyTemplate( params );
 	}
 	private smartviewOpenCube = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		console.log( 'We are at smartviewOpenCube', payload.name );
 		await this.smartviewListCubes( payload );
+		console.log( 'We are at smartviewOpenCube & we listed cubes', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_OpenCube.xml', payload );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
-
 		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_opencube' ).length === 0;
 		if ( hasFailed ) throw ( new Error( 'Failure to open cube ' + payload.name + '@smartviewOpenCube' ) );
 		return payload;
 	}
 	private smartviewListCubes = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		console.log( 'We are at smartviewListCubes', payload.name );
 		await this.smartviewOpenApplication( payload );
+		console.log( 'We are at smartviewListCubes & we opened application', payload.name );
 		await this.smartviewGetAvailableServices( payload );
+		console.log( 'We are at smartviewListCubes & we got available services', payload.name );
 		await this.smartviewListDocuments( payload );
+		console.log( 'We are at smartviewListCubes & we listed documents', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_ListCubes.xml', payload );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
@@ -48,7 +53,9 @@ export class SmartViewTool {
 		return payload;
 	}
 	private smartviewOpenApplication = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		console.log( 'We are at smartviewOpenApplication', payload.name );
 		const appList = await this.listApplications( payload );
+		console.log( 'We are at smartviewOpenApplication & we listed applications', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_OpenApplication.xml', payload );
 		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_openapplication' ).length === 0;
@@ -62,14 +69,20 @@ export class SmartViewTool {
 		return this.validateSID( payload );
 	}
 	public validateSID = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		console.log( 'We are at validateSID', payload.name );
 		if ( !payload.smartview.SID ) {
+			console.log( 'We are at validateSID & no SID', payload.name );
 			delete payload.smartview.cookie;
 			delete payload.smartview.ssotoken;
 			if ( payload.type === EnvironmentType.HP ) await this.hpObtainSID( payload );
 			if ( payload.type === EnvironmentType.PBCS ) await this.pbcsObtainSID( payload );
+		} else {
+			console.log( 'We are at validateSID & we have SID', payload.name, payload.smartview.SID );
 		}
 		await this.smartviewPrepareEnvironment( payload );
+		console.log( 'We are at validateSID & environment is prepared', payload.name );
 		await this.smartviewListApplicationsValidator( payload ).catch( () => {
+			console.log( 'We are at validateSID & Validator caught', payload.name );
 			delete payload.smartview.SID;
 			delete payload.smartview.cookie;
 			delete payload.smartview.ssotoken;
@@ -85,6 +98,7 @@ export class SmartViewTool {
 				}
 			}
 		} );
+		console.log( 'We are at validateSID & Validator did not catch', payload.name );
 		return payload;
 	}
 	// public smartviewReadDataPrepare = async ( payload ) => {
@@ -680,9 +694,20 @@ export class SmartViewTool {
 	// 	payload.smartview.ruleList = $( 'rule' ).toArray().map( rule => ( { name: $( rule ).text(), hasRTP: rule.attribs.rtp, type: rule.attribs.type } ) );
 	// 	return payload;
 	// }
+	public listDescriptions = async ( payload: { environment: EnvironmentDetail, stream: Stream, field: StreamField } ) => {
+		return await this.smartviewListDescriptions( payload );
+	}
 	// public getDescriptionsWithHierarchy = ( refObj: EnvironmentDetail, refField: ATStreamField ) => {
 	// 	return this.smartviewGetDescriptionsWithHierarchy( refObj, refField ).then( result => result.smartview.memberList );
 	// }
+	private smartviewListDescriptions = async ( payload: { environment: EnvironmentDetail, stream: Stream, field: StreamField } ) => {
+		console.log( 'We are at smartviewListDescriptions', payload.field.name );
+		await this.smartviewListDimensions( payload.environment );
+		console.log( 'We are at smartviewListDescriptions & we listed dimensions', payload.field.name );
+		await this.smartviewOpenDimension( payload.environment );
+		console.log( 'We are at smartviewListDescriptions & we opened dimensions', payload.field.name );
+		return ( await this.smartviewListDescriptionsAction( payload.environment, payload.field ) ).smartview.memberList;
+	}
 	// private smartviewGetDescriptionsWithHierarchy = ( refObj: EnvironmentDetail, refField: ATStreamField ): Promise<EnvironmentDetail> => {
 	// 	return this.smartviewListAliasTables( refObj )
 	// 		.then( resEnv => { refObj = resEnv; return this.smartviewOpenDimension( refObj, refField ); } )
@@ -702,40 +727,40 @@ export class SmartViewTool {
 	// 		} ).catch( reject );
 	// 	} );
 	// }
-	// private smartviewGetDescriptionsWithHierarchyAction = async ( payload: EnvironmentDetail, field: ATStreamField ): Promise<EnvironmentDetail> => {
-	// 	const numberofColumns = 4; // Because columns are membername, description, desired aliastable name and parent
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_ExecuteGridforDescriptionsWithHierarchy.xml', {
-	// 		SID: payload.smartview.SID,
-	// 		table: payload.smartview.cube,
-	// 		numberofColumns,
-	// 		rangeend: ( numberofColumns * 2 - 1 ),
-	// 		descriptiveTable: field.description.table,
-	// 		name: field.name
-	// 	} );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+	private smartviewListDescriptionsAction = async ( payload: EnvironmentDetail, field: StreamField ): Promise<EnvironmentDetail> => {
+		const numberofColumns = 4; // Because columns are membername, description, desired aliastable name and parent
+		const body = await this.smartviewGetXMLTemplate( 'req_ExecuteGridforDescriptionsWithHierarchy.xml', {
+			SID: payload.smartview.SID,
+			table: payload.smartview.cube,
+			numberofColumns,
+			rangeend: ( numberofColumns * 2 - 1 ),
+			descriptiveTable: field.description.table,
+			name: field.name
+		} );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_executegrid' ).length === 0;
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_executegrid' ).length === 0;
 
-	// 	const rangeStart = parseInt( $( 'range' ).attr( 'start' ), 10 );
+		const rangeStart = parseInt( $( 'range' ).attr( 'start' ), 10 );
 
-	// 	if ( hasFailed ) {
-	// 		throw ( new Error( 'Failure to get descriptions ' + payload.name + '@smartviewGetDescriptionsAction' ) );
-	// 	} else if ( rangeStart > 1 ) {
-	// 		throw ( new Error( 'Failure to get descriptions, wrong number returned for rangeStart ' + payload.name + '@smartviewGetDescriptionsAction' ) );
-	// 	}
+		if ( hasFailed ) {
+			throw ( new Error( 'Failure to get descriptions ' + payload.name + '@smartviewGetDescriptionsAction' ) );
+		} else if ( rangeStart > 1 ) {
+			throw ( new Error( 'Failure to get descriptions, wrong number returned for rangeStart ' + payload.name + '@smartviewGetDescriptionsAction' ) );
+		}
 
-	// 	const vals = $( 'vals' ).text().split( '|' );
-	// 	vals.splice( 0, ( numberofColumns - rangeStart ) );
-	// 	payload.smartview.memberList = [];
-	// 	while ( vals.length ) {
-	// 		const curMemberArray = vals.splice( 0, numberofColumns );
-	// 		const curMember: { RefField: string, Description: string, Parent: string } = { RefField: curMemberArray[0], Description: curMemberArray[numberofColumns - 1], Parent: curMemberArray[2] };
-	// 		if ( !curMember.Description ) { curMember.Description = curMemberArray[1]; }
-	// 		if ( !curMember.Description ) { curMember.Description = curMemberArray[0]; }
-	// 		payload.smartview.memberList.push( curMember );
-	// 	}
-	// 	return payload;
-	// }
+		const vals = $( 'vals' ).text().split( '|' );
+		vals.splice( 0, ( numberofColumns - rangeStart ) );
+		payload.smartview.memberList = [];
+		while ( vals.length ) {
+			const curMemberArray = vals.splice( 0, numberofColumns );
+			const curMember: { RefField: string, Description: string, Parent: string } = { RefField: curMemberArray[0], Description: curMemberArray[numberofColumns - 1], Parent: curMemberArray[2] };
+			if ( !curMember.Description ) { curMember.Description = curMemberArray[1]; }
+			if ( !curMember.Description ) { curMember.Description = curMemberArray[0]; }
+			payload.smartview.memberList.push( curMember );
+		}
+		return payload;
+	}
 	// public getDescriptions = async ( payload: EnvironmentDetail, field: ATStreamField ) => {
 	// 	await this.smartviewGetDescriptions( payload, field );
 	// 	return payload.smartview.memberList;
@@ -746,16 +771,14 @@ export class SmartViewTool {
 	// 	await this.smartviewGetDescriptionsAction( payload, field );
 	// 	return payload;
 	// }
-	// private smartviewOpenDimension = async ( payload: EnvironmentDetail, field: ATStreamField ): Promise<EnvironmentDetail> => {
-	// 	await this.smartviewOpenApplication( payload );
-	// 	const body = await this.smartviewGetXMLTemplate( 'req_OpenCube.xml', { SID: payload.smartview.SID,
-	// server: payload.smartview.planningserver, database: payload.smartview.application, table: 'HSP_DIM_' + field.name } );
-	// 	const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
-
-	// 	const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_opencube' ).length === 0;
-	// 	if ( hasFailed ) throw ( new Error( 'Failure to open dimension ' + payload.name + '@smartviewOpenDimension' ) );
-	// 	return payload;
-	// }
+	private smartviewOpenDimension = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		await this.smartviewOpenApplication( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_OpenDimension.xml', payload.smartview );
+		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_opencube' ).length === 0;
+		if ( hasFailed ) throw ( new Error( 'Failure to open dimension ' + payload.name + '@smartviewOpenDimension' ) );
+		return payload;
+	}
 	// private smartviewGetDescriptionsAction = async ( payload: EnvironmentDetail, field: ATStreamField ): Promise<EnvironmentDetail> => {
 	// 	const numberofColumns = 3; // Because columns are membername, description and desired aliastable name
 	// 	const body = await this.smartviewGetXMLTemplate( 'req_ExecuteGridforDescriptions.xml', {
@@ -808,7 +831,9 @@ export class SmartViewTool {
 		return payload.smartview.dimensions;
 	}
 	private smartviewListDimensions = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		console.log( 'We are at smartviewListDimensions', payload.name );
 		await this.smartviewOpenCube( payload );
+		console.log( 'We are at smartviewListDimensions & we opened cube', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_EnumDims.xml', payload );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
@@ -849,15 +874,27 @@ export class SmartViewTool {
 		return payload.smartview.applications;
 	}
 	private smartviewListApplicationsValidator = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
+		console.log( 'We are at smartviewListApplicationsValidator', payload.name );
 		await this.smartviewListServers( payload );
+		console.log( 'We are at smartviewListApplicationsValidator & servers listed', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_ListApplications.xml', payload );
-		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
-
+		console.log( 'We are at smartviewListApplicationsValidator & AAA', payload.name );
+		console.log( body );
+		console.log( payload.smartview );
+		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } ).catch( ( e ) => {
+			console.log( 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' );
+			console.log( e );
+			// return <any>{};
+			throw e;
+		} );
+		console.log( 'We are at smartviewListApplicationsValidator & BBB', payload.name );
 		const isListed = $( 'body' ).children().toArray().filter( e => ( e.name === 'res_listapplications' ) ).length > 0;
+		console.log( 'We are at smartviewListApplicationsValidator & CCC', payload.name );
 
 		if ( !isListed ) throw new Error( 'Failure to list applications@smartviewListApplications' );
 
 		payload.smartview.applications = $( 'apps' ).text().split( '|' ).map( curApp => ( { name: curApp } ) );
+		console.log( 'We are at smartviewListApplicationsValidator & applications identified', payload.name, payload.smartview.applications );
 		return payload;
 	}
 	public listServers = async ( payload: EnvironmentDetail ) => {

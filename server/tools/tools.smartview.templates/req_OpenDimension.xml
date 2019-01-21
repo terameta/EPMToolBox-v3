@@ -1,0 +1,9 @@
+<req_OpenCube>
+	<sID>{{SID}}</sID>
+	<srv>{{planningserver}}</srv>
+	<app>{{application}}</app>
+	<cube>HSP_DIM_{{dimension}}</cube>
+	<type></type>
+	<url></url>
+	<form></form>
+</req_OpenCube>

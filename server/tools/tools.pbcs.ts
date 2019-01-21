@@ -6,6 +6,7 @@ import { EnvironmentDetail } from '../../shared/models/environments.models';
 import { SortByPosition, arrayCartesian } from '../../shared/utilities/utility.functions';
 import { findMembers, getPBCSReadDataSelections } from '../../shared/utilities/hp.utilities';
 import * as Promisers from '../../shared/utilities/promisers';
+import { Stream, StreamField } from 'shared/models/streams.models';
 
 export class PBCSTool {
 	private smartview: SmartViewTool;
@@ -19,7 +20,7 @@ export class PBCSTool {
 	public listTables = ( payload: EnvironmentDetail ) => this.smartview.listCubes( payload );
 	public listFields = ( payload: EnvironmentDetail ) => this.smartview.listDimensions( payload );
 	public listAliasTables = ( payload: EnvironmentDetail ) => this.smartview.listAliasTables( payload );
-	// public getDescriptions = ( payload: ATEnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptions( payload, field );
+	public listDescriptions = ( payload: EnvironmentDetail, stream: Stream, field: StreamField ) => this.smartview.listDescriptions( { environment: payload, stream, field } );
 	// public getDescriptionsWithHierarchy = ( payload: ATEnvironmentDetail, field: ATStreamField ) => this.smartview.getDescriptionsWithHierarchy( payload, field );
 	// public listProcedures = ( payload: ATEnvironmentDetail ) => this.smartview.listBusinessRules( payload );
 	// public listProcedureDetails = ( payload: ATEnvironmentDetail ) => this.smartview.listBusinessRuleDetails( payload );
