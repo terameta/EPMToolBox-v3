@@ -1,21 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/app.state';
-import { filter, combineLatest, map, tap, debounceTime, distinctUntilKeyChanged, distinctUntilChanged, take } from 'rxjs/operators';
+import { filter, combineLatest, map, tap, distinctUntilKeyChanged } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { StreamExport, StreamExportHPDB, StreamExportHPDBDimensionDefinition, Stream } from 'shared/models/streams.models';
+import { StreamExport, StreamExportHPDB, StreamExportHPDBDimensionDefinition, Stream, StreamField, StreamExportHPDBSelectionDefinition } from 'shared/models/streams.models';
 import { JSONDeepCopy, SortByPosition } from 'shared/utilities/utility.functions';
 import { FEATURE } from '../streams.state';
 import { UtilityService } from 'src/app/shared/utility.service';
-import { CloneTarget } from 'shared/models/clone.target';
 import { NotificationType } from 'src/app/notification/notification.models';
 import { NotificationNew } from 'src/app/notification/notification.actions';
 import { v4 as uuid } from 'uuid';
 import { RouterGo } from 'src/app/shared/router.actions';
 import { Load } from 'src/app/shared/artifacts.actions';
 import { ArtifactType } from 'shared/models/artifacts.models';
-import { from } from 'rxjs';
 import { LoadState } from 'shared/models/generic.loadstate';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { HpdbMemberSelectorComponent } from 'src/app/shared/hpdb-member-selector/hpdb-member-selector.component';
 
 @Component( {
 	selector: 'app-stream-export-detail-hpdb',
@@ -23,36 +23,29 @@ import { LoadState } from 'shared/models/generic.loadstate';
 	styleUrls: ['./stream-export-detail-hpdb.component.scss']
 } )
 export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
+	private modalRef: BsModalRef;
 	public feature = FEATURE;
-	private debouncer = 0;
+	public LoadStates = LoadState;
 	public stream$ = this.store.select( 'streams' ).pipe(
 		filter( s => s.loaded ),
 		combineLatest( this.store.select( 'shared' ) ),
 		map( ( [t, h] ) => <Stream>JSONDeepCopy( t.items[h.currentID] ) ),
-		distinctUntilKeyChanged( 'id' ),
-		// tap( a => console.log( JSON.stringify( a ) ) )
-		// combineLatest( this.store.select( 'artifacts' ) ),
-		// // tap( s => s.fieldList.forEach( f => this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) ) ) )
-		// tap( ( [s, a] ) => {
-		// 	s.fieldList.forEach( f => {
-		// 		this.debouncer += 1000;
-		// 		if ( !a.fieldDescriptionLists[s.id + '_' + f.name] || a.fieldDescriptionLists[s.id + '_' + f.name].loadState === LoadState.NotLoaded ) {
-		// 			console.log( 'Dispatching', s.id + '_' + f.name, JSON.stringify( a.fieldDescriptionLists ) );
-		// 			// this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) );
-		// 			setTimeout( () => {
-		// 				this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) );
-		// 			}, this.debouncer );
-		// 		}
-		// 	} );
-		// 	console.log( a );
-		// } ),
-		// map( ( [s, a] ) => s )
+		distinctUntilKeyChanged( 'id' )
 	);
-	private artifactDispatcher = this.stream$.pipe(
-		filter( s => !!s.fieldList ),
-		tap( s => console.log( 'We will now dispatch for all' ) ),
-		tap( s => s.fieldList.forEach( f => this.store.dispatch( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) ) ) )
-	).subscribe();
+	// private artifactDispatcher = this.stream$.pipe(
+	// 	filter( s => !!s.fieldList ),
+	// 	combineLatest( this.store.select( s => s.artifacts.fieldDescriptionLists ) ),
+	// 	filter( ( [s, a] ) => ( Object.values( a ).filter( ai => ai.loadState === LoadState.Loading ).length === 0 ) ),
+	// 	map( ( [s, a] ) => (
+	// 		s.fieldList.
+	// 			filter( f => !a[s.id + '_' + f.name] ).
+	// 			filter( ( f, fi ) => ( fi === 0 ) ).
+	// 			map( f => ( new Load( { stream: s.id, environment: s.environment, field: f.name, type: ArtifactType.FieldDescriptionList } ) ) )
+	// 	) ),
+	// 	filter( al => al.length > 0 ),
+	// 	map( al => al[0] ),
+	// 	tap( a => this.store.dispatch( a ) )
+	// ).subscribe();
 
 	public artifacts$ = this.store.select( 'artifacts' ).pipe( map( a => a.fieldDescriptionLists ) );
 
@@ -74,15 +67,21 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 			sxp.povDims.forEach( ( d, di ) => d.position = di );
 			sxp.rowDims.forEach( ( d, di ) => d.position = di );
 			sxp.colDims.forEach( ( d, di ) => d.position = di );
+			if ( !sxp.pags ) sxp.pags = {};
+			if ( !sxp.povs ) sxp.povs = {};
+			if ( !sxp.rows ) sxp.rows = [{}];
+			if ( !sxp.cols ) sxp.cols = [{}];
 			return sxp;
 		} ) );
 
 
-	constructor( private store: Store<AppState>, public us: UtilityService ) { }
+	constructor( private store: Store<AppState>, public us: UtilityService, private modalService: BsModalService, ) { }
 
 	ngOnInit() { }
 
-	ngOnDestroy() { this.artifactDispatcher.unsubscribe(); this.artifactDispatcher = null; }
+	ngOnDestroy() {
+		// this.artifactDispatcher.unsubscribe(); this.artifactDispatcher = null;
+	}
 
 	public dimensionDrop = ( event: CdkDragDrop<StreamExportHPDBDimensionDefinition[]> ) => {
 		if ( event.previousContainer === event.container ) {
@@ -121,6 +120,17 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 		item.exports = item.exports.filter( e => e.id !== sx.id );
 		item.exports.push( sx );
 		this.us.update( this.feature, item );
+	}
+
+	public refreshMembers = async ( stream: Stream, field: StreamField ) => {
+		this.store.dispatch( new Load( { stream: stream.id, environment: stream.environment, field: field.name, type: ArtifactType.FieldDescriptionList, forceRefetch: true } ) );
+	}
+
+	public openMemberSelector = async ( stream: Stream, field: string, section: StreamExportHPDBSelectionDefinition ) => {
+		this.modalRef = this.modalService.show( HpdbMemberSelectorComponent, {
+			class: 'modal-lg',
+			initialState: { field, section, stream }
+		} );
 	}
 
 }

@@ -40,4 +40,6 @@ $container-max-widths: (
 	xxl: 1200px
 );
 
-$modal-lg: calc(100% - 48px);
+$modal-xl: calc(100% - 48px);
+$modal-lg: 80%;
+$modal-md: 70%;

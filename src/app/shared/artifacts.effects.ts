@@ -19,7 +19,9 @@ export class ArtifactEffects {
 		mergeMap( ( a: Load ) => this.service.load( a.payload ).pipe(
 			map( result => new LoadComplete( result ) ),
 			catchError( ( e: HttpErrorResponse ) => of(
-				new NotificationNew( { title: a.type, message: 'Load failed.\nDetails:\n' + e.error.message, type: NotificationType.Error } )
+				a.payload.retryCount > 5 ?
+					new NotificationNew( { title: a.type, message: 'Load failed.\nDetails:\n' + e.error.message, type: NotificationType.Error } ) :
+					new Load( { ...a.payload, retryCount: 1 + a.payload.retryCount } )
 			) )
 		) )
 	);

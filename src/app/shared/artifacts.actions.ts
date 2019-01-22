@@ -7,7 +7,7 @@ export class Load implements ReducingAction {
 	readonly feature = FEATURE;
 	readonly type = FEATURE + 'Load';
 
-	constructor( public payload: ArtifactQuery ) { }
+	constructor( public payload: ArtifactQuery ) { if ( !payload.retryCount ) payload.retryCount = 1; }
 
 	public reducer = ( state: ArtifactState ): ArtifactState => {
 

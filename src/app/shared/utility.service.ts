@@ -63,7 +63,7 @@ export class UtilityService {
 	public coder = ( code: string, options: any, name?: string ): Promise<string | boolean> => {
 		const modalRef: BsModalRef = this.modalService.show( CoderComponent, {
 			initialState: { code, options, name },
-			class: 'modal-lg',
+			class: 'modal-xl',
 			animated: false
 		} );
 		return new Promise( ( resolve, reject ) => {

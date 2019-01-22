@@ -82,10 +82,10 @@ export interface StreamExportHPDB extends StreamExport {
 	pagDims: StreamExportHPDBDimensionDefinition[],
 	cellCounts: any,
 	cellCount: number,
-	rows: any[],
-	cols: any[],
-	povs: any[],
-	pags: any[]
+	rows: StreamExportHPDBSelectionDefinition[],
+	cols: StreamExportHPDBSelectionDefinition[],
+	povs: StreamExportHPDBSelectionDefinition,
+	pags: StreamExportHPDBSelectionDefinition
 }
 
 export interface StreamExportHPDBDimensionDefinition {
@@ -94,6 +94,15 @@ export interface StreamExportHPDBDimensionDefinition {
 	selectable: boolean,
 	defaultSelection: string,
 	limits: any[]
+}
+
+export interface StreamExportHPDBSelectionDefinition {
+	[key: string]: StreamExportHPDBSelectionDefinitionItem[]
+}
+
+export interface StreamExportHPDBSelectionDefinitionItem {
+	function: 'member' | 'children' | 'ichildren' | 'descendants' | 'idescendants' | 'level0descendants',
+	selection: string
 }
 
 export const getDefaultATStreamExportHPDB = () => ( <StreamExportHPDB>JSONDeepCopy( {

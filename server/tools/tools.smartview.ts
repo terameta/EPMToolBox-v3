@@ -27,9 +27,7 @@ export class SmartViewTool {
 		return bodyTemplate( params );
 	}
 	private smartviewOpenCube = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-		console.log( 'We are at smartviewOpenCube', payload.name );
 		await this.smartviewListCubes( payload );
-		console.log( 'We are at smartviewOpenCube & we listed cubes', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_OpenCube.xml', payload );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_opencube' ).length === 0;
@@ -37,13 +35,9 @@ export class SmartViewTool {
 		return payload;
 	}
 	private smartviewListCubes = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-		console.log( 'We are at smartviewListCubes', payload.name );
 		await this.smartviewOpenApplication( payload );
-		console.log( 'We are at smartviewListCubes & we opened application', payload.name );
 		await this.smartviewGetAvailableServices( payload );
-		console.log( 'We are at smartviewListCubes & we got available services', payload.name );
 		await this.smartviewListDocuments( payload );
-		console.log( 'We are at smartviewListCubes & we listed documents', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_ListCubes.xml', payload );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
@@ -53,9 +47,7 @@ export class SmartViewTool {
 		return payload;
 	}
 	private smartviewOpenApplication = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-		console.log( 'We are at smartviewOpenApplication', payload.name );
 		const appList = await this.listApplications( payload );
-		console.log( 'We are at smartviewOpenApplication & we listed applications', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_OpenApplication.xml', payload );
 		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_openapplication' ).length === 0;
@@ -69,20 +61,15 @@ export class SmartViewTool {
 		return this.validateSID( payload );
 	}
 	public validateSID = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-		console.log( 'We are at validateSID', payload.name );
 		if ( !payload.smartview.SID ) {
-			console.log( 'We are at validateSID & no SID', payload.name );
 			delete payload.smartview.cookie;
 			delete payload.smartview.ssotoken;
 			if ( payload.type === EnvironmentType.HP ) await this.hpObtainSID( payload );
 			if ( payload.type === EnvironmentType.PBCS ) await this.pbcsObtainSID( payload );
 		} else {
-			console.log( 'We are at validateSID & we have SID', payload.name, payload.smartview.SID );
 		}
 		await this.smartviewPrepareEnvironment( payload );
-		console.log( 'We are at validateSID & environment is prepared', payload.name );
 		await this.smartviewListApplicationsValidator( payload ).catch( () => {
-			console.log( 'We are at validateSID & Validator caught', payload.name );
 			delete payload.smartview.SID;
 			delete payload.smartview.cookie;
 			delete payload.smartview.ssotoken;
@@ -98,7 +85,6 @@ export class SmartViewTool {
 				}
 			}
 		} );
-		console.log( 'We are at validateSID & Validator did not catch', payload.name );
 		return payload;
 	}
 	// public smartviewReadDataPrepare = async ( payload ) => {
@@ -701,11 +687,8 @@ export class SmartViewTool {
 	// 	return this.smartviewGetDescriptionsWithHierarchy( refObj, refField ).then( result => result.smartview.memberList );
 	// }
 	private smartviewListDescriptions = async ( payload: { environment: EnvironmentDetail, stream: Stream, field: StreamField } ) => {
-		console.log( 'We are at smartviewListDescriptions', payload.field.name );
 		await this.smartviewListDimensions( payload.environment );
-		console.log( 'We are at smartviewListDescriptions & we listed dimensions', payload.field.name );
 		await this.smartviewOpenDimension( payload.environment );
-		console.log( 'We are at smartviewListDescriptions & we opened dimensions', payload.field.name );
 		return ( await this.smartviewListDescriptionsAction( payload.environment, payload.field ) ).smartview.memberList;
 	}
 	// private smartviewGetDescriptionsWithHierarchy = ( refObj: EnvironmentDetail, refField: ATStreamField ): Promise<EnvironmentDetail> => {
@@ -831,9 +814,7 @@ export class SmartViewTool {
 		return payload.smartview.dimensions;
 	}
 	private smartviewListDimensions = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-		console.log( 'We are at smartviewListDimensions', payload.name );
 		await this.smartviewOpenCube( payload );
-		console.log( 'We are at smartviewListDimensions & we opened cube', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_EnumDims.xml', payload );
 		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
 
@@ -874,27 +855,19 @@ export class SmartViewTool {
 		return payload.smartview.applications;
 	}
 	private smartviewListApplicationsValidator = async ( payload: EnvironmentDetail ): Promise<EnvironmentDetail> => {
-		console.log( 'We are at smartviewListApplicationsValidator', payload.name );
 		await this.smartviewListServers( payload );
-		console.log( 'We are at smartviewListApplicationsValidator & servers listed', payload.name );
 		const body = await this.smartviewGetXMLTemplate( 'req_ListApplications.xml', payload );
-		console.log( 'We are at smartviewListApplicationsValidator & AAA', payload.name );
-		console.log( body );
-		console.log( payload.smartview );
 		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } ).catch( ( e ) => {
 			console.log( 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' );
 			console.log( e );
 			// return <any>{};
 			throw e;
 		} );
-		console.log( 'We are at smartviewListApplicationsValidator & BBB', payload.name );
 		const isListed = $( 'body' ).children().toArray().filter( e => ( e.name === 'res_listapplications' ) ).length > 0;
-		console.log( 'We are at smartviewListApplicationsValidator & CCC', payload.name );
 
 		if ( !isListed ) throw new Error( 'Failure to list applications@smartviewListApplications' );
 
 		payload.smartview.applications = $( 'apps' ).text().split( '|' ).map( curApp => ( { name: curApp } ) );
-		console.log( 'We are at smartviewListApplicationsValidator & applications identified', payload.name, payload.smartview.applications );
 		return payload;
 	}
 	public listServers = async ( payload: EnvironmentDetail ) => {

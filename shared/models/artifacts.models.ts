@@ -40,7 +40,8 @@ export interface ArtifactQuery {
 	database?: string,
 	table?: string,
 	field?: string,
-	forceRefetch?: boolean
+	forceRefetch?: boolean,
+	retryCount?: number
 }
 
 export enum ArtifactType {
