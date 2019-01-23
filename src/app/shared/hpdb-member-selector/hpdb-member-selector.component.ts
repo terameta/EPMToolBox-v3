@@ -17,6 +17,7 @@ export class HpdbMemberSelectorComponent implements OnInit {
 	@Input() field = '';
 	@Input() section: StreamExportHPDBSelectionDefinition = null;
 	@Input() stream: Stream = null;
+	@Input() isPOV = false;
 
 	public selections: string[] = [];
 	public tempSection: StreamExportHPDBSelectionDefinitionItem[] = [];
@@ -39,14 +40,21 @@ export class HpdbMemberSelectorComponent implements OnInit {
 	}
 
 	public addToSelections = async ( payload: string ) => {
-		if ( !this.selections.find( s => s === payload ) ) this.selections.push( payload );
+		const ti = this.selections.findIndex( s => s === payload );
+		if ( ti < 0 ) {
+			if ( this.isPOV ) this.selections = [];
+			this.selections.push( payload );
+		} else {
+			this.selections.splice( ti, 1 );
+		}
 	}
 
 	public isSelected = ( payload: string ) => ( !!this.selections.find( s => s === payload ) );
 
 	public addToSection = async ( payload: 'member' | 'children' | 'ichildren' | 'descendants' | 'idescendants' | 'level0descendants' ) => {
 		// this.section[this.field] = [...( this.section[this.field] || [] ), ...this.selections.map( s => ( { function: payload, selection: s } ) )];
-		this.tempSection = [...( this.tempSection || [] ), ...this.selections.map( s => ( { function: payload, selection: s } ) )];
+		this.tempSection = [...( this.tempSection || [] ), ...this.selections.map( s => ( { function: payload, selection: s, cellCount: 0 } ) )];
+		if ( this.isPOV ) this.tempSection = [...this.selections.map( s => ( { function: payload, selection: s, cellCount: 0 } ) )];
 		this.selections = [];
 	}
 

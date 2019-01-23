@@ -43,6 +43,7 @@ export function tokenGetter() {
 		MonacoEditorModule.forRoot(),
 		SharedModule,
 		StoreModule.forRoot( AppReducer, { metaReducers: AppMetaReducer } ),
+		// StoreModule.forRoot( AppReducer ),
 		EffectsModule.forRoot( AppEffects ),
 		RouterModule.forRoot( routes ),
 		StoreRouterConnectingModule.forRoot(),

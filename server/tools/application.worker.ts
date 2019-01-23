@@ -67,6 +67,7 @@ export class ApplicationWorker {
 		this.restAPI = new RestAPI( this.app, this.db, this.mainTools );
 
 		this.app.all( '/api/*', ( req, res ) => {
+			console.log( '!!! We are at an unimplemented API call', req.url );
 			res.status( 500 ).send( new Error( 'Not implemented' ) );
 		} );
 

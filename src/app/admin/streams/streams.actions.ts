@@ -47,3 +47,10 @@ export class Delete implements ReducingAction {
 
 	constructor( public payload: Stream ) { }
 }
+
+export class RunExport implements ReducingAction {
+	readonly feature = FEATURE;
+	readonly type = FEATURE + 'Run Export';
+
+	constructor( public payload: { id: number, exportid: string } ) { }
+}

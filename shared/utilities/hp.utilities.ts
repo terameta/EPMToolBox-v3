@@ -1,50 +1,57 @@
-export const findMember = ( memberList: any[], member: string ) => memberList.filter( mbr => mbr.RefField === member );
-export const findChildren = ( memberList: any[], member: string ) => memberList.filter( mbr => mbr.Parent === member );
-export const findDescendants = ( memberList: any[], member: string, currentList: any[] = [] ) => {
+import { FieldDescriptionItem } from 'shared/models/artifacts.models';
+import { StreamExportHPDBSelectionDefinitionItem } from 'shared/models/streams.models';
+
+export const findMember = ( memberList: FieldDescriptionItem[], memberName: string ) => memberList.filter( mbr => mbr.RefField === memberName );
+export const isLevel0 = ( memberList: FieldDescriptionItem[], memberName: string ) => memberList.findIndex( element => element.Parent === memberName ) < 0;
+export const findChildren = ( memberList: FieldDescriptionItem[], memberName: string ) => memberList.filter( mbr => mbr.Parent === memberName );
+export const findDescendants = ( memberList: FieldDescriptionItem[], memberName: string ) => findDescendantsAction( memberList, memberName );
+const findDescendantsAction = ( memberList: FieldDescriptionItem[], member: string, currentList: FieldDescriptionItem[] = [] ) => {
 	const children = findChildren( memberList, member );
 	children.forEach( child => {
 		currentList.push( child );
-		findDescendants( memberList, child.RefField, currentList );
+		findDescendantsAction( memberList, child.RefField, currentList );
 	} );
 	return currentList;
 };
-export const findLevel0 = ( memberList: any[], member: string ) => findDescendants( memberList, member ).filter( element => isLevel0( memberList, element.RefField ) );
-export const isLevel0 = ( memberList: any[], member: string ) => memberList.findIndex( element => element.Parent === member ) < 0;
-export const countMembers = ( memberList: any[], type: string, member: string ) => {
+export const findLevel0 = ( memberList: FieldDescriptionItem[], memberName: string ) => findDescendants( memberList, memberName ).filter( element => isLevel0( memberList, element.RefField ) );
+export const countMembers = ( memberList: FieldDescriptionItem[], member: StreamExportHPDBSelectionDefinitionItem ) => {
 	let count = 0;
-	if ( member ) {
-		if ( type === 'member' ) {
+	if ( member && memberList && memberList.length > 0 ) {
+		if ( member.function === 'member' ) {
 			count = 1;
 		}
-		if ( type === 'level0' ) {
-			count = findLevel0( memberList, member ).length;
+		if ( member.function === 'level0descendants' ) {
+			count = findLevel0( memberList, member.selection ).length;
 		}
-		if ( type === 'children' ) {
-			count = findChildren( memberList, member ).length;
+		if ( member.function === 'children' ) {
+			count = findChildren( memberList, member.selection ).length;
 		}
-		if ( type === 'ichildren' ) {
-			count = findChildren( memberList, member ).length + 1;
+		if ( member.function === 'ichildren' ) {
+			count = findChildren( memberList, member.selection ).length + 1;
 		}
-		if ( type === 'descendants' ) {
-			count = findDescendants( memberList, member ).length;
+		if ( member.function === 'descendants' ) {
+			count = findDescendants( memberList, member.selection ).length;
 		}
-		if ( type === 'idescendants' ) {
-			count = findDescendants( memberList, member ).length + 1;
+		if ( member.function === 'idescendants' ) {
+			count = findDescendants( memberList, member.selection ).length + 1;
 		}
 	}
 	return count;
 };
-export const findMembers = ( memberList: any[], type: string, member: string ) => {
-	if ( member ) {
-		if ( type === 'member' ) return findMember( memberList, member );
-		if ( type === 'level0' ) return findLevel0( memberList, member );
-		if ( type === 'children' ) return findChildren( memberList, member );
-		if ( type === 'ichildren' ) return [member, ...findChildren( memberList, member )];
-		if ( type === 'descendants' ) return findDescendants( memberList, member );
-		if ( type === 'idescendants' ) return [member, ...findDescendants( memberList, member )];
-	}
-	return null;
+export const findMembers = ( ...args ) => {
+	throw new Error( 'findMembers@hp.utilities.ts is not implemented yet' );
 };
+// export const findMembers = ( memberList: any[], type: string, member: string ) => {
+// 	if ( member ) {
+// 		if ( type === 'member' ) return findMember( memberList, member );
+// 		if ( type === 'level0' ) return findLevel0( memberList, member );
+// 		if ( type === 'children' ) return findChildren( memberList, member );
+// 		if ( type === 'ichildren' ) return [member, ...findChildren( memberList, member )];
+// 		if ( type === 'descendants' ) return findDescendants( memberList, member );
+// 		if ( type === 'idescendants' ) return [member, ...findDescendants( memberList, member )];
+// 	}
+// 	return null;
+// };
 
 export const getPBCSReadDataSelections = ( payload: { selectedMember: string, selectionType: string } ): string => {
 	if ( payload.selectionType === 'member' ) return payload.selectedMember;

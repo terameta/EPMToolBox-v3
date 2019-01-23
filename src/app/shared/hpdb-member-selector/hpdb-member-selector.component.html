@@ -8,27 +8,33 @@
 		<div class="row">
 			<div class="col">
 				Members
-				<hr>
+				<hr class="bg-warning">
 				<div style="height: calc(100vh - 250px); overflow: auto !important;">
-					<ng-container *ngFor="let artifact of artifacts.list">
+					<!-- <ng-container *ngFor="let artifact of artifacts.list">
 						<div (click)="addToSelections(artifact.RefField)" class="pointer mb-1" [ngClass]="{active: isSelected(artifact.RefField)}">{{artifact.RefField}}</div>
-					</ng-container>
+					</ng-container> -->
+					<table class="table table-sm table-borderless w-100">
+						<tr *ngFor="let artifact of artifacts.list" (click)="addToSelections(artifact.RefField)" [ngClass]="{active: isSelected(artifact.RefField)}">
+							<td>{{artifact.RefField}}</td>
+							<td>{{artifact.Description}}</td>
+						</tr>
+					</table>
 				</div>
 			</div>
 			<div class="col-1 text-center">
 				FX
-				<hr>
+				<hr class="bg-warning">
 				<i (click)="addToSection('member')" class="fab fa-codepen fa-fw pointer mx-1" style="font-size: 18px;" title="Add as Individual Member"></i><br>
-				<img (click)="addToSection('ichildren')" class="pointer" src="assets/icons/IChildren.png" width="32" height="32" title="Add as Children (Including Self)" alt="Add as Children (Including Self)"><br>
-				<img (click)="addToSection('children')" class="pointer" src="assets/icons/Children.png" width="32" height="32" title="Add as Children" alt="Add as Children"><br>
-				<img (click)="addToSection('idescendants')" class="pointer" src="assets/icons/IDescendants.png" width="32" height="32" title="Add as Descendants (Including Self)" alt="Add as Descendants (Including Self)"><br>
-				<img (click)="addToSection('descendants')" class="pointer" src="assets/icons/Descendants.png" width="32" height="32" title="Add as Descendants" alt="Add as Descendants"><br>
-				<img (click)="addToSection('level0descendants')" class="pointer" src="assets/icons/Descendants0.png" width="32" height="32" title="Add as Level Zero Descendants" alt="Add as Level Zero Descendants"><br>
+				<img *ngIf="!isPOV" (click)="addToSection('ichildren')" class="pointer" src="assets/icons/IChildren.png" width="32" height="32" title="Add as Children (Including Self)" alt="Add as Children (Including Self)"><br>
+				<img *ngIf="!isPOV" (click)="addToSection('children')" class="pointer" src="assets/icons/Children.png" width="32" height="32" title="Add as Children" alt="Add as Children"><br>
+				<img *ngIf="!isPOV" (click)="addToSection('idescendants')" class="pointer" src="assets/icons/IDescendants.png" width="32" height="32" title="Add as Descendants (Including Self)" alt="Add as Descendants (Including Self)"><br>
+				<img *ngIf="!isPOV" (click)="addToSection('descendants')" class="pointer" src="assets/icons/Descendants.png" width="32" height="32" title="Add as Descendants" alt="Add as Descendants"><br>
+				<img *ngIf="!isPOV" (click)="addToSection('level0descendants')" class="pointer" src="assets/icons/Descendants0.png" width="32" height="32" title="Add as Level Zero Descendants" alt="Add as Level Zero Descendants"><br>
 
 			</div>
 			<div class="col">
 				Selections
-				<hr>
+				<hr class="bg-warning">
 				<ng-container *ngFor="let artifact of tempSection">
 					<div class="mb-1">
 						<i class="fas fa-trash-alt mr-5 pointer" (click)="removeFromSection(artifact)"></i>

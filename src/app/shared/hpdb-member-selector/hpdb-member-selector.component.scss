@@ -1,1 +1,4 @@
-.active { border: 1px solid silver; }
+@import '~src/style.colors.scss';
+
+
+.active { border-left: 3px solid $evwarning; }

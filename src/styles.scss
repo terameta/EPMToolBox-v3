@@ -17,6 +17,8 @@ body {
 
 .pointer { cursor: pointer; }
 
+.movable { cursor: move !important; }
+
 .ng-invalid:not(form) {
 	border-left: 2px solid theme-color("danger") !important;
 }

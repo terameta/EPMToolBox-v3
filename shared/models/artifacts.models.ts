@@ -30,8 +30,10 @@ export interface FieldDescriptionList extends Artifact {
 	type: ArtifactType.FieldDescriptionList,
 	stream: number,
 	field: string,
-	list: { RefField: string, Description: string, Parent: string }[]
+	list: FieldDescriptionItem[]
 }
+
+export interface FieldDescriptionItem { RefField: string, Description: string, Parent: string }
 
 export interface ArtifactQuery {
 	type: ArtifactType,

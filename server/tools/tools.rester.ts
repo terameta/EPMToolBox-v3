@@ -14,7 +14,14 @@ export class Rester {
 	public respond = ( theFunction: Function, payload: any, req: Request, res: Response ) => {
 		theFunction( payload ).
 			then( ( result: any ) => res.send( result ) ).
-			catch( ( issue: Error ) => res.status( 500 ).json( { status: 'fail', title: issue.name, message: issue.message } ) );
+			catch( ( issue: Error ) => {
+				console.log( '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<' );
+				console.log( '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<' );
+				console.log( issue );
+				console.log( '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<' );
+				console.log( '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<' );
+				res.status( 500 ).json( { status: 'fail', title: issue.name, message: issue.message } );
+			} );
 	}
 
 	public restify( router: Router, tool: ArtifactTools | CredentialTools | EnvironmentTools | StreamTools | TagTools | TagGroupTools ) {

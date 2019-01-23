@@ -1,4 +1,5 @@
 import { JSONDeepCopy } from '../utilities/utility.functions';
+import { ExecutionStatus } from './generic.executionstate';
 
 export interface Stream {
 	id: number,
@@ -72,7 +73,8 @@ export interface StreamFieldDescription {
 
 export interface StreamExport {
 	id: string,
-	name: string
+	name: string,
+	lastUpdate: Date
 }
 
 export interface StreamExportHPDB extends StreamExport {
@@ -80,12 +82,23 @@ export interface StreamExportHPDB extends StreamExport {
 	colDims: StreamExportHPDBDimensionDefinition[],
 	povDims: StreamExportHPDBDimensionDefinition[],
 	pagDims: StreamExportHPDBDimensionDefinition[],
-	cellCounts: any,
-	cellCount: number,
+	// cellCounts: {
+	// 	pags: number[],
+	// 	povs: number[],
+	// 	rows: number[][],
+	// 	cols: number[][]
+	// },
+	// cellCount: number,
 	rows: StreamExportHPDBSelectionDefinition[],
 	cols: StreamExportHPDBSelectionDefinition[],
 	povs: StreamExportHPDBSelectionDefinition,
-	pags: StreamExportHPDBSelectionDefinition
+	pags: StreamExportHPDBSelectionDefinition,
+	status: ExecutionStatus,
+	progress: {
+		divisor: number,
+		dividend: number,
+		percentage: number
+	}
 }
 
 export interface StreamExportHPDBDimensionDefinition {
@@ -102,7 +115,8 @@ export interface StreamExportHPDBSelectionDefinition {
 
 export interface StreamExportHPDBSelectionDefinitionItem {
 	function: 'member' | 'children' | 'ichildren' | 'descendants' | 'idescendants' | 'level0descendants',
-	selection: string
+	selection: string,
+	cellCount: number
 }
 
 export const getDefaultATStreamExportHPDB = () => ( <StreamExportHPDB>JSONDeepCopy( {

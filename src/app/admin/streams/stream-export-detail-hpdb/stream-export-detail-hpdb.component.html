@@ -13,6 +13,9 @@
 							<span class="input-group-text">Name:</span>
 						</div>
 						<input type="text" name="ExportName" class="form-control" [(ngModel)]="sxport.name">
+						<div class="input-group-append">
+							<span class="input-group-text">Cell Count: {{countAll(sxport) | number:'1.0-0'}}</span>
+						</div>
 					</div>
 				</div>
 				<div class="col">
@@ -20,6 +23,11 @@
 						<div class="btn-group btn-group-xs ml-auto">
 							<button type="submit" class="btn btn-outline-success" title="Save" (click)="update(stream, sxport)"><i class="fas fa-save fa-fw"></i></button>
 							<button type="button" class="btn btn-outline-dark" (click)="clone(stream, sxport)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
+						</div>
+						<div class="btn-group btn-group-xs ml-3">
+							<button type="button" class="btn btn-outline-dark" (click)="execute(stream, sxport)" title="Execute Export" [disabled]="sxport.status == XState.Executing"><i class="fas fa-play fa-fw"></i></button>
+						</div>
+						<div class="btn-group btn-group-xs ml-3">
 							<button type="button" class="btn btn-outline-danger" (click)="delete(stream, sxport)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
 						</div>
 					</div>
@@ -45,8 +53,8 @@
 										<div cdkDropList #pagDims="cdkDropList" [cdkDropListData]="sxport.pagDims" [cdkDropListConnectedTo]="[povDims, rowDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
 											<div class="btn-toolbar m-1" *ngFor="let dim of sxport.pagDims" cdkDrag>
 												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
 												</div>
 												<div class="btn-group btn-group-xs ml-auto">
 													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
@@ -63,8 +71,8 @@
 										<div cdkDropList #povDims="cdkDropList" [cdkDropListData]="sxport.povDims" [cdkDropListConnectedTo]="[pagDims, rowDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
 											<div class="btn-toolbar m-1" *ngFor="let dim of sxport.povDims" cdkDrag>
 												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
 												</div>
 												<div class="btn-group btn-group-xs ml-auto">
 													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
@@ -81,8 +89,8 @@
 										<div cdkDropList #rowDims="cdkDropList" [cdkDropListData]="sxport.rowDims" [cdkDropListConnectedTo]="[pagDims, povDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
 											<div class="btn-toolbar m-1 text-nowrap" *ngFor="let dim of sxport.rowDims" cdkDrag>
 												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
 												</div>
 												<div class="btn-group btn-group-xs ml-auto">
 													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
@@ -99,8 +107,8 @@
 										<div cdkDropList #colDims="cdkDropList" [cdkDropListData]="sxport.colDims" [cdkDropListConnectedTo]="[pagDims, povDims, rowDims]" (cdkDropListDropped)="dimensionDrop($event)">
 											<div class="btn-toolbar m-1 text-nowrap" *ngFor="let dim of sxport.colDims" cdkDrag>
 												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
 												</div>
 												<div class="btn-group btn-group-xs ml-auto">
 													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
@@ -120,48 +128,88 @@
 										<div class="btn-toolbar m-1" *ngFor="let dim of sxport.pagDims">
 											<div class="btn-group btn-group-xs" title="Choose Member(s)" (click)="openMemberSelector(stream, dim.name, sxport.pags)">
 												<button type="button" class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
-												<button type="button" class="btn btn-outline-dark member-selections text-truncate">
-													Selected MembersSelected MembersSelected MembersSelected MembersSelected MembersSelected Members
+												<button type="button" class="btn btn-outline-dark member-selections text-truncate text-left">
+													<span class="d-flex" *ngFor="let sel of sxport.pags[dim.name]">
+														<span>{{representSelection(sel)}}</span>
+														<span class="ml-auto">#{{countMembers(artifacts[stream.id + '_' + dim.name]?.list, sel, sxport)}}</span>
+													</span>
 												</button>
-												<button type="button" class="btn btn-outline-dark">
-													<i class="fas fa-crosshairs fa-fw"></i>
-												</button>
-
 											</div>
 										</div>
-										<pre>{{ sxport.pags | json }}</pre>
 									</td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td>
+										<div class="btn-toolbar m-1" *ngFor="let dim of sxport.povDims">
+											<div class="btn-group btn-group-xs" title="Choose Member(s)" (click)="openMemberSelector(stream, dim.name, sxport.povs, true)">
+												<button type="button" class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+												<button type="button" class="btn btn-outline-dark member-selections text-truncate text-left">
+													<span class="d-flex" *ngFor="let sel of sxport.povs[dim.name]">
+														<span>{{representSelection(sel)}}</span>
+														<span class="ml-auto">#{{countMembers(artifacts[stream.id + '_' + dim.name]?.list, sel, sxport)}}</span>
+													</span>
+												</button>
+											</div>
+										</div>
+									</td>
+									<td>
+										<div class="btn-toolbar mr-1">
+											<div class="btn-group btn-group-xs ml-auto">
+												<button class="btn btn-outline-dark" title="Add New Row" (click)="sectionTupleAdd(sxport.rows)">
+													<i class="fas fa-plus fa-fw"></i>
+												</button>
+											</div>
+										</div>
+										<ng-container *ngFor="let rowsection of sxport.rows; let i = index;">
+											Row {{i + 1}}
+											<button class="btn btn-xs btn-outline-dark ml-5" title="Delete Row" (click)="sectionTupleRemove(sxport.rows, i)">
+												<i class="fas fa-minus fa-fw"></i>
+											</button>
+											<hr class="m-0 my-1">
+											<div class="btn-toolbar m-1" *ngFor="let dim of sxport.rowDims">
+												<div class="btn-group btn-group-xs" title="Choose Member(s)" (click)="openMemberSelector(stream, dim.name, rowsection)">
+													<button type="button" class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+													<button type="button" class="btn btn-outline-dark member-selections text-truncate text-left">
+														<span class="d-flex" *ngFor="let sel of rowsection[dim.name]">
+															<span>{{representSelection(sel)}}</span>
+															<span class="ml-auto">#{{countMembers(artifacts[stream.id + '_' + dim.name]?.list, sel, sxport)}}</span>
+														</span>
+													</button>
+												</div>
+											</div>
+										</ng-container>
+									</td>
+									<td>
+										<div class="btn-toolbar mr-1">
+											<div class="btn-group btn-group-xs ml-auto">
+												<button class="btn btn-outline-dark" title="Add New Column" (click)="sectionTupleAdd(sxport.cols)">
+													<i class="fas fa-plus fa-fw"></i>
+												</button>
+											</div>
+										</div>
+										<ng-container *ngFor="let colsection of sxport.cols; let i = index;">
+											Column {{i + 1}}
+											<button class="btn btn-xs btn-outline-dark ml-5" title="Delete Column" (click)="sectionTupleRemove(sxport.cols, i)">
+												<i class="fas fa-minus fa-fw"></i>
+											</button>
+											<hr class="m-0 my-1">
+											<div class="btn-toolbar m-1" *ngFor="let dim of sxport.colDims">
+												<div class="btn-group btn-group-xs" title="Choose Member(s)" (click)="openMemberSelector(stream, dim.name, colsection)">
+													<button type="button" class="btn btn-outline-dark dim text-left">{{dim.name}}</button>
+													<button type="button" class="btn btn-outline-dark member-selections text-truncate text-left">
+														<span class="d-flex" *ngFor="let sel of colsection[dim.name]">
+															<span>{{representSelection(sel)}}</span>
+															<span class="ml-auto">#{{countMembers(artifacts[stream.id + '_' + dim.name]?.list, sel, sxport)}}</span>
+														</span>
+													</button>
+												</div>
+											</div>
+										</ng-container>
+									</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
 			</div>
-			<div class="row my-1">
-				<div class="col">
-					Pages:
-
-				</div>
-				<div class="col">
-					POVs:
-
-				</div>
-				<!-- </div>
-		<div class="row my-1"> -->
-				<div class="col">
-					Rows:
-
-				</div>
-				<div class="col">
-					Columns:
-
-				</div>
-			</div>
-			<pre>{{sxport | json}}</pre>
-			<pre>{{stream.fieldList | json}}</pre>
 		</ng-container>
 	</ng-container>
 </ng-container>

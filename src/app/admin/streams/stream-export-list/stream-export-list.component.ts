@@ -29,7 +29,7 @@ export class StreamExportListComponent implements OnInit {
 		const name = await this.us.prompt( 'Please name the new export', 'New Export' );
 		if ( name ) {
 			const target: Stream = JSONDeepCopy( s );
-			const newExport: StreamExport = { id: uuid(), name };
+			const newExport: StreamExport = { id: uuid(), name, lastUpdate: new Date() };
 			if ( !Array.isArray( target.exports ) ) {
 				target.exports = [];
 			}
