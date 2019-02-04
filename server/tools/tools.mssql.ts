@@ -106,4 +106,8 @@ export class MSSQLTool {
 	// public writeData = async ( payload: ATEnvironmentDetail ) => {
 	// 	throw new Error( 'We are curretly unable to write data to MSSQL tables' );
 	// }
+
+	public readData = async ( payload, stream: Stream ) => {
+		throw new Error( 'Not yet @ readData @ tools.mssql.ts' );
+	}
 }

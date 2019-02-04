@@ -4,18 +4,41 @@ import { Stream, StreamFieldDescription } from 'shared/models/streams.models';
 import { Tuple } from 'shared/models/tuple';
 import { CloneTarget } from 'shared/models/clone.target';
 import { SortByPosition } from '../../shared/utilities/utility.functions';
+import { EnvironmentTools } from './tools.environments';
+
+export const streamGetOne = async ( id: number, db: DB, tools: MainTools ): Promise<Stream> => {
+	const { tuple } = await db.queryOne<Tuple>( 'SELECT * FROM streams WHERE id = ?', id );
+	return tools.pTR<Stream>( tuple );
+};
+
+export const streamUpdate = async ( payload: Stream, db: DB, tools: MainTools ) => {
+	if ( payload.fieldList ) {
+		payload.fieldList.sort( SortByPosition );
+		payload.fieldList.forEach( f => {
+			if ( f.isDescribed && !f.description ) f.description = <StreamFieldDescription>{};
+		} );
+	}
+	await db.queryOne( 'UPDATE streams SET ? WHERE id = ?', [tools.pTW( payload ), payload.id] );
+	return { status: 'success' };
+};
 
 export class StreamTools {
-	constructor( private db: DB, private tools: MainTools ) { }
+	private environmentTool: EnvironmentTools;
+
+	constructor( private db: DB, private tools: MainTools ) {
+		this.environmentTool = new EnvironmentTools( this.db, this.tools );
+	}
 
 	public getAll = async (): Promise<Stream[]> => {
 		const { tuples } = await this.db.query<Tuple>( 'SELECT * FROM streams' );
 		return tuples.map<Stream>( this.tools.pTR );
 	}
-	public getOne = async ( id: number ): Promise<Stream> => {
-		const { tuple } = await this.db.queryOne<Tuple>( 'SELECT * FROM streams WHERE id = ?', id );
-		return this.tools.pTR<Stream>( tuple );
-	}
+	// public getOne = async ( id: number ): Promise<Stream> => {
+	// 	const { tuple } = await this.db.queryOne<Tuple>( 'SELECT * FROM streams WHERE id = ?', id );
+	// 	return this.tools.pTR<Stream>( tuple );
+	// }
+	public getOne = ( id: number ) => streamGetOne( id, this.db, this.tools );
+
 	public create = async ( payload: Stream ) => {
 		delete payload.id;
 		if ( !payload.name ) payload.name = 'New Stream';
@@ -31,22 +54,182 @@ export class StreamTools {
 		return await this.create( stream );
 	}
 
-	public update = async ( payload: Stream ) => {
-		if ( payload.fieldList ) {
-			payload.fieldList.sort( SortByPosition );
-			payload.fieldList.forEach( f => {
-				if ( f.isDescribed && !f.description ) f.description = <StreamFieldDescription>{};
-			} );
-		}
-		await this.db.queryOne( 'UPDATE streams SET ? WHERE id = ?', [this.tools.pTW( payload ), payload.id] );
-		return { status: 'success' };
-	}
+	// public update = async ( payload: Stream ) => {
+	// 	if ( payload.fieldList ) {
+	// 		payload.fieldList.sort( SortByPosition );
+	// 		payload.fieldList.forEach( f => {
+	// 			if ( f.isDescribed && !f.description ) f.description = <StreamFieldDescription>{};
+	// 		} );
+	// 	}
+	// 	await this.db.queryOne( 'UPDATE streams SET ? WHERE id = ?', [this.tools.pTW( payload ), payload.id] );
+	// 	return { status: 'success' };
+	// }
+	public update = ( payload: Stream ) => streamUpdate( payload, this.db, this.tools );
 
 	public delete = async ( id: number ) => {
 		await this.db.query( 'DELETE FROM streams WHERE id = ?', id );
 		return { status: 'success' };
 	}
+
+	public executeExport = async ( payload: { id: number, xid: string, user: any, selections: any, hierarchies?: any } ) => {
+		const stream = await this.getOne( payload.id );
+		const sxport: any = stream.exports.find( e => e.id === payload.xid );
+		sxport.selections = payload.selections;
+		sxport.streamid = payload.id;
+		this.environmentTool.readData( stream.environment, stream.dbName, stream.tableName, sxport, stream );
+	}
 }
+
+
+
+// 	public executeExport = ( payload: { streamid: number, exportid: number, user: any, hierarchies?: any } ) => {
+// 		this.executeExportAction( payload )
+// 			.then( ( result: any ) => this.executeExportPrepareFile( { result, user: payload.user, hierarchies: result.query.hierarchies } ) )
+// 			.then( this.executeExportSendFile )
+// 			.catch( async ( issue ) => {
+// 				const systemAdmin: any = await this.settingsTool.getOne( 'systemadmin' );
+// 				const stream = await this.getOne( payload.streamid );
+// 				const query = stream.exports.find( e => e.id === payload.exportid );
+// 				const params = { fromname: systemAdmin.fromname, exportname: query.name, issue };
+// 				let bodyXML = await Promisers.readFile( path.join( __dirname, './tools.email.templates/stream.export.failed.html' ) );
+// 				let bodyTemplate = Handlebars.compile( bodyXML );
+// 				let body = bodyTemplate( params );
+// 				this.mailTool.sendMail( {
+// 					from: systemAdmin.emailaddress,
+// 					to: payload.user.email,
+// 					cc: systemAdmin.emailaddress,
+// 					subject: 'Export failed',
+// 					html: body
+// 				} ).catch( console.log );
+// 				bodyXML = await Promisers.readFile( path.join( __dirname, './tools.email.templates/stream.export.failed.toAdmin.html' ) );
+// 				bodyTemplate = Handlebars.compile( bodyXML );
+// 				body = bodyTemplate( params );
+// 				this.mailTool.sendMail( {
+// 					from: systemAdmin.emailaddress,
+// 					to: systemAdmin.emailaddress,
+// 					subject: 'Export failed (Administrator Notification)',
+// 					html: body
+// 				} ).catch( console.log );
+// 			} ).catch( console.log );
+// 		return Promise.resolve( { status: 'Initiated' } );
+// 	}
+// 	private executeExportAction = async ( payload: { streamid: number, exportid: number, user: any } ) => {
+// 		const stream = await this.getOne( payload.streamid );
+// 		const query = stream.exports.find( e => e.id === payload.exportid );
+// 		query.streamid = payload.streamid;
+// 		query.dimensions = _.keyBy( stream.fieldList.map( f => ( <DimeStreamFieldDetail>{ id: f.id, stream: f.stream, name: f.name, type: f.type, position: f.position, descriptiveTable: f.descriptiveTable } ) ), 'id' );
+// 		return this.environmentTool.readData( { id: stream.environment, db: stream.dbName, table: stream.tableName, query } );
+// 	}
+
+// 	private executeExportPrepareFile = async ( payload ) => {
+// 		payload.workbookBuffer = new PassThrough();
+// 		const workbook = new excel.stream.xlsx.WorkbookWriter( { stream: payload.workbookBuffer } );
+// 		workbook.creator = 'EPM Toolbox';
+// 		workbook.lastModifiedBy = 'EPM Toolbox';
+// 		workbook.created = new Date();
+// 		workbook.modified = new Date();
+
+// 		const data = payload.result.data;
+// 		const numRowDims = payload.result.query.rowDims.length;
+// 		// const povsheet = workbook.addWorksheet( 'POVs', { views: [{ state: 'frozen', activeCell: 'A1' }] } );
+
+// 		// let currentRow = 0;
+// 		// let currentCol = 0;
+
+// 		// povsheet.getCell( ++currentRow, ++currentCol ).value = 'POVs:';
+// 		// payload.result.query.povMembers.forEach( pov => {
+// 		// 	povsheet.getCell( currentRow, ++currentCol ).value = pov[0].RefField;
+// 		// } );
+// 		const povHeaders = payload.result.query.povDims.map( d => payload.result.query.dimensions[d].name ).map( h => ( { header: h, key: h } ) );
+// 		povHeaders.splice( 0, 0, { header: 'POV Dimensions', key: 'POV Dimensions' } );
+// 		const povValues = payload.result.query.povMembers.map( p => p[0].RefField );
+// 		povValues.splice( 0, 0, 'POV Selections' );
+
+
+// 		const sheet = workbook.addWorksheet( 'Data', { views: [{ state: 'frozen', xSplit: numRowDims * 2, ySplit: 4, activeCell: 'A1' }] } );
+
+// 		// sheet.columns = povHeaders;
+// 		await sheet.addRow( povHeaders.map( h => h.header ) ).commit();
+// 		await sheet.addRow( povValues ).commit();
+// 		await sheet.addRow( [] ).commit();
+// 		// await sheet.commit();
+
+// 		if ( data.length < 1 ) {
+// 			sheet.addRow( ['There is no data produced with the data export. If in doubt, please contact system admin.'] );
+// 		} else {
+// 			const rowDims = payload.result.query.rowDims;
+// 			const dimensions = payload.result.query.dimensions;
+// 			const dataColumnHeaders = payload.result.query.colMembers.map( cm => cm.map( f => f.RefField ).join( '-' ) );
+// 			const sheetColumns = [];
+// 			rowDims.forEach( rd => {
+// 				const columnDefiner = dimensions[rd].name;
+// 				sheetColumns.push( { header: dimensions[rd].name, key: dimensions[rd].name } );
+// 				sheetColumns.push( { header: dimensions[rd].name + ' Desc', key: dimensions[rd].name + ' Desc' } );
+// 			} );
+// 			dataColumnHeaders.forEach( dch => {
+// 				sheetColumns.push( { header: dch, key: dch } );
+// 			} );
+// 			// sheet.columns = sheetColumns;
+// 			await sheet.addRow( sheetColumns.map( c => c.header ) ).commit();
+
+// 			while ( data.length > 0 ) {
+// 				const rowToPush = [];
+// 				const datum = data.splice( 0, 1 )[0];
+// 				datum.headers.forEach( ( cell, dataIndex ) => {
+// 					rowToPush.push( cell );
+// 					rowToPush.push( payload.hierarchies[payload.result.query.rowDims[dataIndex]].find( e => e.RefField === cell ).Description || '' );
+// 				} );
+// 				let doWeHaveData = false;
+// 				datum.data.forEach( cell => {
+// 					if ( cell ) doWeHaveData = true;
+// 					rowToPush.push( cell );
+// 				} );
+// 				if ( doWeHaveData ) await sheet.addRow( rowToPush ).commit();
+// 			}
+// 		}
+
+// 		workbook.commit();
+
+// 		return { ...payload, workbook };
+// 	}
+// 	private executeExportSendFile = async ( payload ) => {
+// 		const systemAdmin: any = await this.settingsTool.getOne( 'systemadmin' );
+// 		const params = { fromname: systemAdmin.fromname, exportname: payload.result.query.name };
+// 		const bodyXML = await Promisers.readFile( path.join( __dirname, './tools.email.templates/stream.export.complete.html' ) );
+// 		const bodyTemplate = Handlebars.compile( bodyXML );
+// 		const body = bodyTemplate( params );
+// 		const mailResult = await this.mailTool.sendMail( {
+// 			from: systemAdmin.emailaddress,
+// 			to: payload.user.email,
+// 			cc: systemAdmin.emailaddress,
+// 			subject: 'Requested Data File Attached',
+// 			// text: 'Data file is attached.',
+// 			html: body,
+// 			attachments: [
+// 				{
+// 					filename: payload.result.query.name + '-' + this.tools.getFormattedDateTime() + '.xlsx',
+// 					// content: workbookStream.getContents()
+// 					// content: payload.workbookBuffer.getContents()
+// 					content: payload.workbookBuffer
+// 				}
+// 			]
+// 		} );
+// 		return mailResult;
+// 	}
+// 	private workbookToStreamBuffer = ( workbook: excel.Workbook ) => {
+// 		return new Promise( ( resolve, reject ) => {
+// 			let myWritableStreamBuffer: any; myWritableStreamBuffer = new streamBuffers.WritableStreamBuffer();
+// 			workbook.xlsx.write( myWritableStreamBuffer ).
+// 				then( () => {
+// 					resolve( myWritableStreamBuffer );
+// 				} ).
+// 				catch( reject );
+// 		} );
+// 	}
+
+
+
+
 // import { EnvironmentTool } from './tools.environment';
 // import { MainTools } from './tools.main';
 // import { DB } from './tools.db';
@@ -481,150 +664,7 @@ export class StreamTools {
 // 		} );
 // 	}
 
-// 	public executeExport = ( payload: { streamid: number, exportid: number, user: any, hierarchies?: any } ) => {
-// 		this.executeExportAction( payload )
-// 			.then( ( result: any ) => this.executeExportPrepareFile( { result, user: payload.user, hierarchies: result.query.hierarchies } ) )
-// 			.then( this.executeExportSendFile )
-// 			.catch( async ( issue ) => {
-// 				const systemAdmin: any = await this.settingsTool.getOne( 'systemadmin' );
-// 				const stream = await this.getOne( payload.streamid );
-// 				const query = stream.exports.find( e => e.id === payload.exportid );
-// 				const params = { fromname: systemAdmin.fromname, exportname: query.name, issue };
-// 				let bodyXML = await Promisers.readFile( path.join( __dirname, './tools.email.templates/stream.export.failed.html' ) );
-// 				let bodyTemplate = Handlebars.compile( bodyXML );
-// 				let body = bodyTemplate( params );
-// 				this.mailTool.sendMail( {
-// 					from: systemAdmin.emailaddress,
-// 					to: payload.user.email,
-// 					cc: systemAdmin.emailaddress,
-// 					subject: 'Export failed',
-// 					html: body
-// 				} ).catch( console.log );
-// 				bodyXML = await Promisers.readFile( path.join( __dirname, './tools.email.templates/stream.export.failed.toAdmin.html' ) );
-// 				bodyTemplate = Handlebars.compile( bodyXML );
-// 				body = bodyTemplate( params );
-// 				this.mailTool.sendMail( {
-// 					from: systemAdmin.emailaddress,
-// 					to: systemAdmin.emailaddress,
-// 					subject: 'Export failed (Administrator Notification)',
-// 					html: body
-// 				} ).catch( console.log );
-// 			} ).catch( console.log );
-// 		return Promise.resolve( { status: 'Initiated' } );
-// 	}
-// 	private executeExportAction = async ( payload: { streamid: number, exportid: number, user: any } ) => {
-// 		const stream = await this.getOne( payload.streamid );
-// 		const query = stream.exports.find( e => e.id === payload.exportid );
-// 		query.streamid = payload.streamid;
-// 		query.dimensions = _.keyBy( stream.fieldList.map( f => ( <DimeStreamFieldDetail>{ id: f.id, stream: f.stream, name: f.name, type: f.type, position: f.position, descriptiveTable: f.descriptiveTable } ) ), 'id' );
-// 		return this.environmentTool.readData( { id: stream.environment, db: stream.dbName, table: stream.tableName, query } );
-// 	}
 
-// 	private executeExportPrepareFile = async ( payload ) => {
-// 		payload.workbookBuffer = new PassThrough();
-// 		const workbook = new excel.stream.xlsx.WorkbookWriter( { stream: payload.workbookBuffer } );
-// 		workbook.creator = 'EPM Toolbox';
-// 		workbook.lastModifiedBy = 'EPM Toolbox';
-// 		workbook.created = new Date();
-// 		workbook.modified = new Date();
-
-// 		const data = payload.result.data;
-// 		const numRowDims = payload.result.query.rowDims.length;
-// 		// const povsheet = workbook.addWorksheet( 'POVs', { views: [{ state: 'frozen', activeCell: 'A1' }] } );
-
-// 		// let currentRow = 0;
-// 		// let currentCol = 0;
-
-// 		// povsheet.getCell( ++currentRow, ++currentCol ).value = 'POVs:';
-// 		// payload.result.query.povMembers.forEach( pov => {
-// 		// 	povsheet.getCell( currentRow, ++currentCol ).value = pov[0].RefField;
-// 		// } );
-// 		const povHeaders = payload.result.query.povDims.map( d => payload.result.query.dimensions[d].name ).map( h => ( { header: h, key: h } ) );
-// 		povHeaders.splice( 0, 0, { header: 'POV Dimensions', key: 'POV Dimensions' } );
-// 		const povValues = payload.result.query.povMembers.map( p => p[0].RefField );
-// 		povValues.splice( 0, 0, 'POV Selections' );
-
-
-// 		const sheet = workbook.addWorksheet( 'Data', { views: [{ state: 'frozen', xSplit: numRowDims * 2, ySplit: 4, activeCell: 'A1' }] } );
-
-// 		// sheet.columns = povHeaders;
-// 		await sheet.addRow( povHeaders.map( h => h.header ) ).commit();
-// 		await sheet.addRow( povValues ).commit();
-// 		await sheet.addRow( [] ).commit();
-// 		// await sheet.commit();
-
-// 		if ( data.length < 1 ) {
-// 			sheet.addRow( ['There is no data produced with the data export. If in doubt, please contact system admin.'] );
-// 		} else {
-// 			const rowDims = payload.result.query.rowDims;
-// 			const dimensions = payload.result.query.dimensions;
-// 			const dataColumnHeaders = payload.result.query.colMembers.map( cm => cm.map( f => f.RefField ).join( '-' ) );
-// 			const sheetColumns = [];
-// 			rowDims.forEach( rd => {
-// 				const columnDefiner = dimensions[rd].name;
-// 				sheetColumns.push( { header: dimensions[rd].name, key: dimensions[rd].name } );
-// 				sheetColumns.push( { header: dimensions[rd].name + ' Desc', key: dimensions[rd].name + ' Desc' } );
-// 			} );
-// 			dataColumnHeaders.forEach( dch => {
-// 				sheetColumns.push( { header: dch, key: dch } );
-// 			} );
-// 			// sheet.columns = sheetColumns;
-// 			await sheet.addRow( sheetColumns.map( c => c.header ) ).commit();
-
-// 			while ( data.length > 0 ) {
-// 				const rowToPush = [];
-// 				const datum = data.splice( 0, 1 )[0];
-// 				datum.headers.forEach( ( cell, dataIndex ) => {
-// 					rowToPush.push( cell );
-// 					rowToPush.push( payload.hierarchies[payload.result.query.rowDims[dataIndex]].find( e => e.RefField === cell ).Description || '' );
-// 				} );
-// 				let doWeHaveData = false;
-// 				datum.data.forEach( cell => {
-// 					if ( cell ) doWeHaveData = true;
-// 					rowToPush.push( cell );
-// 				} );
-// 				if ( doWeHaveData ) await sheet.addRow( rowToPush ).commit();
-// 			}
-// 		}
-
-// 		workbook.commit();
-
-// 		return { ...payload, workbook };
-// 	}
-// 	private executeExportSendFile = async ( payload ) => {
-// 		const systemAdmin: any = await this.settingsTool.getOne( 'systemadmin' );
-// 		const params = { fromname: systemAdmin.fromname, exportname: payload.result.query.name };
-// 		const bodyXML = await Promisers.readFile( path.join( __dirname, './tools.email.templates/stream.export.complete.html' ) );
-// 		const bodyTemplate = Handlebars.compile( bodyXML );
-// 		const body = bodyTemplate( params );
-// 		const mailResult = await this.mailTool.sendMail( {
-// 			from: systemAdmin.emailaddress,
-// 			to: payload.user.email,
-// 			cc: systemAdmin.emailaddress,
-// 			subject: 'Requested Data File Attached',
-// 			// text: 'Data file is attached.',
-// 			html: body,
-// 			attachments: [
-// 				{
-// 					filename: payload.result.query.name + '-' + this.tools.getFormattedDateTime() + '.xlsx',
-// 					// content: workbookStream.getContents()
-// 					// content: payload.workbookBuffer.getContents()
-// 					content: payload.workbookBuffer
-// 				}
-// 			]
-// 		} );
-// 		return mailResult;
-// 	}
-// 	private workbookToStreamBuffer = ( workbook: excel.Workbook ) => {
-// 		return new Promise( ( resolve, reject ) => {
-// 			let myWritableStreamBuffer: any; myWritableStreamBuffer = new streamBuffers.WritableStreamBuffer();
-// 			workbook.xlsx.write( myWritableStreamBuffer ).
-// 				then( () => {
-// 					resolve( myWritableStreamBuffer );
-// 				} ).
-// 				catch( reject );
-// 		} );
-// 	}
 // }
 
 // */

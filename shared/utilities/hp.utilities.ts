@@ -38,24 +38,21 @@ export const countMembers = ( memberList: FieldDescriptionItem[], member: Stream
 	}
 	return count;
 };
-export const findMembers = ( ...args ) => {
-	throw new Error( 'findMembers@hp.utilities.ts is not implemented yet' );
+export const findMembers = ( memberList: any[], type: string, member: string ) => {
+	if ( member ) {
+		if ( type === 'member' ) return findMember( memberList, member );
+		if ( type === 'level0descendants' ) return findLevel0( memberList, member );
+		if ( type === 'children' ) return findChildren( memberList, member );
+		if ( type === 'ichildren' ) return [...findMember( memberList, member ), ...findChildren( memberList, member )];
+		if ( type === 'descendants' ) return findDescendants( memberList, member );
+		if ( type === 'idescendants' ) return [...findMember( memberList, member ), ...findDescendants( memberList, member )];
+	}
+	return null;
 };
-// export const findMembers = ( memberList: any[], type: string, member: string ) => {
-// 	if ( member ) {
-// 		if ( type === 'member' ) return findMember( memberList, member );
-// 		if ( type === 'level0' ) return findLevel0( memberList, member );
-// 		if ( type === 'children' ) return findChildren( memberList, member );
-// 		if ( type === 'ichildren' ) return [member, ...findChildren( memberList, member )];
-// 		if ( type === 'descendants' ) return findDescendants( memberList, member );
-// 		if ( type === 'idescendants' ) return [member, ...findDescendants( memberList, member )];
-// 	}
-// 	return null;
-// };
 
 export const getPBCSReadDataSelections = ( payload: { selectedMember: string, selectionType: string } ): string => {
 	if ( payload.selectionType === 'member' ) return payload.selectedMember;
-	if ( payload.selectionType === 'level0' ) return 'ILvl0Descendants(' + payload.selectedMember + ')';
+	if ( payload.selectionType === 'level0descendants' ) return 'ILvl0Descendants(' + payload.selectedMember + ')';
 	if ( payload.selectionType === 'children' ) return 'Children(' + payload.selectedMember + ')';
 	if ( payload.selectionType === 'ichildren' ) return 'Children(' + payload.selectedMember + '), ' + payload.selectedMember;
 	if ( payload.selectionType === 'descendants' ) return 'Descendants(' + payload.selectedMember + ')';

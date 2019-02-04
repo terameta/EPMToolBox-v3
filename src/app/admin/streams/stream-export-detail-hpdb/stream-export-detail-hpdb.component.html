@@ -1,12 +1,8 @@
 <ng-container *ngIf="stream$ | async as stream; else loading">
 	<ng-container *ngIf="sxport$ | async as sxport; else loading">
 		<ng-container *ngIf="artifacts$ | async as artifacts; else loading">
-			<div class="row my-1">
-				<div class="col font-weight-bold">
-					Export Details:
-				</div>
-			</div>
 			<div class="row my-3">
+				<div class="col-2 col-lg-1 font-weight-bold">Export Details:</div>
 				<div class="col">
 					<div class="input-group input-group-sm">
 						<div class="input-group-prepend">
@@ -25,10 +21,25 @@
 							<button type="button" class="btn btn-outline-dark" (click)="clone(stream, sxport)" title="Clone"><i class="far fa-clone fa-fw"></i></button>
 						</div>
 						<div class="btn-group btn-group-xs ml-3">
-							<button type="button" class="btn btn-outline-dark" (click)="execute(stream, sxport)" title="Execute Export" [disabled]="sxport.status == XState.Executing"><i class="fas fa-play fa-fw"></i></button>
-						</div>
-						<div class="btn-group btn-group-xs ml-3">
 							<button type="button" class="btn btn-outline-danger" (click)="delete(stream, sxport)" title="Delete"><i class="far fa-trash-alt fa-fw"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row my-3">
+				<div class="col-2 col-lg-1 font-weight-bold">Run Export:</div>
+				<div class="col">
+					<div class="input-group input-group-sm">
+						<div class="input-group-prepend">
+							<span class="input-group-text">
+								Selections:
+							</span>
+						</div>
+						<select name="Selector{{stream.id}}_{{dim.name}}" class="form-control" *ngFor="let dim of sxport.pagDims" [(ngModel)]="pageSelections[dim.name]">
+							<option value="{{cs.RefField}}" *ngFor="let cs of findMembers( sxport.pags[dim.name], artifacts[stream.id + '_' + dim.name ] )">{{cs.RefField}}</option>
+						</select>
+						<div class="input-group-append">
+							<button type="button" class="btn btn-outline-dark" (click)="execute(stream, sxport)" title="Execute Export" [disabled]="sxport.status == XState.Executing"><i class="fas fa-play fa-fw"></i></button>
 						</div>
 					</div>
 				</div>
@@ -49,75 +60,67 @@
 							<tbody>
 								<tr>
 									<th class="text-nowrap">Dimension Layout:</th>
-									<td>
-										<div cdkDropList #pagDims="cdkDropList" [cdkDropListData]="sxport.pagDims" [cdkDropListConnectedTo]="[povDims, rowDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
-											<div class="btn-toolbar m-1" *ngFor="let dim of sxport.pagDims" cdkDrag>
-												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
-												</div>
-												<div class="btn-group btn-group-xs ml-auto">
-													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
-														<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
-														<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
-														<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
-														<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
-													</button>
-												</div>
+									<td cdkDropList #pagDims="cdkDropList" [cdkDropListData]="sxport.pagDims" [cdkDropListConnectedTo]="[povDims, rowDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
+										<div class="btn-toolbar m-1" *ngFor="let dim of sxport.pagDims" cdkDrag>
+											<div class="btn-group btn-group-xs">
+												<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+												<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
+											</div>
+											<div class="btn-group btn-group-xs ml-auto">
+												<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
+													<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
+													<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
+													<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
+													<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
+												</button>
 											</div>
 										</div>
 									</td>
-									<td>
-										<div cdkDropList #povDims="cdkDropList" [cdkDropListData]="sxport.povDims" [cdkDropListConnectedTo]="[pagDims, rowDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
-											<div class="btn-toolbar m-1" *ngFor="let dim of sxport.povDims" cdkDrag>
-												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
-												</div>
-												<div class="btn-group btn-group-xs ml-auto">
-													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
-														<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
-														<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
-														<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
-														<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
-													</button>
-												</div>
+									<td cdkDropList #povDims="cdkDropList" [cdkDropListData]="sxport.povDims" [cdkDropListConnectedTo]="[pagDims, rowDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
+										<div class="btn-toolbar m-1" *ngFor="let dim of sxport.povDims" cdkDrag>
+											<div class="btn-group btn-group-xs">
+												<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+												<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
+											</div>
+											<div class="btn-group btn-group-xs ml-auto">
+												<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
+													<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
+													<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
+													<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
+													<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
+												</button>
 											</div>
 										</div>
 									</td>
-									<td>
-										<div cdkDropList #rowDims="cdkDropList" [cdkDropListData]="sxport.rowDims" [cdkDropListConnectedTo]="[pagDims, povDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
-											<div class="btn-toolbar m-1 text-nowrap" *ngFor="let dim of sxport.rowDims" cdkDrag>
-												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
-												</div>
-												<div class="btn-group btn-group-xs ml-auto">
-													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
-														<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
-														<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
-														<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
-														<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
-													</button>
-												</div>
+									<td cdkDropList #rowDims="cdkDropList" [cdkDropListData]="sxport.rowDims" [cdkDropListConnectedTo]="[pagDims, povDims, colDims]" (cdkDropListDropped)="dimensionDrop($event)">
+										<div class="btn-toolbar m-1 text-nowrap" *ngFor="let dim of sxport.rowDims" cdkDrag>
+											<div class="btn-group btn-group-xs">
+												<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+												<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
+											</div>
+											<div class="btn-group btn-group-xs ml-auto">
+												<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
+													<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
+													<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
+													<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
+													<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
+												</button>
 											</div>
 										</div>
 									</td>
-									<td>
-										<div cdkDropList #colDims="cdkDropList" [cdkDropListData]="sxport.colDims" [cdkDropListConnectedTo]="[pagDims, povDims, rowDims]" (cdkDropListDropped)="dimensionDrop($event)">
-											<div class="btn-toolbar m-1 text-nowrap" *ngFor="let dim of sxport.colDims" cdkDrag>
-												<div class="btn-group btn-group-xs">
-													<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
-													<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
-												</div>
-												<div class="btn-group btn-group-xs ml-auto">
-													<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
-														<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
-														<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
-														<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
-														<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
-													</button>
-												</div>
+									<td cdkDropList #colDims="cdkDropList" [cdkDropListData]="sxport.colDims" [cdkDropListConnectedTo]="[pagDims, povDims, rowDims]" (cdkDropListDropped)="dimensionDrop($event)">
+										<div class="btn-toolbar m-1 text-nowrap" *ngFor="let dim of sxport.colDims" cdkDrag>
+											<div class="btn-group btn-group-xs">
+												<button class="btn btn-outline-dark movable"><i class="fas fa-arrows-alt fa-fw"></i></button>
+												<button class="btn btn-outline-dark movable dim text-left">{{dim.name}}</button>
+											</div>
+											<div class="btn-group btn-group-xs ml-auto">
+												<button class="btn btn-outline-dark" [disabled]="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading" title="Refresh Member List" (click)="refreshMembers(stream, dim)">
+													<i class="fas fa-pause fa-fw" *ngIf="!artifacts[stream.id + '_' + dim.name]"></i>
+													<i class="fas fa-pause fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.NotLoaded"></i>
+													<i class="fas fa-sync-alt fa-spin fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loading"></i>
+													<i class="fas fa-sync-alt fa-fw" *ngIf="artifacts[stream.id + '_' + dim.name]?.loadState == LoadStates.Loaded"></i>
+												</button>
 											</div>
 										</div>
 									</td>
@@ -208,6 +211,17 @@
 							</tbody>
 						</table>
 					</div>
+				</div>
+			</div>
+			<div class="row my-3">
+				<div class="col">
+					<pre>{{sxport.pagDims | json}}</pre>
+				</div>
+				<div class="col">
+					<pre>{{sxport.pags | json}}</pre>
+				</div>
+				<div class="col">
+					<pre>{{pageSelections | json}}</pre>
 				</div>
 			</div>
 		</ng-container>

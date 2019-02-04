@@ -20,6 +20,12 @@ export class ApiStreams {
 	}
 
 	private setRoutes = () => {
-
+		this.apiRoutes.post( '/export/:id/:xid', ( req, res ) => {
+			this.rester.respond( this.tool.executeExport, {
+				id: parseInt( req.params.id, 10 ),
+				xid: req.params.xid, user: ( req as any ).user,
+				selections: req.body
+			}, req, res );
+		} );
 	}
 }

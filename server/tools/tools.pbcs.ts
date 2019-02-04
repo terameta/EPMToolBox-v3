@@ -26,90 +26,108 @@ export class PBCSTool {
 	// public listProcedureDetails = ( payload: ATEnvironmentDetail ) => this.smartview.listBusinessRuleDetails( payload );
 	// public runProcedure = ( payload: ATEnvironmentDetail ) => this.smartview.runBusinessRule( payload );
 	// public writeData = ( payload ) => this.smartview.writeData( payload );
-	// public readData = ( payload ) => this.pbcsReadData( payload );
-	// private pbcsReadData = async ( payload ) => {
-	// 	payload.query.hierarchies = await this.smartview.smartviewGetAllDescriptionsWithHierarchy( payload, Object.values( <ATStreamField[]>payload.query.dimensions ).sort( SortByPosition ) );
-	// 	await this.pbcsInitiateRest( payload );
-	// 	payload.data = [];
-	// 	const rows = JSON.parse( JSON.stringify( payload.query.rows ) );
-	// 	while ( rows.length > 0 ) {
-	// 		const row = rows.splice( 0, 1 )[0];
-	// 		const query = {
-	// 			exportPlanningData: false,
-	// 			gridDefinition: {
-	// 				suppressMissingBlocks: true,
-	// 				pov: {
-	// 					dimensions: payload.query.povDims.map( dimid => payload.query.dimensions[dimid].name ),
-	// 					members: payload.query.povs.map( pov => [getPBCSReadDataSelections( pov )] )
-	// 				},
-	// 				columns: payload.query.cols.map( col => {
-	// 					return {
-	// 						dimensions: payload.query.colDims.map( dimid => payload.query.dimensions[dimid].name ),
-	// 						members: col.map( c => [getPBCSReadDataSelections( c )] )
-	// 					};
-	// 				} ),
-	// 				rows: [
-	// 					{
-	// 						dimensions: payload.query.rowDims.map( dimid => payload.query.dimensions[dimid].name ),
-	// 						members: row.map( r => [getPBCSReadDataSelections( r )] )
-	// 					}
-	// 				]
-	// 			}
-	// 		};
-	// 		const result = await this.pbcsReadDataAction( payload, query );
-	// 		if ( Array.isArray( result ) ) {
-	// 			result.forEach( r => payload.data.push( r ) );
-	// 		} else {
-	// 			let minIndex = -1;
-	// 			let minNumberofMembers = 999999999;
-	// 			row.forEach( ( selection, dimindex ) => {
-	// 				selection.memberList = findMembers( payload.query.hierarchies[payload.query.rowDims[dimindex]], selection.selectionType, selection.selectedMember );
-	// 				selection.memberCount = selection.memberList.length;
-	// 				if ( selection.memberCount > 1 && selection.memberCount < minNumberofMembers ) {
-	// 					minNumberofMembers = selection.memberCount;
-	// 					minIndex = dimindex;
-	// 				}
-	// 			} );
-	// 			const membersToExpand = JSON.parse( JSON.stringify( row[minIndex].memberList ) );
-	// 			membersToExpand.forEach( ( currentMember, spliceIndex ) => {
-	// 				const toPush = JSON.parse( JSON.stringify( row ) );
-	// 				toPush[minIndex] = { selectedMember: currentMember.RefField, selectionType: 'member' };
-	// 				rows.splice( spliceIndex, 0, toPush );
-	// 			} );
-	// 		}
-	// 	}
+	public readData = ( payload: EnvironmentDetail, stream: Stream ) => this.pbcsReadData( payload, stream );
+	private pbcsReadData = async ( payload: EnvironmentDetail, stream: Stream ) => {
+		console.log( '===========================================' );
+		console.log( '===========================================' );
+		console.log( payload );
+		console.log( '===========================================' );
+		console.log( '===========================================' );
+		console.log( payload.smartview.readDataDefiniton );
+		console.log( '===========================================' );
+		console.log( '===========================================' );
+		// for ( const cd of payload.smartview.readDataDefiniton.pagDims ) {
+		// 	console.log( cd );
+		// 	// await this.listDescriptions( payload )
+		// }
+		for ( const field of stream.fieldList ) {
+			await this.listDescriptions( payload, stream, field );
+			// console.log( field );
+			// console.log( await this.listDescriptions( payload, stream, field ) );
+		}
+		// 	payload.query.hierarchies = await this.smartview.smartviewGetAllDescriptionsWithHierarchy( payload, Object.values( <StreamField[]>payload.query.dimensions ).sort( SortByPosition ) );
+		// 	await this.pbcsInitiateRest( payload );
+		// 	payload.data = [];
+		// 	const rows = JSON.parse( JSON.stringify( payload.query.rows ) );
+		// 	while ( rows.length > 0 ) {
+		// 		const row = rows.splice( 0, 1 )[0];
+		// 		const query = {
+		// 			exportPlanningData: false,
+		// 			gridDefinition: {
+		// 				suppressMissingBlocks: true,
+		// 				pov: {
+		// 					dimensions: payload.query.povDims.map( dimid => payload.query.dimensions[dimid].name ),
+		// 					members: payload.query.povs.map( pov => [getPBCSReadDataSelections( pov )] )
+		// 				},
+		// 				columns: payload.query.cols.map( col => {
+		// 					return {
+		// 						dimensions: payload.query.colDims.map( dimid => payload.query.dimensions[dimid].name ),
+		// 						members: col.map( c => [getPBCSReadDataSelections( c )] )
+		// 					};
+		// 				} ),
+		// 				rows: [
+		// 					{
+		// 						dimensions: payload.query.rowDims.map( dimid => payload.query.dimensions[dimid].name ),
+		// 						members: row.map( r => [getPBCSReadDataSelections( r )] )
+		// 					}
+		// 				]
+		// 			}
+		// 		};
+		// 		const result = await this.pbcsReadDataAction( payload, query );
+		// 		if ( Array.isArray( result ) ) {
+		// 			result.forEach( r => payload.data.push( r ) );
+		// 		} else {
+		// 			let minIndex = -1;
+		// 			let minNumberofMembers = 999999999;
+		// 			row.forEach( ( selection, dimindex ) => {
+		// 				selection.memberList = findMembers( payload.query.hierarchies[payload.query.rowDims[dimindex]], selection.selectionType, selection.selectedMember );
+		// 				selection.memberCount = selection.memberList.length;
+		// 				if ( selection.memberCount > 1 && selection.memberCount < minNumberofMembers ) {
+		// 					minNumberofMembers = selection.memberCount;
+		// 					minIndex = dimindex;
+		// 				}
+		// 			} );
+		// 			const membersToExpand = JSON.parse( JSON.stringify( row[minIndex].memberList ) );
+		// 			membersToExpand.forEach( ( currentMember, spliceIndex ) => {
+		// 				const toPush = JSON.parse( JSON.stringify( row ) );
+		// 				toPush[minIndex] = { selectedMember: currentMember.RefField, selectionType: 'member' };
+		// 				rows.splice( spliceIndex, 0, toPush );
+		// 			} );
+		// 		}
+		// 	}
 
-	// 	const colCartesian = payload.query.cols.map( col => {
-	// 		return arrayCartesian( col.map( ( selection, sindex ) => {
-	// 			return findMembers( payload.query.hierarchies[payload.query.colDims[sindex]], selection.selectionType, selection.selectedMember );
-	// 		} ) );
-	// 	} );
-	// 	payload.query.colMembers = [];
-	// 	colCartesian.forEach( cm => {
-	// 		payload.query.colMembers = payload.query.colMembers.concat( cm );
-	// 	} );
+		// 	const colCartesian = payload.query.cols.map( col => {
+		// 		return arrayCartesian( col.map( ( selection, sindex ) => {
+		// 			return findMembers( payload.query.hierarchies[payload.query.colDims[sindex]], selection.selectionType, selection.selectedMember );
+		// 		} ) );
+		// 	} );
+		// 	payload.query.colMembers = [];
+		// 	colCartesian.forEach( cm => {
+		// 		payload.query.colMembers = payload.query.colMembers.concat( cm );
+		// 	} );
 
-	// 	payload.query.povMembers = payload.query.povs.map( ( pov, pindex ) => findMembers( payload.query.hierarchies[payload.query.povDims[pindex]], pov.selectionType, pov.selectedMember ) );
-	// 	return payload;
-	// }
-	// private pbcsReadDataAction = async ( payload: ATEnvironmentDetail, pbcsQuery: any ): Promise<any> => {
-	// 	await this.pbcsInitiateRest( payload );
-	// 	const dataURL = payload.pbcs.resturl + '/applications/' + payload.database + '/plantypes/' + payload.table + '/exportdataslice';
-	// 	const result = await this.pbcsSendRequest( { method: 'POST', url: dataURL, domain: payload.identitydomain, user: payload.username, pass: payload.password, body: pbcsQuery } );
-	// 	if ( result.body && result.body.detail === 'Unable to load the data entry form as the number of data entry cells exceeded the threshold.' ) {
-	// 		return false;
-	// 	}
-	// 	return result.body.rows;
-	// }
-	// private pbcsInitiateRest = async ( payload: ATEnvironmentDetail ) => {
-	// 	if ( !payload.pbcs.restInitiated ) {
-	// 		// payload = await this.pbcsStaticVerify( payload );
-	// 		await this.pbcsStaticVerify( payload );
-	// 		payload.pbcs.resturl = await this.pbcsGetVersion( payload );
-	// 		payload.pbcs.restInitiated = true;
-	// 	}
-	// 	return payload;
-	// }
+		// 	payload.query.povMembers = payload.query.povs.map( ( pov, pindex ) => findMembers( payload.query.hierarchies[payload.query.povDims[pindex]], pov.selectionType, pov.selectedMember ) );
+		// 	return payload;
+		// }
+		// private pbcsReadDataAction = async ( payload: ATEnvironmentDetail, pbcsQuery: any ): Promise<any> => {
+		// 	await this.pbcsInitiateRest( payload );
+		// 	const dataURL = payload.pbcs.resturl + '/applications/' + payload.database + '/plantypes/' + payload.table + '/exportdataslice';
+		// 	const result = await this.pbcsSendRequest( { method: 'POST', url: dataURL, domain: payload.identitydomain, user: payload.username, pass: payload.password, body: pbcsQuery } );
+		// 	if ( result.body && result.body.detail === 'Unable to load the data entry form as the number of data entry cells exceeded the threshold.' ) {
+		// 		return false;
+		// 	}
+		// 	return result.body.rows;
+	}
+	private pbcsInitiateRest = async ( payload: EnvironmentDetail ) => {
+		throw new Error( 'Not Yet pbcsInitiateRest' );
+		// if ( !payload.pbcs.restInitiated ) {
+		// 	// payload = await this.pbcsStaticVerify( payload );
+		// 	await this.pbcsStaticVerify( payload );
+		// 	payload.pbcs.resturl = await this.pbcsGetVersion( payload );
+		// 	payload.pbcs.restInitiated = true;
+		// }
+		// return payload;
+	}
 	// private pbcsGetVersion = async ( payload: ATEnvironmentDetail ) => {
 	// 	const result = await this.pbcsSendRequest( { method: 'GET', url: payload.pbcs.resturl, domain: payload.identitydomain, user: payload.username, pass: payload.password } );
 	// 	const linkObject = result.body.links.find( e => e.rel === 'current' );

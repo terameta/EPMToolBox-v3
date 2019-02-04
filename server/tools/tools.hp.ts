@@ -20,6 +20,6 @@ export class HPTool {
 	// public listProcedures = ( payload: EnvironmentDetail ) => this.smartview.listBusinessRules( payload );
 	// public listProcedureDetails = ( payload: EnvironmentDetail ) => this.smartview.listBusinessRuleDetails( payload );
 	// public writeData = ( refObj ) => this.smartview.writeData( refObj );
-	// public readData = ( refObj ) => this.smartview.readData( refObj );
-	// public runProcedure = ( refObj ) => this.smartview.runBusinessRule( refObj );
+	public readData = async ( payload: EnvironmentDetail, stream: Stream ) => this.smartview.readData( payload, stream );
+	// public runProcedure = ( payload ) => this.smartview.runBusinessRule( payload );
 }

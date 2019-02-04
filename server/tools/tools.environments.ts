@@ -1,25 +1,24 @@
 import { DB } from './db';
 import { MainTools } from './tools.main';
-import { EnvironmentOnDB, Environment, EnvironmentType, EnvironmentDetail, prepareToWrite, EnvironmentMSSQL, EnvironmentSmartView } from '../../shared/models/environments.models';
+import { Environment, EnvironmentType, EnvironmentDetail, prepareToWrite, EnvironmentMSSQL, EnvironmentSmartView } from '../../shared/models/environments.models';
 import { CredentialTools } from './tools.credentials';
 import { HPTool } from './tools.hp';
 import { PBCSTool } from './tools.pbcs';
 import { MSSQLTool } from './tools.mssql';
 import { CloneTarget } from '../../shared/models/clone.target';
 import { Tuple } from 'shared/models/tuple';
-import { StreamTools } from './tools.streams';
+import { streamGetOne, streamUpdate } from './tools.streams';
+import { Stream } from 'shared/models/streams.models';
 
 export class EnvironmentTools {
 	private credentialTool: CredentialTools;
 	private sourceTools: { [key: number]: HPTool | PBCSTool | MSSQLTool } = {};
-	private streamTools: StreamTools;
 
 	constructor( private db: DB, private tools: MainTools ) {
 		this.credentialTool = new CredentialTools( this.db, this.tools );
 		this.sourceTools[EnvironmentType.HP] = new HPTool( this.db, this.tools );
 		this.sourceTools[EnvironmentType.PBCS] = new PBCSTool( this.db, this.tools );
 		this.sourceTools[EnvironmentType.MSSQL] = new MSSQLTool( this.db, this.tools );
-		this.streamTools = new StreamTools( this.db, this.tools );
 	}
 
 	public getAll = async () => {
@@ -95,7 +94,7 @@ export class EnvironmentTools {
 
 	public listFields = async ( payload: { id: number, streamid: number } ) => {
 		const ce = await this.getDetails( payload.id, true );
-		const cs = await this.streamTools.getOne( payload.streamid );
+		const cs = await streamGetOne( payload.streamid, this.db, this.tools );
 		if ( ce.smartview ) {
 			ce.smartview.application = cs.dbName;
 			ce.smartview.cube = cs.tableName;
@@ -106,7 +105,7 @@ export class EnvironmentTools {
 			ce.mssql.query = cs.customQuery;
 		}
 		cs.fieldList = await this.sourceTools[ce.type].listFields( ce );
-		return await this.streamTools.update( cs );
+		return await streamUpdate( cs, this.db, this.tools );
 	}
 
 	public listDescriptiveTables = async ( payload: { id: number, database: string, table: string } ) => {
@@ -124,7 +123,7 @@ export class EnvironmentTools {
 
 	public listDescriptiveFields = async ( payload: { id: number, streamid: number, field: string } ) => {
 		const ce = await this.getDetails( payload.id, true );
-		const cs = await this.streamTools.getOne( payload.streamid );
+		const cs = await streamGetOne( payload.streamid, this.db, this.tools );
 		if ( ce.type === EnvironmentType.HP || ce.type === EnvironmentType.PBCS ) {
 			throw new Error( 'Planning Databases do not have descriptive field definitions' );
 		} else {
@@ -141,7 +140,7 @@ export class EnvironmentTools {
 
 	public listDescriptions = async ( payload: { id: number, stream: number, field: string } ) => {
 		const ce = await this.getDetails( payload.id, true );
-		const cs = await this.streamTools.getOne( payload.stream );
+		const cs = await streamGetOne( payload.stream, this.db, this.tools );
 		if ( ce.type === EnvironmentType.HP || ce.type === EnvironmentType.PBCS ) {
 			ce.smartview.application = cs.dbName;
 			ce.smartview.cube = cs.tableName;
@@ -149,12 +148,19 @@ export class EnvironmentTools {
 		}
 		return await this.sourceTools[ce.type].listDescriptions( ce, cs, cs.fieldList.find( f => f.name === payload.field ) );
 	}
-	// public listDescriptions = async ( stream: Stream, field: StreamField ) => {
-	// 	const payload = await this.getDetails( stream.environment, true );
-	// 	payload.database = stream.dbName;
-	// 	payload.table = stream.tableName;
-	// 	return await this.sourceTools[payload.type].getDescriptionsWithHierarchy( payload, field );
-	// }
+	public readData = async ( id: number, database: string, table: string, readDataDefiniton: any, stream: Stream ) => {
+		const payload = await this.getDetails( id, true );
+		if ( payload.type === EnvironmentType.HP || payload.type === EnvironmentType.PBCS ) {
+			payload.smartview.application = database;
+			payload.smartview.cube = table;
+			payload.smartview.readDataDefiniton = readDataDefiniton;
+		} else if ( payload.type === EnvironmentType.MSSQL ) {
+			throw new Error( 'Unimplemented environment type @ readData @ tools.environments.ts' );
+		} else {
+			throw new Error( 'Unimplemented environment type @ readData @ tools.environments.ts' );
+		}
+		return this.sourceTools[payload.type].readData( payload, stream );
+	}
 }
 
 
@@ -215,12 +221,5 @@ export class EnvironmentTools {
 // 		payload.sparseDims = refObj.sparseDims;
 // 		payload.denseDim = refObj.denseDim;
 // 		return await this.sourceTools[payload.type].writeData( payload );
-// 	}
-// 	public readData = async ( id: number, database: string, table: string, query: any ) => {
-// 		const payload = await this.getEnvironmentDetails( id, true );
-// 		payload.database = database;
-// 		payload.table = table;
-// 		payload.query = query;
-// 		return await this.sourceTools[payload.type].readData( payload );
 // 	}
 // }

@@ -32,6 +32,7 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 	public feature = FEATURE;
 	public LoadStates = LoadState;
 	private saving = false;
+	public pageSelections: { [key: string]: string } = {};
 	public stream$ = this.store.select( 'streams' ).pipe(
 		filter( s => s.loaded ),
 		combineLatest( this.store.select( 'shared' ) ),
@@ -131,7 +132,7 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 	}
 
 	public execute = async ( item: Stream, sx: StreamExport ) => {
-		this.store.dispatch( new RunExport( { id: item.id, exportid: sx.id } ) );
+		this.store.dispatch( new RunExport( { id: item.id, exportid: sx.id, selections: this.pageSelections } ) );
 	}
 
 	public refreshMembers = async ( stream: Stream, field: StreamField ) => {
@@ -191,5 +192,13 @@ export class StreamExportDetailHpdbComponent implements OnInit, OnDestroy {
 
 	public add = ( a: number, b: number ) => a + b;
 	public multiply = ( a: number, b: number ) => a * b;
+
+	public findMembers = ( selections: { function: string, selection: string }[], listParent: { list: { RefField: string, Parent: string, Description: string }[] } ): FieldDescriptionItem[] => {
+		if ( !listParent ) return null;
+		if ( !listParent.list ) return null;
+		if ( !selections ) return null;
+		if ( !Array.isArray( selections ) ) return null;
+		return selections.map( selection => this.hpUtilities.findMembers( listParent.list, selection.function, selection.selection ) ).reduce( ( pv, cv ) => ( [...pv, ...cv] ) );
+	}
 
 }

@@ -16,5 +16,5 @@ export class StreamsBackend {
 	public clone = ( payload: CloneTarget ) => this.http.put<Stream>( this.baseUrl, payload );
 	public update = ( payload: Stream ) => this.http.patch<Stream>( this.baseUrl, payload );
 	public delete = ( payload: number ) => this.http.delete( this.baseUrl + '/' + payload );
-	public runExport = ( payload: { id: number, exportid: string } ) => this.http.get( `${ this.baseUrl }/export/${ payload.id }/${ payload.exportid }` );
+	public runExport = ( payload: { id: number, exportid: string, selections: any } ) => this.http.post( `${ this.baseUrl }/export/${ payload.id }/${ payload.exportid }`, payload.selections );
 }

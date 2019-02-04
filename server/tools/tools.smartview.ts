@@ -15,12 +15,24 @@ import { StreamField, Stream } from 'shared/models/streams.models';
 export class SmartViewTool {
 	constructor( private db: DB, private tools: MainTools ) { }
 
-	// public readData = async ( payload: EnvironmentDetail ) => this.smartviewReadData( payload );
-	// private smartviewReadData = async ( payload: EnvironmentDetail ) => this.smartviewReadDataMDX( payload );
-	// private smartviewReadDataMDX = async ( payload: EnvironmentDetail ) => {
-	// 	// const body = await this.smartviewGetXMLTemplate( 'req_ExecuteQuery.xml', { SID: payload.SID } );
-	// 	throw new Error( 'Smart view read data MDX is not implemented yet' );
-	// }
+	public readData = async ( payload: EnvironmentDetail, stream: Stream ) => this.smartviewReadData( payload, stream );
+	private smartviewReadData = async ( payload: EnvironmentDetail, stream: Stream ) => this.smartviewReadDataMDX( payload );
+	private smartviewReadDataMDX = async ( payload: EnvironmentDetail ) => {
+		await this.smartviewOpenCube( payload );
+		const body = await this.smartviewGetXMLTemplate( 'req_ExecuteQuery.xml', {
+			SID: payload.smartview.SID, query: `SELECT {[YearTotal].Children} ON COLUMNS, {[4001]} ON ROWS FROM ${ payload.smartview.application }.${ payload.smartview.cube };`
+		} );
+		console.log( '===========================================' );
+		console.log( '===========================================' );
+		console.log( payload );
+		console.log( '===========================================' );
+		console.log( body );
+		console.log( '===========================================' );
+		const { body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		console.log( rBody );
+		console.log( '===========================================' );
+		throw new Error( 'Smart view read data MDX is not implemented yet' );
+	}
 	private smartviewGetXMLTemplate = async ( name: string, params: any ) => {
 		const bodyXML = await Promisers.readFile( join( __dirname, './tools.smartview.templates/' + name ) );
 		const bodyTemplate = hbCompile( bodyXML );
@@ -720,7 +732,12 @@ export class SmartViewTool {
 			descriptiveTable: field.description.table,
 			name: field.name
 		} );
-		const { $ } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		const { $, body: rBody } = await this.smartviewPoster( { url: payload.smartview.planningurl, body, jar: payload.smartview.jar } );
+		console.log( '===========================================' );
+		console.log( '===========================================' );
+		console.log( rBody );
+		console.log( '===========================================' );
+		console.log( '===========================================' );
 
 		const hasFailed = $( 'body' ).children().toArray().filter( e => e.name === 'res_executegrid' ).length === 0;
 

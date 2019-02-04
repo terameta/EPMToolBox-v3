@@ -1,5 +1,6 @@
 import { ConnectionPool } from 'mssql';
 import { CookieJar } from 'request';
+import { StreamExportHPDB } from './streams.models';
 
 // import { JSONDeepCopy } from '../../shared/utilities/utility.functions';
 
@@ -49,7 +50,8 @@ export interface EnvironmentSmartView {
 	ruleList: any[],
 	procedure: { name: string, type: string, hasRTP: string, variables: any[] },
 	jar: CookieJar,
-	form: any
+	form: any,
+	readDataDefiniton: StreamExportHPDB
 }
 
 export interface DatabaseListItem { name: string, tables: TableListItem[] }
